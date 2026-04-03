@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlexiSender</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link rel="stylesheet" href="/style.css">
+<!-- CSS extracted to style.css — build.ts inlines it for distribution -->
+</head>
+<body class="conn-websocket">
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <!-- ROW 1: Logo + Connection + Machine controls -->
+  <div class="toolbar-row" id="toolbar-row1">
+    <div class="logo">Flexi<span>Sender</span></div>
+    <div class="ws-section" id="connSection">
+      <div class="status-dot" id="statusDot"></div>
+      <!-- WebSocket mode -->
+      <input class="ws-input" id="wsUrl" type="text" value="ws://192.168.5.1:80" placeholder="ws://host:port" />
+      <!-- Serial mode -->
+      <span class="serial-port-label" id="serialPortLabel">No port selected</span>
+      <button class="tb-btn primary" id="connectBtn">CONNECT</button>
+      <span class="status-text" id="statusText">DISCONNECTED</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="sd-btn-wrap" id="sdBtnWrap">
+      <button class="tb-btn sd-card-btn" id="sdCardBtn">💾 SD CARD</button>
+    </div>
+    <button class="tb-btn upload-open-btn" id="tbBtn-uploadOpen" title="Load file into sender AND upload to SD card">📤 UPLOAD &amp; OPEN</button>
+    <input type="file" id="uploadFileInput" accept=".nc,.gcode,.g,.ngc,.tap" />
+    <div class="tb-sep" id="tbSep-row1-machine"></div>
+    <button class="tb-btn danger" id="tbBtn-reset">⚡ RESET</button>
+    <button class="tb-btn"        id="tbBtn-unlock">🔓 UNLOCK</button>
+  </div>
+  <!-- ROW 2: File open + Run controls + HOME on right -->
+  <div class="toolbar-row" id="toolbar-row2">
+    <button class="tb-btn" id="tbBtn-open">📂 OPEN</button>
+    <input type="file" id="fileInput" accept=".nc,.gcode,.g,.ngc,.tap" />
+    <div class="tb-sep" id="tbSep-row2-run"></div>
+    <button class="tb-btn success" id="btnStart" disabled>▶ RUN</button>
+    <button class="tb-btn"         id="btnPause" disabled>⏸ HOLD</button>
+    <button class="tb-btn danger"  id="btnStop"  disabled>■ STOP</button>
+    <div style="flex:1"></div>
+    <div class="tb-sep" id="tbSep-row2-home"></div>
+    <button class="tb-btn home-btn not-homed" id="tbBtn-home">⌂ HOME</button>
+  </div>
+</div>
+
+<!-- SERIAL NOT SUPPORTED WARNING -->
+<div class="serial-unsupported-bar">⚠ Web Serial API not supported in this browser — use Chrome or Edge for USB/Serial connections</div>
+
+<!-- SD CARD DROPDOWN PANEL -->
+<div class="sd-panel" id="sdPanel">
+  <div class="sd-panel-header">
+    <span class="sd-panel-title">💾 SD CARD FILES</span>
+    <button class="sd-refresh-btn" id="sdRefreshBtn" title="Fetch file list from controller">⟳ REFRESH</button>
+    <button class="sd-close-btn" id="sdCloseBtn">✕</button>
+  </div>
+  <div class="sd-panel-body">
+    <div class="sd-select-wrap">
+      <select class="sd-select" id="sdFileSelect" size="6">
+        <option value="" disabled selected style="color:var(--text3)">— click Refresh to load files —</option>
+      </select>
+    </div>
+    <div class="sd-panel-actions">
+      <span class="sd-file-info" id="sdFileInfo"></span>
+      <button class="tb-btn success sd-run-btn" id="sdRunBtn" disabled>▶ RUN FROM SD</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-run" data-tab="run">RUN</button>
+  <button class="tab-btn" id="tab-settings" data-tab="settings">SETTINGS: GRBL</button>
+  <button class="tab-btn" id="tab-camera" data-tab="camera">CAMERA</button>
+  <button class="tab-btn" id="tab-tooltable" data-tab="tooltable">TOOL TABLE</button>
+  <button class="tab-btn" id="tab-modules" data-tab="modules">MODULES</button>
+  <button class="tab-btn" id="tab-options" data-tab="options">⚙ OPTIONS</button>
+  <button class="mod-lock-btn" id="modLockBtn" title="Lock / unlock module positions">
+    <span id="modLockIcon">🔓</span>
+    <span id="modLockLabel">UNLOCKED</span>
+  </button>
+</div>
+
+<!-- TAB: RUN -->
+<div class="tab-panel active" id="tabpanel-run" style="flex-direction:column;overflow:hidden;">
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ═══ MODULE: CONSOLE ═══ -->
+  <div class="module-card mod-hidden" id="mod-console" data-mod-size="normal" style="top:10px;left:886px">
+    <div class="module-drag-handle"
+        
+        >
+      <span class="module-drag-dots">⠿⠿</span>
+      <span class="module-drag-title">Console</span>
+      <div style="display:flex;gap:5px;align-items:center">
+        <button class="tb-btn" style="font-size:10px;padding:2px 8px" id="btnConClear">CLEAR</button>
+        <button class="tb-btn" id="btnKeyboard" style="font-size:16px;padding:2px 10px;line-height:1" title="Touch keyboard">⌨</button>
+      </div>
+      <button class="module-drag-close">✕</button>
+    </div>
+    <div class="module-body">
+      <div class="right-console-wrap" style="border:none;border-radius:0">
+        <div class="console-out" id="consoleOut"></div>
+        <div class="console-input-row" style="position:relative">
+          <div class="con-autocomplete" id="conAutocomplete"></div>
+          <span class="con-prompt">›</span>
+          <input class="con-input" id="conInput" placeholder="Send G-code command..." autocomplete="off" />
+          <button class="con-send" id="btnConSend">SEND</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODULE: PROGRAM LIMITS ═══ -->
+  <div class="module-card mod-hidden" id="mod-limits" data-mod-size="normal" style="top:10px;left:302px">
+    <div class="module-drag-handle"
+        
+        >
+      <span class="module-drag-dots">⠿⠿</span>
+      <span class="module-drag-title">Program Limits</span>
+      <button class="module-drag-close">✕</button>
+    </div>
+    <div class="module-body">
+      <div id="limitsEmpty" class="limits-empty">No program loaded</div>
+      <div id="limitsContent" style="display:none">
+        <table class="limits-table">
+          <thead>
+            <tr>
+              <td></td>
+              <th class="limits-col-hdr">MIN</th>
+              <th class="limits-col-hdr">MAX</th>
+              <th class="limits-col-hdr">SPAN</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="limits-row" id="limitsRowX">
+              <td class="limits-axis-label">X</td>
+              <td class="limits-val min" id="limXMin">—</td>
+              <td class="limits-val max" id="limXMax">—</td>
+              <td class="limits-val span" id="limXSpan">—</td>
+            </tr>
+            <tr class="limits-row" id="limitsRowY">
+              <td class="limits-axis-label">Y</td>
+              <td class="limits-val min" id="limYMin">—</td>
+              <td class="limits-val max" id="limYMax">—</td>
+              <td class="limits-val span" id="limYSpan">—</td>
+            </tr>
+            <tr class="limits-row" id="limitsRowZ">
+              <td class="limits-axis-label">Z</td>
+              <td class="limits-val min" id="limZMin">—</td>
+              <td class="limits-val max" id="limZMax">—</td>
+              <td class="limits-val span" id="limZSpan">—</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="limits-divider"></div>
+        <div class="limits-safe-row">
+          <span class="limits-safe-label">Safe Z</span>
+          <input type="number" class="limits-safe-input" id="limitsSafeZ" value="5" step="1" title="Z height to lift to before framing (absolute WCS)" />
+          <span style="font-family:var(--cond);font-size:9px;color:var(--text3);letter-spacing:1px">MM</span>
+        </div>
+        <button class="limits-frame-btn" id="limitsFrameBtn" disabled>⬛ FRAME PROGRAM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: 3D VIEWPORT (fills entire main) -->
+  <div class="center-panel" style="flex:1">
+    <div class="viewport-header">
+      <span class="file-name" id="fileName">No file loaded</span>
+      <button class="view-btn active" data-view="iso">ISO</button>
+      <button class="view-btn" data-view="top">TOP</button>
+      <button class="view-btn" data-view="front">FRONT</button>
+      <button class="view-btn" data-view="side">SIDE</button>
+      <button class="view-btn" id="btnFitView">FIT</button>
+      <button class="view-btn" id="btnToolhead">TOOL ●</button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+      <span class="progress-text" id="progressText">0 / 0 lines</span>
+    </div>
+
+    <div class="viewport-wrap">
+      <canvas id="threeCanvas"></canvas>
+      <div class="viewport-stats" id="vpStats">
+        X: 0.000&nbsp;&nbsp;Y: 0.000&nbsp;&nbsp;Z: 0.000<br>
+        MOVES: 0&nbsp;&nbsp;RAPIDS: 0
+      </div>
+      <button class="vp-copy-btn" id="vpCopyBtn" title="Copy debug stats to clipboard">📋</button>
+    </div>
+
+    <div class="viewport-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#00d4ff"></div>Cut</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ff4444"></div>Rapid</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#00ff88"></div>Current</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffd740"></div>Tool</div>
+      <div class="legend-item" style="margin-left:auto;color:var(--text3);font-family:var(--mono);font-size:10px">Drag:Orbit · Scroll:Zoom · RClick:Pan</div>
+    </div>
+
+  </div><!-- /center-panel -->
+
+  <!-- TOUCH KEYBOARD — direct child of .main so position:absolute uses .main as context -->
+  <div class="touch-kbd-overlay" id="touchKbdOverlay">
+
+      <!-- LEFT: input bar + QWERTY -->
+      <div class="kbd-main">
+        <div class="kbd-input-row">
+          <div class="kbd-input-display" id="kbdInputDisplay">›</div>
+          <button class="kbd-key send-key" style="flex:none;width:64px" data-kbd="send">SEND</button>
+          <button class="kbd-key close-key" style="flex:none;width:40px" data-kbd="close">✕</button>
+        </div>
+        <!-- Number / symbol row -->
+        <div class="kbd-row">
+          <button class="kbd-key" data-key="1">1</button>
+          <button class="kbd-key" data-key="2">2</button>
+          <button class="kbd-key" data-key="3">3</button>
+          <button class="kbd-key" data-key="4">4</button>
+          <button class="kbd-key" data-key="5">5</button>
+          <button class="kbd-key" data-key="6">6</button>
+          <button class="kbd-key" data-key="7">7</button>
+          <button class="kbd-key" data-key="8">8</button>
+          <button class="kbd-key" data-key="9">9</button>
+          <button class="kbd-key" data-key="0">0</button>
+          <button class="kbd-key" data-key="-">-</button>
+          <button class="kbd-key" data-key=".">.</button>
+          <button class="kbd-key" data-key="#">#</button>
+          <button class="kbd-key" data-key="$">$</button>
+        </div>
+        <!-- QWERTY row -->
+        <div class="kbd-row">
+          <button class="kbd-key" data-key="Q">Q</button>
+          <button class="kbd-key" data-key="W">W</button>
+          <button class="kbd-key" data-key="E">E</button>
+          <button class="kbd-key" data-key="R">R</button>
+          <button class="kbd-key" data-key="T">T</button>
+          <button class="kbd-key" data-key="Y">Y</button>
+          <button class="kbd-key" data-key="U">U</button>
+          <button class="kbd-key" data-key="I">I</button>
+          <button class="kbd-key" data-key="O">O</button>
+          <button class="kbd-key" data-key="P">P</button>
+          <button class="kbd-key action" style="flex:1.6" data-kbd="backspace">⌫ DEL</button>
+        </div>
+        <!-- ASDF row -->
+        <div class="kbd-row">
+          <button class="kbd-key" data-key="A">A</button>
+          <button class="kbd-key" data-key="S">S</button>
+          <button class="kbd-key" data-key="D">D</button>
+          <button class="kbd-key" data-key="F">F</button>
+          <button class="kbd-key" data-key="G">G</button>
+          <button class="kbd-key" data-key="H">H</button>
+          <button class="kbd-key" data-key="J">J</button>
+          <button class="kbd-key" data-key="K">K</button>
+          <button class="kbd-key" data-key="L">L</button>
+          <button class="kbd-key" data-key=";">;</button>
+          <button class="kbd-key send-key" style="flex:1.6" data-kbd="send">↵ SEND</button>
+        </div>
+        <!-- ZXCV row -->
+        <div class="kbd-row">
+          <button class="kbd-key" data-key="Z">Z</button>
+          <button class="kbd-key" data-key="X">X</button>
+          <button class="kbd-key" data-key="C">C</button>
+          <button class="kbd-key" data-key="V">V</button>
+          <button class="kbd-key" data-key="B">B</button>
+          <button class="kbd-key" data-key="N">N</button>
+          <button class="kbd-key" data-key="M">M</button>
+          <button class="kbd-key" data-key=" ">SPC</button>
+          <button class="kbd-key" data-key="/">/</button>
+          <button class="kbd-key" data-key="=">=</button>
+          <button class="kbd-key" data-key="*">*</button>
+        </div>
+      </div><!-- /kbd-main -->
+
+      <!-- RIGHT: numpad -->
+      <div class="kbd-numpad">
+        <button class="kbd-key action" style="font-size:10px" data-kbd="clear">CLR</button>
+        <button class="kbd-key" data-key="(">(</button>
+        <button class="kbd-key" data-key=")">)</button>
+
+        <button class="kbd-key" data-key="7">7</button>
+        <button class="kbd-key" data-key="8">8</button>
+        <button class="kbd-key" data-key="9">9</button>
+
+        <button class="kbd-key" data-key="4">4</button>
+        <button class="kbd-key" data-key="5">5</button>
+        <button class="kbd-key" data-key="6">6</button>
+
+        <button class="kbd-key" data-key="1">1</button>
+        <button class="kbd-key" data-key="2">2</button>
+        <button class="kbd-key" data-key="3">3</button>
+
+        <button class="kbd-key np-wide" data-key="0">0</button>
+        <button class="kbd-key" data-key=".">.</button>
+      </div><!-- /kbd-numpad -->
+
+  </div><!-- /touch-kbd-overlay -->
+
+  <!-- ═══ MODULE: TOOL TABLE ═══ -->
+  <div class="module-card mod-hidden" id="mod-tooltable" data-mod-size="normal" style="top:10px;left:302px">
+    <div class="module-drag-handle"
+        
+        >
+      <span class="module-drag-dots">⠿⠿</span>
+      <span class="module-drag-title">Tool Table</span>
+      <div style="display:flex;gap:5px;align-items:center">
+        <span id="modTTCount" style="font-family:var(--mono);font-size:10px;color:var(--text3)"></span>
+        <button class="tb-btn" style="font-size:10px;padding:2px 8px" id="modTTRefresh">↻</button>
+      </div>
+      <button class="module-drag-close">✕</button>
+    </div>
+    <div class="module-body" style="padding:0">
+      <div id="modTTStatus" style="padding:6px 12px;font-family:var(--mono);font-size:11px;color:var(--accent);display:none;"></div>
+      <div style="overflow-x:auto;overflow-y:auto;flex:1">
+        <table id="modTTTable" class="mod-tt-table" style="width:100%;border-collapse:collapse;display:none;">
+          <thead>
+            <tr style="background:var(--surface2);">
+              <th class="tt-th mod-tt-pocket-col">PKT</th>
+              <th class="tt-th">TOOL</th>
+              <th class="tt-th mod-tt-name-col">NAME</th>
+              <th class="tt-th mod-tt-off-col">X</th>
+              <th class="tt-th mod-tt-off-col">Y</th>
+              <th class="tt-th">Z</th>
+              <th class="tt-th mod-tt-dia-col">DIA</th>
+              <th class="tt-th mod-tt-status-col">STATUS</th>
+            </tr>
+          </thead>
+          <tbody id="modTTBody"></tbody>
+        </table>
+        <div id="modTTEmpty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:120px;color:var(--text3);gap:10px;">
+          <div style="font-size:24px;opacity:0.2">⚙</div>
+          <div style="font-family:var(--cond);font-size:11px;letter-spacing:2px;text-transform:uppercase;text-align:center">Connect and click ↻ to load</div>
+        </div>
+      </div>
+      <!-- Legend -->
+      <div style="display:flex;gap:10px;padding:6px 10px;background:var(--surface2);border-top:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--cond);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">
+          <div style="width:10px;height:10px;border-radius:2px;background:rgba(255,140,66,0.18);border:1px solid var(--accent2)"></div>CAROUSEL
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--cond);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">
+          <div style="width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,0.18);border:1px solid var(--green2)"></div>ACTIVE
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODULE: MR BEAR DO NOT TOUCH ═══ -->
+  <div class="module-card mod-hidden" id="mod-bear" data-mod-size="normal" style="top:10px;left:594px">
+    <div class="module-drag-handle"
+        
+        >
+      <span class="module-drag-dots">⠿⠿</span>
+      <span class="module-drag-title">🐻 MR BEAR</span>
+      <div style="display:flex;gap:5px;align-items:center">
+        <span class="bear-status-badge" id="bearStatusBadge">🐻 OFF</span>
+        <button class="tb-btn" style="font-size:10px;padding:2px 8px">↻</button>
+      </div>
+      <button class="module-drag-close">✕</button>
+    </div>
+    <div class="module-body" id="bearModBody" style="padding:0">
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /tab-panel-run -->
+
+<!-- TAB: MODULES -->
+<div class="tab-panel" id="tabpanel-modules" style="flex-direction:column;overflow:hidden;background:var(--bg);">
+  <div class="modules-page">
+    <div class="modules-page-header">
+      <div class="modules-page-title">Modules</div>
+      <div class="modules-page-hint">Toggle modules on or off, then pick a size. Enabled modules appear as floating panels on the RUN page — drag their title bar to reposition them.</div>
+    </div>
+    <div class="modules-config-grid">
+
+      <div class="mod-toggle-card" id="modcfg-position">
+        <div class="mod-toggle-icon">📍</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Machine Position</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">DRO axis readouts, WCS selector, machine state and feed/spindle status</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+            <button class="mod-size-btn">XL</button>
+            <button class="mod-size-btn">XXL</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-jogging">
+        <div class="mod-toggle-icon">🕹</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Jogging</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">XY/Z jog buttons, step size selectors, and jog feed rate control</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+            <button class="mod-size-btn">XL</button>
+            <button class="mod-size-btn">XXL</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-overrides">
+        <div class="mod-toggle-icon">⚡</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Overrides</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">Real-time feed rate, rapid, and spindle speed override sliders</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+            <button class="mod-size-btn">XL</button>
+            <button class="mod-size-btn">XXL</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-spindle">
+        <div class="mod-toggle-icon">🔄</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Spindle / Coolant</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">Spindle direction (CW/CCW/OFF), RPM input, and flood/mist coolant toggles</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+            <button class="mod-size-btn">XL</button>
+            <button class="mod-size-btn">XXL</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-macros">
+        <div class="mod-toggle-icon">🔧</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Macros</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">Quick-access buttons for common G-code commands and machine routines</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+            <button class="mod-size-btn">XL</button>
+            <button class="mod-size-btn">XXL</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-console">
+        <div class="mod-toggle-icon">💻</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Console</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">Live command log with manual G-code entry and touch keyboard support</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+            <button class="mod-size-btn">XL</button>
+            <button class="mod-size-btn">XXL</button>
+          </div>
+          <div class="mod-extra-row">
+            <span class="mod-extra-label">Output lines:</span>
+            <button class="mod-lines-btn active">50</button>
+            <button class="mod-lines-btn">100</button>
+            <button class="mod-lines-btn">200</button>
+            <button class="mod-lines-btn">500</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-tooltable">
+        <div class="mod-toggle-icon">🔩</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Tool Table</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">Live tool library with offsets, pocket assignments and active tool indicator</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+            <button class="mod-size-btn">XL</button>
+            <button class="mod-size-btn">XXL</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-limits">
+        <div class="mod-toggle-icon">📐</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Program Limits</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">Shows the minimum, maximum and span of X, Y and Z movements in the loaded program. Includes a Frame button to trace the XY extents on the machine.</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-signals">
+        <div class="mod-toggle-icon">🔴</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Signals</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">Live indicator lights for X, Y and Z limit switches, probe, toolsetter, door and E-Stop inputs. Reads the Pn: field from the GRBL status report.</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-bear" style="display:none">
+        <div class="mod-toggle-icon">🐻</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">MR BEAR DO NOT TOUCH</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">Zone management for the MR BEAR plugin. Shows exclusion zones in a table and visualizes them as red boxes on the 3D viewport.</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
+            <button class="mod-size-btn">XL</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /tab-panel-modules -->
+
+<!-- TAB: SETTINGS -->
+<div class="tab-panel" id="tabpanel-settings" style="flex-direction:column;overflow:hidden;">
+  <div class="settings-toolbar">
+    <button class="tb-btn primary" id="btnLoadSettings">↓ READ FROM CONTROLLER</button>
+    <button class="tb-btn success" id="btnWriteAll" disabled>↑ WRITE ALL CHANGES</button>
+    <input class="settings-search" id="settingsSearch" placeholder="Search settings…" />
+    <span class="settings-status" id="settingsStatus">Not loaded — connect and click READ FROM CONTROLLER</span>
+  </div>
+  <div class="settings-outer">
+    <div class="settings-groups" id="settingsGroups">
+      <div class="settings-placeholder" style="height:200px">
+        <div class="settings-placeholder-icon">⚙</div>
+        <div>No groups</div>
+      </div>
+    </div>
+    <div class="settings-content" id="settingsContent">
+      <div class="settings-placeholder">
+        <div class="settings-placeholder-icon">⚙</div>
+        <div>Connect and read settings</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)">Uses $ES enumerate + $$ values</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-panel-settings -->
+
+<!-- TAB: CAMERA -->
+<div class="tab-panel" id="tabpanel-camera" style="flex-direction:column;overflow:hidden;">
+  <div class="camera-outer">
+
+    <!-- SIDEBAR -->
+    <div class="camera-sidebar">
+
+      <div>
+        <div class="cam-label">Camera Source</div>
+        <select class="cam-select" id="camSelect">
+          <option value="">— select camera —</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:5px">
+        <button class="cam-btn primary" id="camStartBtn" style="flex:1">▶ START</button>
+        <button class="cam-btn danger"  id="camStopBtn"   style="flex:1" disabled>■ STOP</button>
+      </div>
+
+      <div class="cam-divider"></div>
+
+      <div>
+        <div class="cam-label">Zoom</div>
+        <div class="cam-slider-row">
+          <input type="range" class="cam-slider" min="1" max="8" step="0.1" value="1" id="camZoom"
+           >
+          <span class="cam-slider-val" id="camZoomDisp">1.0x</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="cam-label">Crosshair Style</div>
+        <div class="cam-crosshair-style">
+          <button class="ccs-btn active" data-style="cross"      >+</button>
+          <button class="ccs-btn"        data-style="circle"    >○</button>
+          <button class="ccs-btn"        data-style="both"        >⊕</button>
+          <button class="ccs-btn"        data-style="dot"          >·</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="cam-label">Crosshair Size</div>
+        <div class="cam-slider-row">
+          <input type="range" class="cam-slider" min="20" max="300" value="80" id="camCrossSize"
+           >
+          <span class="cam-slider-val" id="camCrossSizeDisp" style="width:28px">80</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="cam-label">Crosshair Color</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="ccs-btn active" data-color="#00d4ff" style="background:#00d4ff22;border-color:#00d4ff;color:#00d4ff">CYN</button>
+          <button class="ccs-btn"        data-color="#00e676" style="color:#00e676">GRN</button>
+          <button class="ccs-btn"        data-color="#ff3d3d" style="color:#ff3d3d">RED</button>
+          <button class="ccs-btn"        data-color="#ffffff" style="color:#fff">WHT</button>
+        </div>
+      </div>
+
+      <div class="cam-divider"></div>
+
+      <div>
+        <div class="cam-label">Camera Offset (from spindle)</div>
+        <div class="cam-offset-grid">
+          <div class="cam-offset-box">
+            <div class="cam-offset-label">X mm</div>
+            <input class="cam-offset-input" id="camOffX" type="number" step="0.001" value="0.000"
+             >
+          </div>
+          <div class="cam-offset-box">
+            <div class="cam-offset-label">Y mm</div>
+            <input class="cam-offset-input" id="camOffY" type="number" step="0.001" value="0.000"
+             >
+          </div>
+        </div>
+        <div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--text3)">
+          Shift+drag crosshair to measure offset
+        </div>
+      </div>
+
+      <button class="cam-btn" id="camMeasureBtn">📏 MEASURE OFFSET</button>
+
+      <div class="cam-divider"></div>
+
+      <div class="cam-pos-display" id="camPosDisplay">
+        <div class="cam-pos-row"><span class="cam-pos-lbl">Spindle</span><span class="cam-pos-val" id="camSpindlePos">X:0.000 Y:0.000</span></div>
+        <div class="cam-pos-row"><span class="cam-pos-lbl">Camera</span><span class="cam-pos-val" id="camCameraPos">X:0.000 Y:0.000</span></div>
+      </div>
+
+      <button class="cam-btn primary" id="camGoCameraBtn" disabled>→ MOVE TO CAMERA POS</button>
+      <button class="cam-btn"         id="camGoSpindleBtn" disabled>← MOVE TO SPINDLE POS</button>
+      <button class="cam-btn success"  id="camZeroHereBtn" disabled>⊕ ZERO WCS HERE</button>
+    </div>
+
+    <!-- LIVE VIEW -->
+    <div class="camera-main" id="camMain">
+      <div class="camera-off-msg" id="camOffMsg">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+        </svg>
+        Select a camera and click START
+      </div>
+      <div class="camera-video-wrap" id="camWrap" style="display:none;position:relative">
+        <video id="camVideo" autoplay playsinline muted></video>
+        <canvas id="camCanvas"></canvas>
+        <div class="cam-drag-layer" id="camDragLayer">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /tab-panel-camera -->
+
+<!-- TAB: OPTIONS -->
+<div class="tab-panel" id="tabpanel-options" style="flex-direction:column;overflow:hidden;background:var(--bg);">
+  <div class="options-page">
+    <div class="options-page-header">
+      <div class="options-page-title">Options</div>
+      <div class="options-page-hint">Configure appearance and behaviour settings. Changes are saved to local storage and applied immediately.</div>
+    </div>
+
+    <div class="options-grid">
+
+      <!-- ── CONNECTION TYPE ── -->
+      <div class="options-card">
+        <div class="options-card-icon">🔌</div>
+        <div class="options-card-body">
+          <div class="options-card-title">Connection Type</div>
+          <div class="options-card-desc">Choose how FlexiSender connects to your controller. WebSocket connects over your network (WiFi/Ethernet). USB/Serial connects directly via a USB cable using the Web Serial API (Chrome &amp; Edge only).</div>
+          <div style="display:flex;gap:8px;margin-top:12px;" id="connTypeBtns">
+            <button class="opt-conn-btn active" id="connBtnWs"    >🌐 WebSocket</button>
+            <button class="opt-conn-btn"        id="connBtnSerial">🔌 USB / Serial</button>
+          </div>
+          <!-- WebSocket sub-options -->
+          <div id="optWsSection" style="margin-top:12px;">
+            <div class="opt-field-label">WebSocket URL</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-top:2px;">Edit directly in the toolbar. Format: <span style="color:var(--accent)">ws://host:port</span></div>
+          </div>
+          <!-- Serial sub-options -->
+          <div id="optSerialSection" style="margin-top:12px;display:none;">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:140px;">
+                <div class="opt-field-label">Baud Rate</div>
+                <select class="opt-input" id="optBaudRate" style="cursor:pointer;">
+                  <option value="9600">9600</option>
+                  <option value="19200">19200</option>
+                  <option value="38400">38400</option>
+                  <option value="57600">57600</option>
+                  <option value="115200" selected>115200</option>
+                  <option value="230400">230400</option>
+                  <option value="250000">250000</option>
+                  <option value="500000">500000</option>
+                  <option value="1000000">1000000</option>
+                  <option value="2000000">2000000</option>
+                </select>
+              </div>
+              <div style="flex:1;min-width:140px;">
+                <div class="opt-field-label">Data Bits</div>
+                <select class="opt-input" id="optDataBits" style="cursor:pointer;">
+                  <option value="7">7</option>
+                  <option value="8" selected>8</option>
+                </select>
+              </div>
+              <div style="flex:1;min-width:140px;">
+                <div class="opt-field-label">Stop Bits</div>
+                <select class="opt-input" id="optStopBits" style="cursor:pointer;">
+                  <option value="1" selected>1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
+              <div style="flex:1;min-width:140px;">
+                <div class="opt-field-label">Parity</div>
+                <select class="opt-input" id="optParity" style="cursor:pointer;">
+                  <option value="none" selected>None</option>
+                  <option value="even">Even</option>
+                  <option value="odd">Odd</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:10px;font-family:var(--sans);font-size:11px;color:var(--text2);line-height:1.6;">
+              Click <strong style="color:var(--text)">CONNECT</strong> in the toolbar to open the browser's port picker and connect. The browser will remember your last port.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── AUTO-LOAD SETTINGS ── -->
+      <div class="options-card">
+        <div class="options-card-icon">⚡</div>
+        <div class="options-card-body">
+          <div class="options-card-title">Auto-load Settings on Connect</div>
+          <div class="options-card-desc">Automatically fetch GrblHAL settings when connecting. Enables console autocomplete for setting names.</div>
+          <div style="margin-top:10px;">
+            <label class="tb-opt-toggle" style="padding:8px 14px;">
+              <input type="checkbox" id="optAutoLoadSettings"> Enable
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 3D VIEWPORT EXTENTS ── -->
+      <div class="options-card">
+        <div class="options-card-icon">🗺️</div>
+        <div class="options-card-body">
+          <div class="options-card-title">3D Viewport Extents</div>
+          <div class="options-card-desc">Machine-coordinate workspace bounds. 0,0 is home (top-right); enter negative values for your working area. Updates the grid and camera position instantly.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+            <div>
+              <div class="opt-field-label" style="color:#ff6b6b">X Minimum (mm)</div>
+              <input class="opt-input" type="number" id="vpXMin" step="10" value="-300" />
+            </div>
+            <div>
+              <div class="opt-field-label" style="color:#ff6b6b">X Maximum (mm)</div>
+              <input class="opt-input" type="number" id="vpXMax" step="10" value="0" />
+            </div>
+            <div>
+              <div class="opt-field-label" style="color:#6bcb77">Y Minimum (mm)</div>
+              <input class="opt-input" type="number" id="vpYMin" step="10" value="-300" />
+            </div>
+            <div>
+              <div class="opt-field-label" style="color:#6bcb77">Y Maximum (mm)</div>
+              <input class="opt-input" type="number" id="vpYMax" step="10" value="0" />
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+            <span style="font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);">Projection</span>
+            <div style="display:flex;gap:0;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border2);">
+              <button class="bool-btn on" id="projBtnPersp" style="padding:7px 16px;">PERSPECTIVE</button>
+              <button class="bool-btn off" id="projBtnOrtho" style="padding:7px 16px;">ORTHOGRAPHIC</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── COLOUR THEME ── -->
+      <div class="options-card">
+        <div class="options-card-icon">🎨</div>
+        <div class="options-card-body">
+          <div class="options-card-title">Colour Theme</div>
+          <div class="options-card-desc">Customise the primary text colour and background colour. Click the swatch to open the colour picker, or type a hex value. Reset restores the defaults.</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;">
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Primary Text</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorText" class="opt-color-picker" value="#f1f5f9" />
+                <div class="opt-color-swatch" id="optSwatchText" style="background:#f1f5f9"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexText" value="#f1f5f9" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Secondary Text</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorText2" class="opt-color-picker" value="#94a3b8" />
+                <div class="opt-color-swatch" id="optSwatchText2" style="background:#94a3b8"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexText2" value="#94a3b8" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Background</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorBg" class="opt-color-picker" value="#0f0e0c" />
+                <div class="opt-color-swatch" id="optSwatchBg" style="background:#0f0e0c"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexBg" value="#0f0e0c" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Surface</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorSurface" class="opt-color-picker" value="#1a1814" />
+                <div class="opt-color-swatch" id="optSwatchSurface" style="background:#1a1814"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexSurface" value="#1a1814" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Accent</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorAccent" class="opt-color-picker" value="#ff8c42" />
+                <div class="opt-color-swatch" id="optSwatchAccent" style="background:#ff8c42"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexAccent" value="#ff8c42" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:4px;">
+              <button class="opt-action-btn" id="btnResetAllColors">↺ Reset All Colours</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TOOLBAR BUTTON VISIBILITY ── -->
+      <div class="options-card">
+        <div class="options-card-icon">🔧</div>
+        <div class="options-card-body">
+          <div class="options-card-title">Toolbar Button Visibility</div>
+          <div class="options-card-desc">Choose which buttons appear on each toolbar row. Changes apply immediately and are saved.</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;">
+            <div>
+              <div style="font-family:var(--cond);font-size:10px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Row 1 — Machine Controls</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <label class="tb-opt-toggle" data-btn="tbBtn-reset"><input type="checkbox"> ⚡ Reset</label>
+                <label class="tb-opt-toggle" data-btn="tbBtn-unlock"><input type="checkbox"> 🔓 Unlock</label>
+                <label class="tb-opt-toggle" data-btn="sdBtnWrap"><input type="checkbox"> 💾 SD Card</label>
+                <label class="tb-opt-toggle" data-btn="tbBtn-uploadOpen"><input type="checkbox"> 📤 Upload &amp; Open</label>
+              </div>
+            </div>
+            <div style="height:1px;background:var(--border);"></div>
+            <div>
+              <div style="font-family:var(--cond);font-size:10px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Row 2 — Run Controls</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <label class="tb-opt-toggle" data-btn="tbBtn-open"><input type="checkbox"> 📂 Open</label>
+                <label class="tb-opt-toggle" data-btn="btnStart"><input type="checkbox"> ▶ Run</label>
+                <label class="tb-opt-toggle" data-btn="btnPause"><input type="checkbox"> ⏸ Hold</label>
+                <label class="tb-opt-toggle" data-btn="btnStop"><input type="checkbox"> ■ Stop</label>
+                <label class="tb-opt-toggle" data-btn="tbBtn-home"><input type="checkbox"> ⌂ Home</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── JOG STEP SIZES ── -->
+
+      <!-- ── BEAR ZONE COLOURS ── -->
+      <div class="options-card">
+        <div class="options-card-icon">🐻</div>
+        <div class="options-card-body">
+          <div class="options-card-title">Bear Zone Colours</div>
+          <div class="options-card-desc">Colours for zone boxes in the 3D viewport based on what the zone blocks. Applied on next zone refresh.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+            <div class="opt-color-row">
+              <span class="opt-color-label">Blocks All</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optBearColorAll" class="opt-color-picker" value="#ff2222" />
+                <div class="opt-color-swatch" style="background:#ff2222"></div>
+              </div>
+            </div>
+            <div class="opt-color-row">
+              <span class="opt-color-label">Blocks G-code</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optBearColorGcode" class="opt-color-picker" value="#ff6600" />
+                <div class="opt-color-swatch" style="background:#ff6600"></div>
+              </div>
+            </div>
+            <div class="opt-color-row">
+              <span class="opt-color-label">Blocks Jog</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optBearColorJog" class="opt-color-picker" value="#ffcc00" />
+                <div class="opt-color-swatch" style="background:#ffcc00"></div>
+              </div>
+            </div>
+            <div class="opt-color-row">
+              <span class="opt-color-label">Blocks Tool Chg</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optBearColorTool" class="opt-color-picker" value="#cc44ff" />
+                <div class="opt-color-swatch" style="background:#cc44ff"></div>
+              </div>
+            </div>
+            <div class="opt-color-row">
+              <span class="opt-color-label">Allows All</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optBearColorSafe" class="opt-color-picker" value="#22cc66" />
+                <div class="opt-color-swatch" style="background:#22cc66"></div>
+              </div>
+            </div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+              <div class="opt-field-label">Icon Scale</div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+                <input type="range" class="feed-slider" min="0.02" max="0.3" step="0.005" value="0.0875" id="optBearScale" />
+                <span class="feed-val" id="optBearScaleVal" style="width:50px">0.088</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── JOG STEP SIZES ── -->
+      <div class="options-card">
+        <div class="options-card-icon">🕹</div>
+        <div class="options-card-body">
+          <div class="options-card-title">Jog Step Sizes</div>
+          <div class="options-card-desc">Configure the step size presets for XY and Z jog buttons. Comma-separated values in mm.</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
+            <div>
+              <div class="opt-field-label">XY Steps (mm)</div>
+              <input class="opt-input" type="text" id="optJogStepsXY" value="0.01, 0.1, 1, 10, 50" spellcheck="false" />
+            </div>
+            <div>
+              <div class="opt-field-label">Z Steps (mm)</div>
+              <input class="opt-input" type="text" id="optJogStepsZ" value="0.01, 0.1, 1, 5, 10" spellcheck="false" />
+            </div>
+            <button class="opt-action-btn" id="btnApplyJogSteps">↺ Apply &amp; Rebuild Buttons</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB ACCESS CONTROL ── -->
+      <div class="options-card">
+        <div class="options-card-icon">🔒</div>
+        <div class="options-card-body">
+          <div class="options-card-title">Tab Access Control</div>
+          <div class="options-card-desc">Lock tabs to prevent accidental access. Locked tabs are greyed out and cannot be clicked. Useful for protecting GRBL settings on a shared machine.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;" id="optTabLockList">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /tab-panel-options -->
+
+<!-- TAB: TOOL TABLE -->
+<div class="tab-panel" id="tabpanel-tooltable" style="flex-direction:column;overflow:hidden;background:var(--bg);">
+  <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;">
+    <span style="font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);">TOOL TABLE</span>
+    <span style="flex:1"></span>
+    <span id="ttToolCount" style="font-family:var(--mono);font-size:11px;color:var(--text3)"></span>
+    <button class="tb-btn" id="btnTTRefresh">↻ REFRESH</button>
+  </div>
+
+  <!-- Status / empty state -->
+  <div id="ttStatus" style="padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--accent);flex-shrink:0;display:none;"></div>
+
+  <!-- Table -->
+  <div style="flex:1;overflow-y:auto;padding:12px 16px;">
+    <table id="ttTable" style="width:100%;border-collapse:collapse;display:none;">
+      <thead>
+        <tr style="background:var(--surface2);">
+          <th class="tt-th">POCKET</th>
+          <th class="tt-th">TOOL</th>
+          <th class="tt-th">NAME</th>
+          <th class="tt-th">X OFF</th>
+          <th class="tt-th">Y OFF</th>
+          <th class="tt-th">Z OFF</th>
+          <th class="tt-th">DIA</th>
+          <th class="tt-th">STATUS</th>
+        </tr>
+      </thead>
+      <tbody id="ttTableBody"></tbody>
+    </table>
+
+    <div id="ttEmpty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--text3);gap:12px;">
+      <div style="font-size:32px;opacity:0.2">⚙</div>
+      <div style="font-family:var(--cond);font-size:12px;letter-spacing:2px;text-transform:uppercase;">Connect and click Refresh to load tool table</div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div style="display:flex;gap:20px;padding:8px 16px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;align-items:center;">
+    <div style="display:flex;align-items:center;gap:7px;font-family:var(--cond);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">
+      <div style="width:12px;height:12px;border-radius:3px;background:rgba(255,140,66,0.18);border:1px solid var(--accent2)"></div>
+      IN CAROUSEL (Pn ≥ 1)
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;font-family:var(--cond);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">
+      <div style="width:12px;height:12px;border-radius:3px;background:var(--surface3);border:1px solid var(--border2)"></div>
+      NOT IN CAROUSEL (P0)
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;font-family:var(--cond);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">
+      <div style="width:12px;height:12px;border-radius:3px;background:rgba(34,197,94,0.18);border:1px solid var(--green2)"></div>
+      CURRENT TOOL
+    </div>
+  </div>
+</div><!-- /tab-panel-tooltable -->
+
+
+<script src="/bundle.js" type="module"></script>
+<!-- DEV-RELOAD -->
+<script>
+(function(){const ws=new WebSocket('ws://'+location.host+'/ws');ws.onmessage=()=>location.reload();ws.onclose=()=>setTimeout(()=>location.reload(),1000);})();
+</script>
+<!-- /DEV-RELOAD -->
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "flexisender",
+  "version": "5.0.0",
+  "scripts": {
+    "sim": "bun run sim.ts",
+    "dev": "bun run serve.ts",
+    "build": "bun run build.ts"
+  }
+}
