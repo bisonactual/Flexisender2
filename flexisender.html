@@ -41,6 +41,15 @@
     --mono: 'Share Tech Mono', monospace;
     --sans: 'Barlow', sans-serif;
     --cond: 'Barlow Condensed', sans-serif;
+
+    /* Configurable tab active colour */
+    --tab-active: #ff8c42;
+
+    /* Configurable viewport toolpath colours */
+    --vp-cut:      #00d4ff;
+    --vp-rapid:    #ff4444;
+    --vp-executed: #00ff88;
+    --vp-tool:     #ffd740;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -250,6 +259,15 @@
   .feed-slider { flex: 1; -webkit-appearance: none; height: 4px; background: var(--border2); outline: none; cursor: pointer; border-radius: 2px; }
   .feed-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); cursor: pointer; border-radius: 50%; }
   .feed-val { font-family: var(--mono); font-size: 12px; color: var(--accent); width: 40px; text-align: right; font-weight: 700; }
+  .feed-val-input {
+    background: var(--surface3); border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    padding: 2px 4px; outline: none; cursor: text; transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+  .feed-val-input::-webkit-inner-spin-button,
+  .feed-val-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .feed-val-input:focus { border-color: var(--accent); color: #fff; }
+  .step-btn-unit { font-family: var(--cond); font-size: 8px; letter-spacing: 0.5px; opacity: 0.55; margin-left: 1px; vertical-align: super; }
 
   /* ── Jogging module — fills card width at every size preset ────────────── */
   #mod-jogging .jog-section { background: transparent; border: none; padding: 4px 0; }
@@ -755,7 +773,7 @@
   .tab-bar { display: flex; align-items: stretch; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; padding: 0 8px; gap: 4px; }
   .tab-btn { font-family: var(--cond); font-weight: 700; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; padding: 0 18px; height: 38px; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text3); cursor: pointer; transition: all 0.15s; border-radius: 0; }
   .tab-btn:hover { color: var(--text2); }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent2); }
+  .tab-btn.active { color: var(--tab-active); border-bottom-color: var(--tab-active); }
   .tab-panel { display: none; flex: 1; overflow: hidden; }
   .tab-panel.active { display: flex; flex: 1; overflow: hidden; }
 
@@ -906,7 +924,7 @@
     color: var(--text3); cursor: pointer; transition: all 0.12s; white-space: nowrap;
   }
   .dock-tab:hover { color: var(--text2); }
-  .dock-tab.active { color: var(--accent); border-bottom-color: var(--accent2); }
+  .dock-tab.active { color: var(--tab-active); border-bottom-color: var(--tab-active); }
 
   .dock-resize-handle { flex-shrink: 0; z-index: 120; }
   .dock-resize-h {
@@ -1289,10 +1307,10 @@
     </div>
 
     <div class="viewport-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#00d4ff"></div>Cut</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ff4444"></div>Rapid</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#00ff88"></div>Current</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ffd740"></div>Tool</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--vp-cut)"></div>Cut</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--vp-rapid)"></div>Rapid</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--vp-executed)"></div>Current</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--vp-tool)"></div>Tool</div>
       <div class="legend-item" style="margin-left:auto;color:var(--text3);font-family:var(--mono);font-size:10px">Drag:Orbit · Scroll:Zoom · RClick:Pan</div>
     </div>
 
@@ -1963,6 +1981,62 @@
               <button class="opt-reset-btn">Reset</button>
             </div>
 
+            <div style="height:1px;background:var(--border);margin:4px 0;"></div>
+            <div style="font-family:var(--cond);font-size:10px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Tab Bar</div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Active Tab</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorTabActive" class="opt-color-picker" value="#ff8c42" />
+                <div class="opt-color-swatch" id="optSwatchTabActive" style="background:#ff8c42"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexTabActive" value="#ff8c42" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div style="height:1px;background:var(--border);margin:4px 0;"></div>
+            <div style="font-family:var(--cond);font-size:10px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">3D Viewport</div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Cut Moves</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorVpCut" class="opt-color-picker" value="#00d4ff" />
+                <div class="opt-color-swatch" id="optSwatchVpCut" style="background:#00d4ff"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexVpCut" value="#00d4ff" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Rapid Moves</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorVpRapid" class="opt-color-picker" value="#ff4444" />
+                <div class="opt-color-swatch" id="optSwatchVpRapid" style="background:#ff4444"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexVpRapid" value="#ff4444" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Executed Path</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorVpExecuted" class="opt-color-picker" value="#00ff88" />
+                <div class="opt-color-swatch" id="optSwatchVpExecuted" style="background:#00ff88"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexVpExecuted" value="#00ff88" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Tool Marker</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorVpTool" class="opt-color-picker" value="#ffd740" />
+                <div class="opt-color-swatch" id="optSwatchVpTool" style="background:#ffd740"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexVpTool" value="#ffd740" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
             <div style="display:flex;gap:8px;margin-top:4px;">
               <button class="opt-action-btn" id="btnResetAllColors">↺ Reset All Colours</button>
             </div>
@@ -2061,7 +2135,7 @@
         <div class="options-card-icon">🕹</div>
         <div class="options-card-body">
           <div class="options-card-title">Jog Step Sizes</div>
-          <div class="options-card-desc">Configure the step size presets for XY and Z jog buttons. Comma-separated values in mm.</div>
+          <div class="options-card-desc">Configure the step size presets and maximum feed rates for XY and Z jogging. Comma-separated values in mm. Max speed caps the slider regardless of its position.</div>
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
             <div>
               <div class="opt-field-label">XY Steps (mm)</div>
@@ -2070,6 +2144,16 @@
             <div>
               <div class="opt-field-label">Z Steps (mm)</div>
               <input class="opt-input" type="text" id="optJogStepsZ" value="0.01, 0.1, 1, 5, 10" spellcheck="false" />
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <div class="opt-field-label">Max XY Speed (mm/min)</div>
+                <input class="opt-input" type="number" id="optJogMaxXY" value="3000" min="1" step="100" />
+              </div>
+              <div>
+                <div class="opt-field-label">Max Z Speed (mm/min)</div>
+                <input class="opt-input" type="number" id="optJogMaxZ" value="500" min="1" step="50" />
+              </div>
             </div>
             <button class="opt-action-btn" id="btnApplyJogSteps">↺ Apply &amp; Rebuild Buttons</button>
           </div>
@@ -2174,6 +2258,8 @@ var init_state = __esm({
       // Jog
       jogStepXY: 10,
       jogStepZ: 1,
+      jogMaxSpeedXY: 3e3,
+      jogMaxSpeedZ: 500,
       statusInterval: null,
       _isJogging: false,
       jogHoldMode: false,
@@ -2327,18 +2413,31 @@ var init_state = __esm({
       { id: "bear", icon: "\u{1F43B}", name: "MR BEAR" }
     ];
     OPT_COLOR_DEFAULTS = {
+      // UI theme
       text: "#f1f5f9",
       text2: "#94a3b8",
       bg: "#0f0e0c",
       surface: "#1a1814",
-      accent: "#ff8c42"
+      accent: "#ff8c42",
+      // Tab bar
+      tabActive: "#ff8c42",
+      // Viewport toolpath
+      vpCut: "#00d4ff",
+      vpRapid: "#ff4444",
+      vpExecuted: "#00ff88",
+      vpTool: "#ffd740"
     };
     OPT_COLOR_CSS_VARS = {
       text: "--text",
       text2: "--text2",
       bg: "--bg",
       surface: "--surface",
-      accent: "--accent"
+      accent: "--accent",
+      tabActive: "--tab-active",
+      vpCut: "--vp-cut",
+      vpRapid: "--vp-rapid",
+      vpExecuted: "--vp-executed",
+      vpTool: "--vp-tool"
     };
     OPT_LOCKABLE_TABS = [
       { id: "settings", label: "SETTINGS: GRBL" },
@@ -2484,7 +2583,8 @@ __export(jog_exports, {
   setStepXY: () => setStepXY,
   setStepZ: () => setStepZ,
   startJog: () => startJog,
-  stopJog: () => stopJog
+  stopJog: () => stopJog,
+  updateFeedSliderMax: () => updateFeedSliderMax
 });
 function makeGhost(color, opacity) {
   const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity, depthWrite: false });
@@ -2632,11 +2732,11 @@ function startPreviewAnim() {
 }
 function setStepXY(v) {
   state.jogStepXY = v;
-  _xyStepContainer?.querySelectorAll(".xy-step-btn").forEach((b) => b.classList.toggle("active", parseFloat(b.textContent) === v));
+  _xyStepContainer?.querySelectorAll(".xy-step-btn").forEach((b) => b.classList.toggle("active", parseFloat(b.dataset.step || b.childNodes[0]?.textContent || "") === v));
 }
 function setStepZ(v) {
   state.jogStepZ = v;
-  _zStepContainer?.querySelectorAll(".z-step-btn").forEach((b) => b.classList.toggle("active", parseFloat(b.textContent) === v));
+  _zStepContainer?.querySelectorAll(".z-step-btn").forEach((b) => b.classList.toggle("active", parseFloat(b.dataset.step || b.childNodes[0]?.textContent || "") === v));
 }
 function rebuildSteps(xySteps, zSteps) {
   if (_xyStepContainer) buildStepBtns(_xyStepContainer, xySteps, "xy-step-btn", 10, setStepXY);
@@ -2645,18 +2745,37 @@ function rebuildSteps(xySteps, zSteps) {
 function buildStepBtns(container, steps, cls, defaultStep, setter) {
   container.innerHTML = "";
   for (const v of steps) {
-    const btn = /* @__PURE__ */ h("button", { class: "step-btn " + cls + (v === defaultStep ? " active" : ""), onClick: () => setter(v) }, v);
+    const btn = /* @__PURE__ */ h("button", { class: "step-btn " + cls + (v === defaultStep ? " active" : ""), onClick: () => setter(v) }, v, /* @__PURE__ */ h("span", { class: "step-btn-unit" }, "mm"));
     container.appendChild(btn);
   }
 }
-function jogFeedValue() {
-  return _feedSlider?.value || "1000";
+function clampFeed(raw, isZ) {
+  const max = isZ ? state.jogMaxSpeedZ : state.jogMaxSpeedXY;
+  return Math.min(Math.max(1, raw), max);
+}
+function jogFeedValue(isZ = false) {
+  const raw = parseInt(_feedSlider?.value || "1000");
+  return String(clampFeed(raw, isZ));
+}
+function updateFeedSliderMax() {
+  const xyMax = state.jogMaxSpeedXY;
+  const zMax = state.jogMaxSpeedZ;
+  const globalMax = Math.max(xyMax, zMax);
+  if (_feedSlider) {
+    _feedSlider.max = String(globalMax);
+    const cur = parseInt(_feedSlider.value);
+    if (cur > globalMax) {
+      _feedSlider.value = String(globalMax);
+      if (_feedVal) _feedVal.value = String(globalMax);
+    }
+  }
 }
 function startJog(dir) {
   if (!state.connected) return;
-  const f = jogFeedValue();
-  const step = state.jogStepXY;
   const v = jogDirToVec(dir);
+  const isZ = v.z !== 0;
+  const f = jogFeedValue(isZ);
+  const step = state.jogStepXY;
   const color = jogDirColor(v);
   if (!_predictedDirty) {
     _predicted.x = toolGroup.position.x;
@@ -2807,19 +2926,38 @@ function mount(parent) {
         _feedSlider = el;
       },
       onInput: () => {
-        _feedVal.textContent = _feedSlider.value;
+        _feedVal.value = _feedSlider.value;
       }
     }
-  ), /* @__PURE__ */ h("span", { class: "feed-val", ref: (el) => {
-    _feedVal = el;
-  } }, "1000")), /* @__PURE__ */ h("div", { class: "jog-step-axis-row" }, /* @__PURE__ */ h("span", { class: "jog-step-axis-label" }, "XY"), /* @__PURE__ */ h("div", { class: "jog-step-axis-btns", ref: (el) => {
+  ), /* @__PURE__ */ h(
+    "input",
+    {
+      type: "number",
+      class: "feed-val feed-val-input",
+      min: "1",
+      max: "3000",
+      value: "1000",
+      ref: (el) => {
+        _feedVal = el;
+      },
+      onInput: () => {
+        const v = Math.max(1, parseInt(_feedVal.value) || 1);
+        _feedSlider.value = String(Math.min(v, parseInt(_feedSlider.max)));
+      },
+      onBlur: () => {
+        const v = Math.max(1, parseInt(_feedVal.value) || 1);
+        _feedVal.value = String(v);
+        _feedSlider.value = String(Math.min(v, parseInt(_feedSlider.max)));
+      }
+    }
+  )), /* @__PURE__ */ h("div", { class: "jog-step-axis-row" }, /* @__PURE__ */ h("span", { class: "jog-step-axis-label" }, "XY"), /* @__PURE__ */ h("div", { class: "jog-step-axis-btns", ref: (el) => {
     _xyStepContainer = el;
   } }, [0.01, 0.1, 1, 10, 50].map(
-    (v) => /* @__PURE__ */ h("button", { class: "step-btn xy-step-btn" + (v === 10 ? " active" : ""), onClick: () => setStepXY(v) }, v)
+    (v) => /* @__PURE__ */ h("button", { class: "step-btn xy-step-btn" + (v === 10 ? " active" : ""), onClick: () => setStepXY(v) }, v, /* @__PURE__ */ h("span", { class: "step-btn-unit" }, "mm"))
   ))), /* @__PURE__ */ h("div", { class: "jog-step-axis-row" }, /* @__PURE__ */ h("span", { class: "jog-step-axis-label" }, "Z"), /* @__PURE__ */ h("div", { class: "jog-step-axis-btns", ref: (el) => {
     _zStepContainer = el;
   } }, [0.01, 0.1, 1, 5, 10].map(
-    (v) => /* @__PURE__ */ h("button", { class: "step-btn z-step-btn" + (v === 1 ? " active" : ""), onClick: () => setStepZ(v) }, v)
+    (v) => /* @__PURE__ */ h("button", { class: "step-btn z-step-btn" + (v === 1 ? " active" : ""), onClick: () => setStepZ(v) }, v, /* @__PURE__ */ h("span", { class: "step-btn-unit" }, "mm"))
   )))));
   parent.appendChild(card);
   on("status", ["mpos"], () => jogSyncPredicted());
@@ -2837,8 +2975,8 @@ function initKeyboardJog() {
     state.kbJogActive = true;
     state.kbJogKey = e.key;
     setJogging(true);
-    const f = jogFeedValue();
     const axis = dir[0], sign = dir[1] === "+" ? "" : "-";
+    const f = jogFeedValue(axis === "Z");
     highlightJogBtn(dir, true);
     sendCmd("$J=G91 " + axis + sign + KEYBOARD_JOG_DIST + " F" + f);
   });
@@ -2939,6 +3077,7 @@ function optApplyColor(key, hex) {
   if (swatch) swatch.style.background = hex;
   const hexInput = document.getElementById("optHex" + capKey(key));
   if (hexInput && hexInput !== document.activeElement) hexInput.value = hex;
+  if (key.startsWith("vp")) vpRefreshColors();
   optSaveColors();
 }
 function optHexChange(key, val) {
@@ -3084,13 +3223,17 @@ function _updateRow2Visibility() {
 function optSaveJogSteps() {
   lsSet("fs-opt-jogsteps", {
     xy: document.getElementById("optJogStepsXY").value,
-    z: document.getElementById("optJogStepsZ").value
+    z: document.getElementById("optJogStepsZ").value,
+    maxXY: document.getElementById("optJogMaxXY").value,
+    maxZ: document.getElementById("optJogMaxZ").value
   });
 }
 function optLoadJogSteps() {
   const s = lsGet("fs-opt-jogsteps", {});
   if (s.xy) document.getElementById("optJogStepsXY").value = s.xy;
   if (s.z) document.getElementById("optJogStepsZ").value = s.z;
+  if (s.maxXY) document.getElementById("optJogMaxXY").value = s.maxXY;
+  if (s.maxZ) document.getElementById("optJogMaxZ").value = s.maxZ;
 }
 function parseSteps(raw) {
   return raw.split(",").map((s) => parseFloat(s.trim())).filter((n) => !isNaN(n) && n > 0);
@@ -3099,7 +3242,12 @@ function optApplyJogSteps() {
   const xySteps = parseSteps(document.getElementById("optJogStepsXY").value);
   const zSteps = parseSteps(document.getElementById("optJogStepsZ").value);
   if (xySteps.length === 0 || zSteps.length === 0) return;
+  const maxXY = parseInt(document.getElementById("optJogMaxXY").value) || 3e3;
+  const maxZ = parseInt(document.getElementById("optJogMaxZ").value) || 500;
+  state.jogMaxSpeedXY = Math.max(1, maxXY);
+  state.jogMaxSpeedZ = Math.max(1, maxZ);
   rebuildSteps(xySteps, zSteps);
+  updateFeedSliderMax();
   optSaveJogSteps();
 }
 function optSaveBearColors() {
@@ -3152,6 +3300,7 @@ var init_options = __esm({
     init_ui();
     init_console();
     init_jog();
+    init_viewport();
     BEAR_COLOR_IDS = ["optBearColorAll", "optBearColorGcode", "optBearColorJog", "optBearColorTool", "optBearColorSafe"];
   }
 });
@@ -3497,8 +3646,16 @@ function initViewport() {
   dlight.position.set(1, 2, 1);
   scene.add(dlight);
   target = new THREE.Vector3(0, 0, 0);
+  function cssColorToHex2(varName, fallback) {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    if (raw && raw.startsWith("#") && raw.length === 7) {
+      const n = parseInt(raw.slice(1), 16);
+      return isNaN(n) ? fallback : n;
+    }
+    return fallback;
+  }
   const toolGeo = new THREE.CylinderGeometry(0, 1.5, 4, 8);
-  const toolMat = new THREE.MeshPhongMaterial({ color: 16747586, emissive: 2756608 });
+  const toolMat = new THREE.MeshPhongMaterial({ color: cssColorToHex2("--vp-tool", 16766784), emissive: 2756608 });
   toolMesh = new THREE.Mesh(toolGeo, toolMat);
   toolMesh.rotation.x = Math.PI;
   toolMesh.position.y = 2;
@@ -3512,7 +3669,7 @@ function initViewport() {
   toolGroup.position.set(0, 0, 0);
   scene.add(toolGroup);
   const ringGeo = new THREE.RingGeometry(1.5, 2.5, 16);
-  ringMat = new THREE.MeshBasicMaterial({ color: 16766784, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+  ringMat = new THREE.MeshBasicMaterial({ color: cssColorToHex2("--vp-tool", 16766784), side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
   const ringMesh = new THREE.Mesh(ringGeo, ringMat);
   ringMesh.rotation.x = -Math.PI / 2;
   toolGroup.add(ringMesh);
@@ -3808,12 +3965,12 @@ function buildToolpathMesh(segments) {
   });
   if (rapidPts.length > 0) {
     const g = new THREE.BufferGeometry().setFromPoints(rapidPts);
-    rapidLines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 16729156, transparent: true, opacity: 0.5 }));
+    rapidLines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: cssColorToHex("--vp-rapid", 16729156), transparent: true, opacity: 0.5 }));
     scene.add(rapidLines);
   }
   if (cutPts.length > 0) {
     const g = new THREE.BufferGeometry().setFromPoints(cutPts);
-    cutLines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 54527, transparent: true, opacity: 0.85 }));
+    cutLines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: cssColorToHex("--vp-cut", 54527), transparent: true, opacity: 0.85 }));
     scene.add(cutLines);
   }
 }
@@ -3831,8 +3988,21 @@ function updateExecutedPath(segIdx) {
   }
   if (pts.length < 2) return;
   const g = new THREE.BufferGeometry().setFromPoints(pts);
-  executedLine = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 65416, linewidth: 2 }));
+  executedLine = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: cssColorToHex("--vp-executed", 65416), linewidth: 2 }));
   scene.add(executedLine);
+}
+function vpRefreshColors() {
+  const toolColor = cssColorToHex("--vp-tool", 16766784);
+  if (toolMesh?.material) {
+    toolMesh.material.color.setHex(toolColor);
+  }
+  if (ringMat) {
+    ringMat.color.setHex(toolColor);
+  }
+  if (state.toolpathSegments.length > 0) {
+    buildToolpathMesh(state.toolpathSegments);
+    if (state.segmentIndex > 0) updateExecutedPath(state.segmentIndex);
+  }
 }
 function vpApply() {
   const xMin = parseFloat(document.getElementById("vpXMin").value);
@@ -6987,7 +7157,7 @@ function initChunk3Events() {
     document.getElementById("projBtnOrtho").classList.add("selected");
     document.getElementById("projBtnPersp").classList.remove("selected");
   });
-  const colorKeys = ["text", "text2", "bg", "surface", "accent"];
+  const colorKeys = ["text", "text2", "bg", "surface", "accent", "tabActive", "vpCut", "vpRapid", "vpExecuted", "vpTool"];
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   colorKeys.forEach((k) => {
     on2("optColor" + cap(k), "input", () => optApplyColor(k, document.getElementById("optColor" + cap(k)).value));
@@ -7015,6 +7185,8 @@ function initChunk3Events() {
   });
   on2("optJogStepsXY", "input", () => optSaveJogSteps());
   on2("optJogStepsZ", "input", () => optSaveJogSteps());
+  on2("optJogMaxXY", "change", () => optSaveJogSteps());
+  on2("optJogMaxZ", "change", () => optSaveJogSteps());
   on2("btnApplyJogSteps", "click", () => optApplyJogSteps());
 }
 function initChunk2Events() {
