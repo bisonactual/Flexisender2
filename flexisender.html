@@ -267,7 +267,8 @@
   .feed-val-input::-webkit-inner-spin-button,
   .feed-val-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   .feed-val-input:focus { border-color: var(--accent); color: #fff; }
-  .step-btn-unit { font-family: var(--cond); font-size: 8px; letter-spacing: 0.5px; opacity: 0.55; margin-left: 1px; vertical-align: super; }
+  .step-btn-unit { font-family: var(--cond); font-size: 8px; letter-spacing: 0.5px; opacity: 0.55; margin-left: 1px; vertical-align: super; display: none; }
+  body.jog-show-units .step-btn-unit { display: inline; }
 
   /* ── Jogging module — fills card width at every size preset ────────────── */
   #mod-jogging .jog-section { background: transparent; border: none; padding: 4px 0; }
@@ -2156,6 +2157,9 @@
               </div>
             </div>
             <button class="opt-action-btn" id="btnApplyJogSteps">↺ Apply &amp; Rebuild Buttons</button>
+            <label class="tb-opt-toggle" style="margin-top:2px;">
+              <input type="checkbox" id="optJogShowUnits"> Show mm units on distance buttons
+            </label>
           </div>
         </div>
       </div>
@@ -3249,6 +3253,16 @@ function optApplyJogSteps() {
   rebuildSteps(xySteps, zSteps);
   updateFeedSliderMax();
   optSaveJogSteps();
+}
+function optApplyJogShowUnits(show) {
+  document.body.classList.toggle("jog-show-units", show);
+  lsSet("fs-opt-jog-show-units", show);
+}
+function optLoadJogShowUnits() {
+  const show = lsGet("fs-opt-jog-show-units", false);
+  const cb = document.getElementById("optJogShowUnits");
+  if (cb) cb.checked = show;
+  document.body.classList.toggle("jog-show-units", show);
 }
 function optSaveBearColors() {
   const c = {};
@@ -7022,6 +7036,7 @@ function modTouchStart(e, modId) {
   };
   card.style.zIndex = "200";
   dockDragStart(moduleId);
+  e.preventDefault();
 }
 function initModDragListeners() {
   document.addEventListener("mousemove", (e) => {
@@ -7043,13 +7058,14 @@ function initModDragListeners() {
   });
   document.addEventListener("touchmove", (e) => {
     if (!state._modDrag) return;
+    e.preventDefault();
     const t = e.touches[0];
     const dx = t.clientX - state._modDrag.startX;
     const dy = t.clientY - state._modDrag.startY;
     state._modDrag.card.style.left = Math.max(0, state._modDrag.origLeft + dx) + "px";
     state._modDrag.card.style.top = Math.max(0, state._modDrag.origTop + dy) + "px";
     dockDragMove(t.clientX, t.clientY);
-  }, { passive: true });
+  }, { passive: false });
   document.addEventListener("touchend", (e) => {
     if (!state._modDrag) return;
     const t = e.changedTouches[0];
@@ -7188,6 +7204,10 @@ function initChunk3Events() {
   on2("optJogMaxXY", "change", () => optSaveJogSteps());
   on2("optJogMaxZ", "change", () => optSaveJogSteps());
   on2("btnApplyJogSteps", "click", () => optApplyJogSteps());
+  on2("optJogShowUnits", "change", () => {
+    const cb = document.getElementById("optJogShowUnits");
+    optApplyJogShowUnits(cb.checked);
+  });
 }
 function initChunk2Events() {
   document.querySelectorAll(".module-drag-handle").forEach((handle) => {
@@ -7195,7 +7215,7 @@ function initChunk2Events() {
     if (!card) return;
     const modId = card.id;
     handle.addEventListener("mousedown", (e) => modDragStart(e, modId));
-    handle.addEventListener("touchstart", (e) => modTouchStart(e, modId));
+    handle.addEventListener("touchstart", (e) => modTouchStart(e, modId), { passive: false });
   });
   document.querySelectorAll(".module-drag-close").forEach((btn) => {
     const card = btn.closest(".module-card");
@@ -7391,6 +7411,7 @@ var init_main = __esm({
       initToolbarOptions();
       optLoadJogSteps();
       optApplyJogSteps();
+      optLoadJogShowUnits();
       optLoadBearColors();
       try {
         const al = document.getElementById("optAutoLoadSettings");
