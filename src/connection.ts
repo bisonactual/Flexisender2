@@ -142,6 +142,9 @@ function onOpen(): void {
   setTimeout(() => {
     try { if (lsGet('fs-opt-autoload-settings', false)) import('./settings').then(s => s.loadSettings()); } catch (_) {}
   }, 1500);
+  setTimeout(() => {
+    try { import('./offsets').then(o => o.loadOffsets()); } catch (_) {}
+  }, 1800);
   const fb = document.getElementById('limitsFrameBtn') as HTMLButtonElement | null;
   if (fb && state.progLimits) fb.disabled = false;
 }
@@ -158,6 +161,11 @@ function onClose(): void {
   const fb = document.getElementById('limitsFrameBtn') as HTMLButtonElement | null;
   if (fb) fb.disabled = true;
   state.machineHomed = false; state._prevMachineStateSl = ''; _updateHomeBtnHomed();
+  state.wcsOffsets = {};
+  state.tloOffset = 0;
+  state.tloActive = false;
+  state.wcsPhase = 'idle';
+  try { import('./offsets').then(o => o.renderOffsetsTable()); } catch (_) {}
 }
 
 // ── Send helpers ──────────────────────────────────────────────────────────────

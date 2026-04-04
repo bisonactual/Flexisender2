@@ -157,6 +157,7 @@ export function modTouchStart(e: TouchEvent, modId: string): void {
   };
   card.style.zIndex = '200';
   dockDragStart(moduleId);
+  e.preventDefault();
 }
 
 export function initModDragListeners(): void {
@@ -181,13 +182,14 @@ export function initModDragListeners(): void {
 
   document.addEventListener('touchmove', e => {
     if (!state._modDrag) return;
+    e.preventDefault();
     const t = e.touches[0];
     const dx = t.clientX - state._modDrag.startX;
     const dy = t.clientY - state._modDrag.startY;
     state._modDrag.card.style.left = Math.max(0, state._modDrag.origLeft + dx) + 'px';
     state._modDrag.card.style.top = Math.max(0, state._modDrag.origTop + dy) + 'px';
     dockDragMove(t.clientX, t.clientY);
-  }, { passive: true });
+  }, { passive: false });
 
   document.addEventListener('touchend', e => {
     if (!state._modDrag) return;

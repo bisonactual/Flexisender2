@@ -11,6 +11,7 @@ import { settingsIntercept, tryInterceptValue, onSettingWriteOk, onSettingWriteE
 import { toolTableIntercept, renderToolTable, renderModTT } from './tooltable';
 import { bearCheckPlugin, bearIntercept, bearParseStatus } from './bear';
 import { emit, type StatusReport } from './bus';
+import { offsetsIntercept, offsetsInterceptOk } from './offsets';
 
 export function parseResponse(raw: string): void {
   if (raw.startsWith('<') && raw.endsWith('>')) { parseStatus(raw.slice(1, -1)); return; }
@@ -31,7 +32,12 @@ export function parseResponse(raw: string): void {
 
   if (bearIntercept(raw)) return;
 
+  // Offset intercept — handles $# responses and live [G54:] etc. updates
+  // Always active (not phase-gated) so live updates work mid-session
+  if (offsetsIntercept(raw)) { log('rx', raw); return; }
+
   if (raw === 'ok' || raw.startsWith('error:')) {
+    offsetsInterceptOk();
     if (raw.startsWith('error:')) {
       log('err', raw + (_dequeuedSent ? '  ← "' + _dequeuedSent.line + '"' : ''));
       onSettingWriteErr(raw);
