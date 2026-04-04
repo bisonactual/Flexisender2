@@ -1116,7 +1116,38 @@
   .vp-copy-btn:hover { background: var(--surface3); color: var(--text); border-color: var(--accent); }
   .vp-copy-btn.copied { background: rgba(34,197,94,0.2); border-color: var(--green); color: var(--green); }
 
-  /* ── WCS Coordinate Offset Table ─────────────────────────────────────────── */
+  .dro-mini-tlo { grid-column: span 2; }
+  .dro-mini-tlo-active { background: rgba(229,92,0,0.12); border-color: var(--accent2); }
+  .dro-mini-tlo-active .dro-mini-label { color: var(--accent); }
+  .dro-mini-tlo-active .dro-mini-value { color: var(--accent); }
+  .dro-tlo-clear {
+    background: none; border: 1px solid var(--border2); color: var(--text3);
+    font-family: var(--cond); font-weight: 700; font-size: 9px; letter-spacing: 1px;
+    padding: 2px 6px; cursor: pointer; border-radius: 20px; transition: all 0.12s;
+    text-transform: uppercase; white-space: nowrap; flex-shrink: 0; display: none;
+  }
+  .dro-mini-tlo-active .dro-tlo-clear { display: inline-block; color: var(--accent2); border-color: var(--accent2); }
+  .dro-tlo-clear:hover { background: rgba(229,92,0,0.2); color: var(--accent); border-color: var(--accent); }
+
+  /* ── Tool Length probing module ──────────────────────────────────────────── */
+  .tl-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; }
+  .tl-section-label { font-family: var(--cond); font-weight: 700; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 2px; }
+  .tl-row { display: flex; align-items: center; gap: 8px; }
+  .tl-label { font-family: var(--cond); font-size: 10px; letter-spacing: 0.5px; color: var(--text2); flex: 1; }
+  .tl-input { background: var(--surface3); border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 4px 8px; width: 80px; text-align: right; outline: none; border-radius: var(--radius-sm); transition: border-color 0.15s; -moz-appearance: textfield; }
+  .tl-input::-webkit-inner-spin-button, .tl-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .tl-input:focus { border-color: var(--accent); }
+  .tl-mode-btn { display: flex; align-items: center; gap: 5px; font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 0.5px; color: var(--text2); cursor: pointer; background: var(--surface3); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 6px 12px; transition: all 0.12s; flex: 1; justify-content: center; }
+  .tl-mode-btn:has(input:checked) { background: rgba(229,92,0,0.2); border-color: var(--accent2); color: var(--accent); }
+  .tl-mode-btn input[type=radio] { display: none; }
+  .tl-status { font-family: var(--cond); font-size: 11px; letter-spacing: 0.5px; padding: 6px 8px; border-radius: var(--radius-sm); text-align: center; }
+  .tl-status-idle    { background: var(--surface2); color: var(--text3); }
+  .tl-status-running { background: rgba(245,158,11,0.15); color: var(--yellow); animation: pulse 1s infinite; }
+  .tl-status-ok      { background: rgba(34,197,94,0.15); color: var(--green); }
+  .tl-status-err     { background: rgba(239,68,68,0.15); color: var(--red); }
+  .tl-result { font-family: var(--mono); font-size: 11px; color: var(--accent); text-align: center; min-height: 16px; }
+  .tl-ref-display { font-family: var(--mono); font-size: 11px; color: var(--text3); padding: 4px 0; }
+
   .wcs-outer { flex: 1; overflow-y: auto; background: var(--bg); }
   .wcs-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .wcs-toolbar-title { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); flex: 1; }
@@ -1165,6 +1196,25 @@
   #wcsEmpty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--text3); gap: 12px; }
   #wcsEmpty .wcs-empty-icon { font-size: 32px; opacity: 0.2; }
   #wcsEmpty .wcs-empty-text { font-family: var(--cond); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+
+  /* ── Tool Length module ──────────────────────────────────────────────────── */
+  .tl-section { display: flex; flex-direction: column; gap: 5px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; }
+  .tl-section-label { font-family: var(--cond); font-weight: 700; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 2px; }
+  .tl-row { display: flex; align-items: center; gap: 8px; }
+  .tl-label { font-family: var(--cond); font-size: 10px; letter-spacing: 0.5px; color: var(--text2); flex: 1; }
+  .tl-input { background: var(--surface3); border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 4px 8px; width: 80px; text-align: right; outline: none; border-radius: var(--radius-sm); transition: border-color 0.15s; -moz-appearance: textfield; }
+  .tl-input::-webkit-inner-spin-button, .tl-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .tl-input:focus { border-color: var(--accent); }
+  .tl-mode-btn { display: flex; align-items: center; gap: 5px; flex: 1; background: var(--surface3); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 7px 10px; font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 0.5px; color: var(--text2); cursor: pointer; transition: all 0.12s; }
+  .tl-mode-btn:has(input:checked) { background: rgba(229,92,0,0.18); border-color: var(--accent2); color: var(--accent); }
+  .tl-mode-btn input[type=radio] { accent-color: var(--accent); }
+  .tl-ref-display { font-family: var(--mono); font-size: 11px; color: var(--text3); padding: 2px 0; }
+  .tl-status { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 7px 10px; border-radius: var(--radius-sm); text-align: center; }
+  .tl-status-idle    { background: var(--surface2); color: var(--text3); }
+  .tl-status-running { background: rgba(245,158,11,0.15); color: var(--yellow); border: 1px solid var(--yellow2); animation: pulse 0.8s infinite; }
+  .tl-status-ok      { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid var(--green2); }
+  .tl-status-err     { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid var(--red2); }
+  .tl-result { font-family: var(--mono); font-size: 12px; color: var(--accent); text-align: center; min-height: 16px; }
 
 </style>
 <!-- CSS extracted to style.css — build.ts inlines it for distribution -->
@@ -1708,6 +1758,21 @@
             <button class="mod-size-btn active">Normal</button>
             <button class="mod-size-btn">Large</button>
             <button class="mod-size-btn">XL</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-toggle-card" id="modcfg-toollength">
+        <div class="mod-toggle-icon">⊕</div>
+        <div class="mod-toggle-info">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="mod-toggle-name" style="flex:1">Tool Length</div>
+            <div class="mod-switch"></div>
+          </div>
+          <div class="mod-toggle-desc">Probe tool length using a touch plate or fixed toolsetter (G59.3). Applies offset with G43.1. Supports reference tool workflow for multi-tool setups.</div>
+          <div class="mod-size-row">
+            <button class="mod-size-btn active">Normal</button>
+            <button class="mod-size-btn">Large</button>
           </div>
         </div>
       </div>
@@ -2483,7 +2548,8 @@ var init_state = __esm({
       tooltable: { x: 10, y: 10, enabled: false, size: "xl" },
       limits: { x: 302, y: 10, enabled: false, size: "normal" },
       signals: { x: 594, y: 10, enabled: false, size: "normal" },
-      bear: { x: 594, y: 10, enabled: false, size: "normal" }
+      bear: { x: 594, y: 10, enabled: false, size: "normal" },
+      toollength: { x: 886, y: 10, enabled: false, size: "normal" }
     };
     MODULE_DEFS = [
       { id: "position", icon: "\u{1F4CD}", name: "Machine Position" },
@@ -2495,7 +2561,8 @@ var init_state = __esm({
       { id: "tooltable", icon: "\u{1F529}", name: "Tool Table" },
       { id: "limits", icon: "\u{1F4D0}", name: "Program Limits" },
       { id: "signals", icon: "\u{1F534}", name: "Signals" },
-      { id: "bear", icon: "\u{1F43B}", name: "MR BEAR" }
+      { id: "bear", icon: "\u{1F43B}", name: "MR BEAR" },
+      { id: "toollength", icon: "\u2295", name: "Tool Length" }
     ];
     OPT_COLOR_DEFAULTS = {
       // UI theme
@@ -5189,6 +5256,7 @@ function offsetsIntercept(raw) {
   if (key === "TLO") {
     state.tloOffset = vals.length === 1 ? vals[0] : vals[2] ?? vals[0];
     state.tloActive = state.tloOffset !== 0;
+    emit("status", /* @__PURE__ */ new Set(["tlo"]), { machineState: "", tlo: state.tloOffset });
     renderOffsetsTable();
     return true;
   }
@@ -5385,6 +5453,7 @@ var init_offsets = __esm({
     init_state();
     init_console();
     init_connection();
+    init_bus();
     WCS_ENTRIES = [
       { code: "G54", label: "G54", id: 1 },
       { code: "G55", label: "G55", id: 2 },
@@ -5399,6 +5468,199 @@ var init_offsets = __esm({
       { code: "G30", label: "G30 \u2014 Home 2", id: 0 },
       { code: "TLO", label: "TLO \u2014 Tool Length Offset", id: 0 }
     ];
+  }
+});
+
+// src/probing/probe-program.ts
+function isProbingRunning() {
+  return _running;
+}
+function probingIntercept(raw) {
+  const m = raw.match(/^\[PRB:([^,]+),([^,]+),([^:]+):(\d)\]$/);
+  if (!m) return false;
+  const result = {
+    x: parseFloat(m[1]),
+    y: parseFloat(m[2]),
+    z: parseFloat(m[3]),
+    success: m[4] === "1"
+  };
+  _probeResult = result;
+  if (_probeResolve) {
+    _probeResolve(result);
+    _probeResolve = null;
+  }
+  return false;
+}
+function probingIdleNotify(machineState) {
+  const sl = machineState.toLowerCase().split(":")[0];
+  if ((sl === "idle" || sl === "alarm") && _idleResolve) {
+    if (_idleTimeout) clearTimeout(_idleTimeout);
+    _idleResolve();
+    _idleResolve = null;
+  }
+}
+function waitIdle(timeoutMs = 3e4) {
+  return new Promise((resolve) => {
+    if (!_running || _cancelled) {
+      resolve(false);
+      return;
+    }
+    _idleResolve = () => resolve(true);
+    _idleTimeout = setTimeout(() => {
+      _idleResolve = null;
+      resolve(false);
+    }, timeoutMs);
+  });
+}
+function waitProbe(timeoutMs = 15e3) {
+  return new Promise((resolve) => {
+    if (!_running || _cancelled) {
+      resolve(null);
+      return;
+    }
+    _probeResult = null;
+    _probeResolve = resolve;
+    setTimeout(() => {
+      if (_probeResolve) {
+        _probeResolve = null;
+        resolve(null);
+      }
+    }, timeoutMs);
+  });
+}
+async function sendAndWait(cmd, timeoutMs = 3e4) {
+  if (_cancelled) return false;
+  sendCmd(cmd);
+  return waitIdle(timeoutMs);
+}
+function cancelProbing() {
+  _cancelled = true;
+  _running = false;
+  if (_idleResolve) {
+    _idleResolve();
+    _idleResolve = null;
+  }
+  if (_probeResolve) {
+    _probeResolve(null);
+    _probeResolve = null;
+  }
+  if (_idleTimeout) {
+    clearTimeout(_idleTimeout);
+    _idleTimeout = null;
+  }
+}
+async function runToolLengthProbe(seq) {
+  if (!state.connected) {
+    log("err", "Not connected");
+    return null;
+  }
+  if (_running) {
+    log("err", "Probing already in progress");
+    return null;
+  }
+  _running = true;
+  _cancelled = false;
+  _probeResult = null;
+  try {
+    if (seq.mode === "toolsetter") {
+      return await runToolsetterSequence(seq);
+    } else {
+      return await runTouchplateSequence(seq);
+    }
+  } finally {
+    _running = false;
+  }
+}
+async function runTouchplateSequence(seq) {
+  log("info", "\u2295 Touch plate probe starting\u2026");
+  const fastCmd = `G38.3G91F${seq.probeFeedRate}Z-${seq.probeDistance.toFixed(4)}`;
+  sendCmd(fastCmd);
+  const fastResult = await waitProbe();
+  if (!fastResult || !fastResult.success) {
+    log("err", "\u2717 Probe: no contact on fast probe \u2014 check probe wiring and position");
+    await sendAndWait(`G91G0Z${seq.latchDistance.toFixed(4)}`);
+    return null;
+  }
+  if (!await sendAndWait(`G91G0Z${seq.latchDistance.toFixed(4)}`)) {
+    log("err", "\u2717 Probe: failed to retract after fast probe");
+    return null;
+  }
+  const slowCmd = `G38.3G91F${seq.latchFeedRate}Z-${(seq.latchDistance * 2).toFixed(4)}`;
+  sendCmd(slowCmd);
+  const slowResult = await waitProbe();
+  if (!slowResult || !slowResult.success) {
+    log("err", "\u2717 Probe: no contact on slow probe");
+    await sendAndWait(`G91G0Z${seq.latchDistance.toFixed(4)}`);
+    return null;
+  }
+  await sendAndWait(`G90G53G0Z${state.machineZ.toFixed(4)}`);
+  log("info", `\u2713 Touch plate probe: Z=${slowResult.z.toFixed(4)}`);
+  return slowResult;
+}
+async function runToolsetterSequence(seq) {
+  if (seq.toolsetterX === void 0 || seq.toolsetterY === void 0 || seq.toolsetterZ === void 0) {
+    log("err", "\u2717 Toolsetter: G59.3 position not set \u2014 configure it in the Offsets tab");
+    return null;
+  }
+  const startX = state.machineX;
+  const startY = state.machineY;
+  const startZ = state.machineZ;
+  const depth = seq.toolsetterDepth ?? 10;
+  log("info", "\u2295 Toolsetter probe starting\u2026");
+  if (!await sendAndWait(`G53G0Z0`)) {
+    log("err", "\u2717 Toolsetter: could not rapid to Z home");
+    return null;
+  }
+  if (!await sendAndWait(`G53G0X${seq.toolsetterX.toFixed(4)}Y${seq.toolsetterY.toFixed(4)}`)) {
+    log("err", "\u2717 Toolsetter: could not rapid to toolsetter XY");
+    return null;
+  }
+  const approachZ = seq.toolsetterZ + depth;
+  if (!await sendAndWait(`G53G0Z${approachZ.toFixed(4)}`)) {
+    log("err", "\u2717 Toolsetter: could not approach toolsetter Z");
+    return null;
+  }
+  const fastCmd = `G38.3G91F${seq.probeFeedRate}Z-${(depth + 5).toFixed(4)}`;
+  sendCmd(fastCmd);
+  const fastResult = await waitProbe();
+  if (!fastResult || !fastResult.success) {
+    log("err", "\u2717 Toolsetter: no contact on fast probe");
+    await sendAndWait(`G53G0Z0`);
+    await sendAndWait(`G53G0X${startX.toFixed(4)}Y${startY.toFixed(4)}`);
+    return null;
+  }
+  if (!await sendAndWait(`G91G0Z${seq.latchDistance.toFixed(4)}`)) {
+    log("err", "\u2717 Toolsetter: failed to retract");
+    return null;
+  }
+  const slowCmd = `G38.3G91F${seq.latchFeedRate}Z-${(seq.latchDistance * 2).toFixed(4)}`;
+  sendCmd(slowCmd);
+  const slowResult = await waitProbe();
+  if (!slowResult || !slowResult.success) {
+    log("err", "\u2717 Toolsetter: no contact on slow probe");
+    await sendAndWait(`G53G0Z0`);
+    await sendAndWait(`G53G0X${startX.toFixed(4)}Y${startY.toFixed(4)}`);
+    return null;
+  }
+  await sendAndWait(`G53G0Z0`);
+  await sendAndWait(`G53G0X${startX.toFixed(4)}Y${startY.toFixed(4)}`);
+  await sendAndWait(`G53G0Z${startZ.toFixed(4)}`);
+  log("info", `\u2713 Toolsetter probe: Z=${slowResult.z.toFixed(4)}`);
+  return slowResult;
+}
+var _running, _cancelled, _probeResult, _probeResolve, _idleResolve, _idleTimeout;
+var init_probe_program = __esm({
+  "src/probing/probe-program.ts"() {
+    "use strict";
+    init_state();
+    init_console();
+    init_connection();
+    _running = false;
+    _cancelled = false;
+    _probeResult = null;
+    _probeResolve = null;
+    _idleResolve = null;
+    _idleTimeout = null;
   }
 });
 
@@ -5423,6 +5685,7 @@ function parseResponse(raw) {
     log("rx", raw);
     return;
   }
+  probingIntercept(raw);
   if (raw === "ok" || raw.startsWith("error:")) {
     offsetsInterceptOk();
     if (raw.startsWith("error:")) {
@@ -5590,6 +5853,7 @@ function setMachineState(s) {
     _updateHomeBtnHomed();
   }
   state._prevMachineStateSl = sl;
+  probingIdleNotify(s);
 }
 var init_parser = __esm({
   "src/parser.ts"() {
@@ -5604,6 +5868,7 @@ var init_parser = __esm({
     init_bear();
     init_bus();
     init_offsets();
+    init_probe_program();
   }
 });
 
@@ -6123,7 +6388,11 @@ function mount2(parent) {
     _bufVal = el;
   } }, "15/15")), /* @__PURE__ */ h("div", { class: "dro-mini" }, /* @__PURE__ */ h("div", { class: "dro-mini-label" }, "LINE"), /* @__PURE__ */ h("div", { class: "dro-mini-value", ref: (el) => {
     _lineVal = el;
-  } }, "\u2014")))));
+  } }, "\u2014")), /* @__PURE__ */ h("div", { class: "dro-mini dro-mini-tlo", ref: (el) => {
+    _tloCard = el;
+  } }, /* @__PURE__ */ h("div", { class: "dro-mini-label" }, "TLO"), /* @__PURE__ */ h("div", { style: "display:flex;align-items:center;gap:4px;" }, /* @__PURE__ */ h("div", { class: "dro-mini-value", ref: (el) => {
+    _tloVal = el;
+  } }, "\u2014"), /* @__PURE__ */ h("button", { class: "dro-tlo-clear", title: "Cancel TLO (G49)", onClick: () => sendCmd("G49") }, "G49"))))));
   parent.appendChild(card);
   on("status", ["mpos"], (r) => {
     if (!r.mpos) return;
@@ -6161,8 +6430,14 @@ function mount2(parent) {
       _wcsSelect.value = r.wcs;
     }
   });
+  on("status", ["tlo"], (r) => {
+    if (r.tlo === void 0) return;
+    const active = r.tlo !== 0;
+    _tloVal.textContent = active ? r.tlo.toFixed(3) + " mm" : "\u2014";
+    _tloCard.classList.toggle("dro-mini-tlo-active", active);
+  });
 }
-var _droX, _droY, _droZ, _droMX, _droMY, _droMZ, _feedVal2, _spindleVal, _bufVal, _lineVal, _stateBadge, _stateText, _wcsSelect;
+var _droX, _droY, _droZ, _droMX, _droMY, _droMZ, _feedVal2, _spindleVal, _bufVal, _lineVal, _stateBadge, _stateText, _wcsSelect, _tloVal, _tloCard;
 var init_position = __esm({
   "src/modules/position.tsx"() {
     "use strict";
@@ -6449,6 +6724,294 @@ var init_signals = __esm({
       { ch: "D", id: "door", label: "Door" },
       { ch: "R", id: "estop", label: "E-Stop" }
     ];
+  }
+});
+
+// src/probing/tool-length.tsx
+function loadConfig() {
+  return { ...DEFAULTS, ...lsGet("fs-tl-config", {}) };
+}
+function saveConfig(cfg) {
+  lsSet("fs-tl-config", cfg);
+}
+function getNumVal(id) {
+  return parseFloat(document.getElementById(id)?.value || "0") || 0;
+}
+function setStatus2(msg, type = "idle") {
+  if (!_statusEl) return;
+  _statusEl.textContent = msg;
+  _statusEl.className = "tl-status tl-status-" + type;
+}
+function updateModeUI() {
+  const isToolsetter = _cfg.mode === "toolsetter";
+  if (_touchPlateSection) _touchPlateSection.style.display = isToolsetter ? "none" : "";
+  if (_toolsetterSection) _toolsetterSection.style.display = isToolsetter ? "" : "none";
+}
+function updateRefDisplay() {
+  if (!_refDisplay) return;
+  if (_cfg.tloReference !== null) {
+    _refDisplay.textContent = "Ref: " + _cfg.tloReference.toFixed(4) + " mm";
+    _refDisplay.style.color = "var(--green)";
+    if (_clearRefBtn) _clearRefBtn.style.display = "";
+  } else {
+    _refDisplay.textContent = "No reference set";
+    _refDisplay.style.color = "var(--text3)";
+    if (_clearRefBtn) _clearRefBtn.style.display = "none";
+  }
+}
+async function doProbe() {
+  if (!state.connected) {
+    log("err", "Not connected");
+    return;
+  }
+  if (isProbingRunning()) return;
+  _cfg.probeFeedRate = getNumVal("tlProbeFeed");
+  _cfg.latchFeedRate = getNumVal("tlLatchFeed");
+  _cfg.probeDistance = getNumVal("tlProbeDistance");
+  _cfg.latchDistance = getNumVal("tlLatchDistance");
+  _cfg.touchPlateHeight = getNumVal("tlPlateHeight");
+  _cfg.toolsetterDepth = getNumVal("tlToolsetterDepth");
+  saveConfig(_cfg);
+  let tsX, tsY, tsZ;
+  if (_cfg.mode === "toolsetter") {
+    const ts = state.wcsOffsets["G59.3"];
+    if (!ts) {
+      log("err", "Toolsetter: G59.3 not set \u2014 go to the Offsets tab and set it first");
+      setStatus2("G59.3 not set", "err");
+      return;
+    }
+    tsX = ts.x;
+    tsY = ts.y;
+    tsZ = ts.z;
+  }
+  _probeBtn.disabled = true;
+  _cancelBtn.disabled = false;
+  setStatus2("Probing\u2026", "running");
+  if (_resultDisplay) _resultDisplay.textContent = "";
+  const result = await runToolLengthProbe({
+    mode: _cfg.mode,
+    probeFeedRate: _cfg.probeFeedRate,
+    latchFeedRate: _cfg.latchFeedRate,
+    probeDistance: _cfg.probeDistance,
+    latchDistance: _cfg.latchDistance,
+    touchPlateHeight: _cfg.touchPlateHeight,
+    toolsetterX: tsX,
+    toolsetterY: tsY,
+    toolsetterZ: tsZ,
+    toolsetterDepth: _cfg.toolsetterDepth,
+    tloReference: _cfg.tloReference
+  });
+  _probeBtn.disabled = false;
+  _cancelBtn.disabled = true;
+  if (!result || !result.success) {
+    setStatus2("Probe failed", "err");
+    return;
+  }
+  let tlo;
+  if (_cfg.mode === "touchplate") {
+    tlo = result.z;
+    if (_cfg.tloReference !== null) {
+      tlo = result.z - _cfg.tloReference - _cfg.touchPlateHeight;
+    } else {
+      tlo = result.z - _cfg.touchPlateHeight;
+    }
+  } else {
+    tlo = result.z;
+    if (_cfg.tloReference !== null) {
+      tlo = result.z - _cfg.tloReference;
+    }
+  }
+  sendCmd(`G43.1Z${tlo.toFixed(4)}`);
+  log("info", `Tool length offset applied: G43.1 Z${tlo.toFixed(4)}`);
+  if (_resultDisplay) {
+    _resultDisplay.textContent = `Z=${result.z.toFixed(4)}  TLO=${tlo.toFixed(4)} mm`;
+  }
+  setStatus2("\u2713 Complete \u2014 TLO applied", "ok");
+  setTimeout(() => {
+    Promise.resolve().then(() => (init_offsets(), offsets_exports)).then((o) => o.loadOffsets());
+  }, 300);
+}
+function mount7(parent) {
+  _cfg = loadConfig();
+  const card = /* @__PURE__ */ h("div", { class: "module-card mod-hidden", id: "mod-toollength", dataset: { modSize: "normal" }, style: "top:10px;left:886px" }, /* @__PURE__ */ h("div", { class: "module-drag-handle" }, /* @__PURE__ */ h("span", { class: "module-drag-dots" }, "\u283F\u283F"), /* @__PURE__ */ h("span", { class: "module-drag-title" }, "Tool Length"), /* @__PURE__ */ h("button", { class: "module-drag-close", onClick: () => {
+    card.classList.add("mod-hidden");
+  } }, "\u2715")), /* @__PURE__ */ h("div", { class: "module-body", style: "gap:8px" }, /* @__PURE__ */ h("div", { class: "tl-section" }, /* @__PURE__ */ h("div", { class: "tl-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "tl-mode-btn" }, /* @__PURE__ */ h(
+    "input",
+    {
+      type: "radio",
+      name: "tlMode",
+      value: "touchplate",
+      checked: true,
+      ref: (el) => {
+        _modeTouch = el;
+      },
+      onChange: () => {
+        _cfg.mode = "touchplate";
+        saveConfig(_cfg);
+        updateModeUI();
+      }
+    }
+  ), "Touch Plate"), /* @__PURE__ */ h("label", { class: "tl-mode-btn" }, /* @__PURE__ */ h(
+    "input",
+    {
+      type: "radio",
+      name: "tlMode",
+      value: "toolsetter",
+      ref: (el) => {
+        _modeToolsetter = el;
+      },
+      onChange: () => {
+        _cfg.mode = "toolsetter";
+        saveConfig(_cfg);
+        updateModeUI();
+      }
+    }
+  ), "Toolsetter"))), /* @__PURE__ */ h("div", { class: "tl-section" }, /* @__PURE__ */ h("div", { class: "tl-section-label" }, "Feed Rates"), /* @__PURE__ */ h("div", { class: "tl-row" }, /* @__PURE__ */ h("span", { class: "tl-label" }, "Probe (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "tl-input", id: "tlProbeFeed", value: String(_cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "tl-row" }, /* @__PURE__ */ h("span", { class: "tl-label" }, "Latch (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "tl-input", id: "tlLatchFeed", value: String(_cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "tl-row" }, /* @__PURE__ */ h("span", { class: "tl-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "tl-input", id: "tlProbeDistance", value: String(_cfg.probeDistance), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "tl-row" }, /* @__PURE__ */ h("span", { class: "tl-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "tl-input", id: "tlLatchDistance", value: String(_cfg.latchDistance), min: "0.1", step: "0.1" }))), /* @__PURE__ */ h(
+    "div",
+    {
+      class: "tl-section",
+      id: "tlTouchPlateSection",
+      ref: (el) => {
+        _touchPlateSection = el;
+      }
+    },
+    /* @__PURE__ */ h("div", { class: "tl-section-label" }, "Touch Plate"),
+    /* @__PURE__ */ h("div", { class: "tl-row" }, /* @__PURE__ */ h("span", { class: "tl-label" }, "Plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "tl-input", id: "tlPlateHeight", value: String(_cfg.touchPlateHeight), min: "0", step: "0.1" }))
+  ), /* @__PURE__ */ h(
+    "div",
+    {
+      class: "tl-section",
+      id: "tlToolsetterSection",
+      style: "display:none",
+      ref: (el) => {
+        _toolsetterSection = el;
+      }
+    },
+    /* @__PURE__ */ h("div", { class: "tl-section-label" }, "Toolsetter"),
+    /* @__PURE__ */ h("div", { class: "tl-row" }, /* @__PURE__ */ h("span", { class: "tl-label" }, "Approach depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "tl-input", id: "tlToolsetterDepth", value: String(_cfg.toolsetterDepth), min: "1", step: "1" })),
+    /* @__PURE__ */ h("div", { style: "font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px;" }, "XY+Z position from G59.3 in Offsets tab")
+  ), /* @__PURE__ */ h("div", { class: "tl-section" }, /* @__PURE__ */ h("div", { class: "tl-section-label" }, "Reference Tool"), /* @__PURE__ */ h("div", { class: "tl-ref-display", ref: (el) => {
+    _refDisplay = el;
+  } }, "No reference set"), /* @__PURE__ */ h("div", { style: "display:flex;gap:5px;margin-top:5px;" }, /* @__PURE__ */ h(
+    "button",
+    {
+      class: "tb-btn",
+      style: "flex:1;font-size:10px;padding:5px",
+      ref: (el) => {
+        _setRefBtn = el;
+      },
+      onClick: async () => {
+        if (!state.connected) {
+          log("err", "Not connected");
+          return;
+        }
+        if (isProbingRunning()) return;
+        _probeBtn.disabled = true;
+        _cancelBtn.disabled = false;
+        setStatus2("Measuring reference\u2026", "running");
+        const r = await runToolLengthProbe({
+          mode: _cfg.mode,
+          probeFeedRate: _cfg.probeFeedRate,
+          latchFeedRate: _cfg.latchFeedRate,
+          probeDistance: _cfg.probeDistance,
+          latchDistance: _cfg.latchDistance,
+          touchPlateHeight: _cfg.touchPlateHeight,
+          toolsetterX: state.wcsOffsets["G59.3"]?.x,
+          toolsetterY: state.wcsOffsets["G59.3"]?.y,
+          toolsetterZ: state.wcsOffsets["G59.3"]?.z,
+          toolsetterDepth: _cfg.toolsetterDepth
+        });
+        _probeBtn.disabled = false;
+        _cancelBtn.disabled = true;
+        if (r && r.success) {
+          _cfg.tloReference = r.z;
+          saveConfig(_cfg);
+          updateRefDisplay();
+          sendCmd("G49");
+          setStatus2("\u2713 Reference set \u2014 probe subsequent tools with PROBE", "ok");
+          log("info", `TLO reference set: Z=${r.z.toFixed(4)}`);
+        } else {
+          setStatus2("Reference probe failed", "err");
+        }
+      }
+    },
+    "SET REF"
+  ), /* @__PURE__ */ h(
+    "button",
+    {
+      class: "tb-btn danger",
+      style: "font-size:10px;padding:5px;display:none",
+      ref: (el) => {
+        _clearRefBtn = el;
+      },
+      onClick: () => {
+        _cfg.tloReference = null;
+        saveConfig(_cfg);
+        updateRefDisplay();
+        sendCmd("G49");
+        setStatus2("Reference cleared", "idle");
+      }
+    },
+    "CLEAR"
+  ))), /* @__PURE__ */ h("div", { class: "tl-status tl-status-idle", ref: (el) => {
+    _statusEl = el;
+  } }, "Ready"), /* @__PURE__ */ h("div", { class: "tl-result", ref: (el) => {
+    _resultDisplay = el;
+  } }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h(
+    "button",
+    {
+      class: "tb-btn success",
+      style: "flex:1;padding:10px;font-size:13px",
+      ref: (el) => {
+        _probeBtn = el;
+      },
+      onClick: () => doProbe()
+    },
+    "\u2295 PROBE"
+  ), /* @__PURE__ */ h(
+    "button",
+    {
+      class: "tb-btn danger",
+      style: "padding:10px;font-size:13px",
+      disabled: true,
+      ref: (el) => {
+        _cancelBtn = el;
+      },
+      onClick: () => {
+        cancelProbing();
+        setStatus2("Cancelled", "idle");
+      }
+    },
+    "\u2715"
+  ))));
+  parent.appendChild(card);
+  if (_cfg.mode === "toolsetter" && _modeToolsetter) {
+    _modeToolsetter.checked = true;
+    updateModeUI();
+  }
+  updateRefDisplay();
+}
+var DEFAULTS, _cfg, _statusEl, _probeBtn, _cancelBtn, _setRefBtn, _clearRefBtn, _refDisplay, _resultDisplay, _modeTouch, _modeToolsetter, _touchPlateSection, _toolsetterSection;
+var init_tool_length = __esm({
+  "src/probing/tool-length.tsx"() {
+    "use strict";
+    init_jsx();
+    init_state();
+    init_connection();
+    init_console();
+    init_ui();
+    init_probe_program();
+    DEFAULTS = {
+      mode: "touchplate",
+      probeFeedRate: 100,
+      latchFeedRate: 25,
+      probeDistance: 50,
+      latchDistance: 1,
+      touchPlateHeight: 0,
+      toolsetterDepth: 10,
+      tloReference: null
+    };
+    _cfg = loadConfig();
   }
 });
 
@@ -7699,6 +8262,7 @@ var init_main = __esm({
     init_spindle();
     init_macros();
     init_signals();
+    init_tool_length();
     init_settings();
     init_tooltable();
     init_offsets();
@@ -7729,6 +8293,8 @@ var init_main = __esm({
     mount5(mainEl);
     mount(mainEl);
     mount6(mainEl);
+    mount7(mainEl);
+    mount7(mainEl);
     initKeyboardJog();
     document.querySelectorAll(".module-drag-handle").forEach((handle) => {
       const card = handle.closest(".module-card");
