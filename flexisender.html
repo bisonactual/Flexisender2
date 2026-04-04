@@ -7210,19 +7210,6 @@ function initChunk3Events() {
   });
 }
 function initChunk2Events() {
-  document.querySelectorAll(".module-drag-handle").forEach((handle) => {
-    const card = handle.closest(".module-card");
-    if (!card) return;
-    const modId = card.id;
-    handle.addEventListener("mousedown", (e) => modDragStart(e, modId));
-    handle.addEventListener("touchstart", (e) => modTouchStart(e, modId), { passive: false });
-  });
-  document.querySelectorAll(".module-drag-close").forEach((btn) => {
-    const card = btn.closest(".module-card");
-    if (!card) return;
-    const moduleId = card.id.replace("mod-", "");
-    btn.addEventListener("click", () => toggleModule(moduleId, false));
-  });
   document.querySelectorAll(".mod-toggle-card").forEach((cfgCard) => {
     const moduleId = cfgCard.id.replace("modcfg-", "");
     const sw = cfgCard.querySelector(".mod-switch");
@@ -7382,6 +7369,18 @@ var init_main = __esm({
     mount(mainEl);
     mount6(mainEl);
     initKeyboardJog();
+    document.querySelectorAll(".module-drag-handle").forEach((handle) => {
+      const card = handle.closest(".module-card");
+      if (!card) return;
+      const modId = card.id;
+      handle.addEventListener("mousedown", (e) => modDragStart(e, modId));
+      handle.addEventListener("touchstart", (e) => modTouchStart(e, modId), { passive: false });
+    });
+    document.querySelectorAll(".module-drag-close").forEach((btn) => {
+      const card = btn.closest(".module-card");
+      if (!card) return;
+      btn.addEventListener("click", () => toggleModule(card.id.replace("mod-", ""), false));
+    });
     initModDragListeners();
     initSdClickOutside();
     initCameraListeners();
