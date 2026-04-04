@@ -58,9 +58,19 @@ export function initViewport(): void {
 
   target = new THREE.Vector3(0, 0, 0);
 
+// ── Read a CSS colour variable as a THREE.js hex number ──────────────────────
+function cssColorToHex(varName: string, fallback: number): number {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  if (raw && raw.startsWith('#') && raw.length === 7) {
+    const n = parseInt(raw.slice(1), 16);
+    return isNaN(n) ? fallback : n;
+  }
+  return fallback;
+}
+
   // Toolhead marker
   const toolGeo = new THREE.CylinderGeometry(0, 1.5, 4, 8);
-  const toolMat = new THREE.MeshPhongMaterial({ color: 0xff8c42, emissive: 0x2a1000 });
+  const toolMat = new THREE.MeshPhongMaterial({ color: cssColorToHex('--vp-tool', 0xffd740), emissive: 0x2a1000 });
   toolMesh = new THREE.Mesh(toolGeo, toolMat);
   toolMesh.rotation.x = Math.PI;
   toolMesh.position.y = 2;
@@ -76,7 +86,7 @@ export function initViewport(): void {
   scene.add(toolGroup);
 
   const ringGeo = new THREE.RingGeometry(1.5, 2.5, 16);
-  ringMat = new THREE.MeshBasicMaterial({ color: 0xffd740, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+  ringMat = new THREE.MeshBasicMaterial({ color: cssColorToHex('--vp-tool', 0xffd740), side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
   const ringMesh = new THREE.Mesh(ringGeo, ringMat);
   ringMesh.rotation.x = -Math.PI / 2;
   toolGroup.add(ringMesh);
@@ -373,12 +383,12 @@ export function buildToolpathMesh(segments: any[]): void {
 
   if (rapidPts.length > 0) {
     const g = new THREE.BufferGeometry().setFromPoints(rapidPts);
-    rapidLines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xff4444, transparent: true, opacity: 0.5 }));
+    rapidLines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: cssColorToHex('--vp-rapid', 0xff4444), transparent: true, opacity: 0.5 }));
     scene.add(rapidLines);
   }
   if (cutPts.length > 0) {
     const g = new THREE.BufferGeometry().setFromPoints(cutPts);
-    cutLines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.85 }));
+    cutLines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: cssColorToHex('--vp-cut', 0x00d4ff), transparent: true, opacity: 0.85 }));
     scene.add(cutLines);
   }
 }
@@ -394,8 +404,19 @@ export function updateExecutedPath(segIdx: number): void {
   }
   if (pts.length < 2) return;
   const g = new THREE.BufferGeometry().setFromPoints(pts);
-  executedLine = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0x00ff88, linewidth: 2 }));
+  executedLine = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: cssColorToHex('--vp-executed', 0x00ff88), linewidth: 2 }));
   scene.add(executedLine);
+}
+
+// Rebuild toolpath meshes from current segments so colour changes take effect immediately
+export function vpRefreshColors(): void {
+  const toolColor = cssColorToHex('--vp-tool', 0xffd740);
+  if (toolMesh?.material) { toolMesh.material.color.setHex(toolColor); }
+  if (ringMat) { ringMat.color.setHex(toolColor); }
+  if (state.toolpathSegments.length > 0) {
+    buildToolpathMesh(state.toolpathSegments);
+    if (state.segmentIndex > 0) updateExecutedPath(state.segmentIndex);
+  }
 }
 
 export function vpApply(): void {

@@ -5,7 +5,8 @@
 import { state, OPT_COLOR_DEFAULTS, OPT_COLOR_CSS_VARS, OPT_LOCKABLE_TABS, TB_BTN_DEFAULTS } from './state';
 import { lsGet, lsSet } from './ui';
 import { log } from './console';
-import { rebuildSteps } from './modules/jog';
+import { rebuildSteps, updateFeedSliderMax } from './modules/jog';
+import { vpRefreshColors } from './viewport';
 
 // ── Connection mode ───────────────────────────────────────────────────────────
 export function optSetConnMode(mode: 'websocket' | 'serial'): void {
@@ -55,6 +56,7 @@ export function optApplyColor(key: string, hex: string): void {
   if (swatch) (swatch as HTMLElement).style.background = hex;
   const hexInput = document.getElementById('optHex' + capKey(key)) as HTMLInputElement | null;
   if (hexInput && hexInput !== document.activeElement) hexInput.value = hex;
+  if (key.startsWith('vp')) vpRefreshColors();
   optSaveColors();
 }
 
@@ -204,18 +206,22 @@ function _updateRow2Visibility(): void {
   if (homeSep) homeSep.classList.toggle('tb-item-hidden', !homeVis);
 }
 
-// ── Jog step sizes ────────────────────────────────────────────────────────────
+// ── Jog step sizes & max speeds ───────────────────────────────────────────────
 export function optSaveJogSteps(): void {
   lsSet('fs-opt-jogsteps', {
-    xy: (document.getElementById('optJogStepsXY') as HTMLInputElement).value,
-    z: (document.getElementById('optJogStepsZ') as HTMLInputElement).value,
+    xy:       (document.getElementById('optJogStepsXY') as HTMLInputElement).value,
+    z:        (document.getElementById('optJogStepsZ') as HTMLInputElement).value,
+    maxXY:    (document.getElementById('optJogMaxXY') as HTMLInputElement).value,
+    maxZ:     (document.getElementById('optJogMaxZ') as HTMLInputElement).value,
   });
 }
 
 export function optLoadJogSteps(): void {
   const s = lsGet<any>('fs-opt-jogsteps', {});
   if (s.xy) (document.getElementById('optJogStepsXY') as HTMLInputElement).value = s.xy;
-  if (s.z) (document.getElementById('optJogStepsZ') as HTMLInputElement).value = s.z;
+  if (s.z)  (document.getElementById('optJogStepsZ')  as HTMLInputElement).value = s.z;
+  if (s.maxXY) (document.getElementById('optJogMaxXY') as HTMLInputElement).value = s.maxXY;
+  if (s.maxZ)  (document.getElementById('optJogMaxZ')  as HTMLInputElement).value = s.maxZ;
 }
 
 function parseSteps(raw: string): number[] {
@@ -224,10 +230,27 @@ function parseSteps(raw: string): number[] {
 
 export function optApplyJogSteps(): void {
   const xySteps = parseSteps((document.getElementById('optJogStepsXY') as HTMLInputElement).value);
-  const zSteps = parseSteps((document.getElementById('optJogStepsZ') as HTMLInputElement).value);
+  const zSteps  = parseSteps((document.getElementById('optJogStepsZ')  as HTMLInputElement).value);
   if (xySteps.length === 0 || zSteps.length === 0) return;
+  const maxXY = parseInt((document.getElementById('optJogMaxXY') as HTMLInputElement).value) || 3000;
+  const maxZ  = parseInt((document.getElementById('optJogMaxZ')  as HTMLInputElement).value) || 500;
+  state.jogMaxSpeedXY = Math.max(1, maxXY);
+  state.jogMaxSpeedZ  = Math.max(1, maxZ);
   rebuildSteps(xySteps, zSteps);
+  updateFeedSliderMax();
   optSaveJogSteps();
+}
+
+export function optApplyJogShowUnits(show: boolean): void {
+  document.body.classList.toggle('jog-show-units', show);
+  lsSet('fs-opt-jog-show-units', show);
+}
+
+export function optLoadJogShowUnits(): void {
+  const show = lsGet<boolean>('fs-opt-jog-show-units', false);
+  const cb = document.getElementById('optJogShowUnits') as HTMLInputElement | null;
+  if (cb) cb.checked = show;
+  document.body.classList.toggle('jog-show-units', show);
 }
 
 // ── Bear zone colours ─────────────────────────────────────────────────────────

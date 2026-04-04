@@ -6,7 +6,7 @@ import { state } from './state';
 import { lsGet, lsSet, $ } from './ui';
 import { log, clearConsole, sendManual, handleConInput, conAutoUpdate } from './console';
 import { toggleConnect, sendCmd } from './connection';
-import { initViewport, setView, fitView, toggleToolhead, vpApply, setProjection } from './viewport';
+import { initViewport, setView, fitView, toggleToolhead, vpApply, setProjection, vpRefreshColors } from './viewport';
 import { loadFile, uploadAndOpenFile, frameProgram } from './gcode';
 import { startJob, pauseJob, stopJob, updateRunButtons, sendReset, unlockAlarm, sendHome, goToXY0, setWCS } from './streaming';
 import { mount as mountJog, initKeyboardJog } from './modules/jog';
@@ -17,12 +17,13 @@ import { mount as mountMacros } from './modules/macros';
 import { mount as mountSignals } from './modules/signals';
 import { loadSettings, filterSettings, writeAllDirty } from './settings';
 import { loadToolTable } from './tooltable';
+import { loadOffsets, renderOffsetsTable } from './offsets';
 import { toggleSdPanel, closeSdPanel, sdRefreshFiles, sdRunSelected, initSdClickOutside } from './sd';
 import { initCameraTab, selectCamera, startCamera, stopCamera, measureOffset, goToCamera, goToSpindle, zeroAtCrosshair, camMouseDown, camMouseMove, camMouseUp, setCrosshairStyle, setCrosshairColor, loadCamSettings, saveCamSettings, drawOverlay, initCameraListeners } from './camera';
 import { kbdPress, kbdBackspace, kbdClear, kbdSend, toggleTouchKeyboard } from './keyboard';
 import { toggleModule, setModSize, setConsoleLines, modInitPositions, toggleModLock, modDragStart, modTouchStart, initModDragListeners } from './modules';
 import { initDock, dockModule, undockModule } from './dock';
-import { optSetConnMode, optSaveConnSettings, optLoadConnSettings, optLoadColors, optLoadTabLocks, optBuildTabLockList, initToolbarOptions, saveTbOpt, optApplyColor, optHexChange, optResetColor, optResetAllColors, optSaveJogSteps, optLoadJogSteps, optApplyJogSteps, optSaveBearColors, optLoadBearColors } from './options';
+import { optSetConnMode, optSaveConnSettings, optLoadConnSettings, optLoadColors, optLoadTabLocks, optBuildTabLockList, initToolbarOptions, saveTbOpt, optApplyColor, optHexChange, optResetColor, optResetAllColors, optSaveJogSteps, optLoadJogSteps, optApplyJogSteps, optApplyJogShowUnits, optLoadJogShowUnits, optSaveBearColors, optLoadBearColors } from './options';
 import { bearRefresh, bearCheckPlugin, bearIntercept, bearParseStatus, bearShowAddForm, bearEditZone, bearSaveZone, bearDeleteZone, bearCancelEdit } from './bear';
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
@@ -35,6 +36,7 @@ export function switchTab(tab: string): void {
   if (tab === 'settings' && !state.settingsLoaded && state.connected) loadSettings();
   if (tab === 'camera' && !state._camTabInited) { state._camTabInited = true; initCameraTab(); }
   if (tab === 'tooltable') loadToolTable();
+  if (tab === 'offsets') loadOffsets();
 }
 
 // ── Expose to window for HTML onclick handlers ────────────────────────────────
@@ -122,7 +124,7 @@ function initChunk3Events(): void {
   on('projBtnOrtho', 'click', () => { setProjection(true); document.getElementById('projBtnOrtho')!.classList.add('selected'); document.getElementById('projBtnPersp')!.classList.remove('selected'); });
 
   // Options — colour theme
-  const colorKeys = ['text', 'text2', 'bg', 'surface', 'accent'];
+  const colorKeys = ['text', 'text2', 'bg', 'surface', 'accent', 'tabActive', 'vpCut', 'vpRapid', 'vpExecuted', 'vpTool'];
   const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   colorKeys.forEach(k => {
     on('optColor' + cap(k), 'input', () => optApplyColor(k, (document.getElementById('optColor' + cap(k)) as HTMLInputElement).value));
@@ -156,26 +158,20 @@ function initChunk3Events(): void {
   // Options — jog steps
   on('optJogStepsXY', 'input', () => optSaveJogSteps());
   on('optJogStepsZ', 'input', () => optSaveJogSteps());
+  on('optJogMaxXY', 'change', () => optSaveJogSteps());
+  on('optJogMaxZ',  'change', () => optSaveJogSteps());
   on('btnApplyJogSteps', 'click', () => optApplyJogSteps());
+  on('optJogShowUnits', 'change', () => {
+    const cb = document.getElementById('optJogShowUnits') as HTMLInputElement;
+    optApplyJogShowUnits(cb.checked);
+  });
 }
 
 // ── Event wiring (chunk 2: modules) ───────────────────────────────────────────
 function initChunk2Events(): void {
 
-  // Module drag handles + close buttons (delegated)
-  document.querySelectorAll<HTMLElement>('.module-drag-handle').forEach(handle => {
-    const card = handle.closest('.module-card') as HTMLElement;
-    if (!card) return;
-    const modId = card.id;
-    handle.addEventListener('mousedown', e => modDragStart(e, modId));
-    handle.addEventListener('touchstart', e => modTouchStart(e, modId));
-  });
-  document.querySelectorAll<HTMLElement>('.module-drag-close').forEach(btn => {
-    const card = btn.closest('.module-card') as HTMLElement;
-    if (!card) return;
-    const moduleId = card.id.replace('mod-', '');
-    btn.addEventListener('click', () => toggleModule(moduleId, false));
-  });
+  // Note: module drag handles and close buttons are wired after all mount() calls
+  // in the init section below, so that JSX-mounted modules are included.
 
   // Module config toggles + size buttons
   document.querySelectorAll<HTMLElement>('.mod-toggle-card').forEach(cfgCard => {
@@ -266,6 +262,7 @@ function initChunk1Events(): void {
   on('sdRefreshBtn', 'click', () => sdRefreshFiles());
   on('sdCloseBtn', 'click', () => closeSdPanel());
   on('sdRunBtn', 'click', () => sdRunSelected());
+  on('btnWcsRefresh', 'click', () => loadOffsets());
 
   // Tab bar
   document.querySelectorAll<HTMLElement>('.tab-btn[data-tab]').forEach(btn => {
@@ -317,6 +314,22 @@ mountMacros(mainEl);
 mountJog(mainEl);
 mountSignals(mainEl);
 initKeyboardJog();
+
+// Re-wire drag handles now that all JSX-mounted modules are in the DOM.
+// initChunk2Events() runs before the mount() calls so querySelectorAll misses them.
+document.querySelectorAll<HTMLElement>('.module-drag-handle').forEach(handle => {
+  const card = handle.closest('.module-card') as HTMLElement;
+  if (!card) return;
+  const modId = card.id;
+  handle.addEventListener('mousedown', e => modDragStart(e as MouseEvent, modId));
+  handle.addEventListener('touchstart', e => modTouchStart(e as TouchEvent, modId), { passive: false });
+});
+document.querySelectorAll<HTMLElement>('.module-drag-close').forEach(btn => {
+  const card = btn.closest('.module-card') as HTMLElement;
+  if (!card) return;
+  btn.addEventListener('click', () => toggleModule(card.id.replace('mod-', ''), false));
+});
+
 initModDragListeners();
 initSdClickOutside();
 initCameraListeners();
@@ -346,6 +359,7 @@ window.addEventListener('load', () => {
   initToolbarOptions();
   optLoadJogSteps();
   optApplyJogSteps();
+  optLoadJogShowUnits();
   optLoadBearColors();
   // Restore auto-load settings toggle
   try { const al = document.getElementById('optAutoLoadSettings') as HTMLInputElement; if (al) al.checked = lsGet('fs-opt-autoload-settings', false); } catch (_) {}

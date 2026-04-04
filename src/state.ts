@@ -15,6 +15,8 @@ export const state = {
   // Jog
   jogStepXY: 10,
   jogStepZ: 1,
+  jogMaxSpeedXY: 3000,
+  jogMaxSpeedZ: 500,
   statusInterval: null as ReturnType<typeof setInterval> | null,
   _isJogging: false,
   jogHoldMode: false,
@@ -61,8 +63,11 @@ export const state = {
   totalMoves: 0,
   totalRapids: 0,
 
-  // Tool table
-  ttEntries: [] as any[],
+  // Work coordinate offsets ($# table)
+  wcsOffsets: {} as Record<string, { x: number; y: number; z: number }>,
+  tloOffset: 0 as number,
+  tloActive: false as boolean,
+  wcsPhase: 'idle' as string,
   currentToolNumber: 0,
   ttPhase: 'idle' as string,
   _ttLines: [] as string[],
@@ -200,19 +205,32 @@ export const MODULE_DEFS = [
 ];
 
 export const OPT_COLOR_DEFAULTS: Record<string, string> = {
-  text: '#f1f5f9',
-  text2: '#94a3b8',
-  bg: '#0f0e0c',
-  surface: '#1a1814',
-  accent: '#ff8c42',
+  // UI theme
+  text:     '#f1f5f9',
+  text2:    '#94a3b8',
+  bg:       '#0f0e0c',
+  surface:  '#1a1814',
+  accent:   '#ff8c42',
+  // Tab bar
+  tabActive: '#ff8c42',
+  // Viewport toolpath
+  vpCut:      '#00d4ff',
+  vpRapid:    '#ff4444',
+  vpExecuted: '#00ff88',
+  vpTool:     '#ffd740',
 };
 
 export const OPT_COLOR_CSS_VARS: Record<string, string> = {
-  text: '--text',
-  text2: '--text2',
-  bg: '--bg',
-  surface: '--surface',
-  accent: '--accent',
+  text:     '--text',
+  text2:    '--text2',
+  bg:       '--bg',
+  surface:  '--surface',
+  accent:   '--accent',
+  tabActive: '--tab-active',
+  vpCut:      '--vp-cut',
+  vpRapid:    '--vp-rapid',
+  vpExecuted: '--vp-executed',
+  vpTool:     '--vp-tool',
 };
 
 export const OPT_LOCKABLE_TABS = [
