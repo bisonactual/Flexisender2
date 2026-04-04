@@ -1153,7 +1153,7 @@
   .prob-subtab-btn { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 16px; cursor: pointer; white-space: nowrap; margin-bottom: -2px; transition: all 0.15s; }
   .prob-subtab-btn:hover { color: var(--text); background: var(--surface2); }
   .prob-subtab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .prob-panels { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
+  .prob-panels { display: flex; flex-direction: column; overflow: hidden; }
   .prob-subtab-panel { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 12px; }
   .prob-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; }
   .prob-section-label { font-family: var(--cond); font-weight: 700; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 2px; }
@@ -1178,22 +1178,6 @@
   .prob-edge-btn { font-family: var(--cond); font-weight: 700; font-size: 12px; letter-spacing: 1px; background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); padding: 8px 4px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.12s; text-align: center; }
   .prob-edge-btn:hover { background: var(--border); color: var(--text); }
   .prob-edge-btn.active { background: rgba(229,92,0,0.25); border-color: var(--accent2); color: var(--accent); }
-
-  /* ── Probe preview panel ─────────────────────────────────────────────────── */
-  .prob-preview-panel { height: 200px; flex-shrink: 0; display: flex; gap: 0; border-top: 1px solid var(--border2); background: var(--surface); }
-  .prob-preview-canvases { display: flex; gap: 1px; background: var(--border); flex-shrink: 0; }
-  .prob-preview-canvas { display: block; background: #0f0e0c; }
-  .prob-preview-controls { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 12px; min-width: 0; }
-  .prob-preview-dro { display: flex; flex-direction: column; gap: 4px; }
-  .prob-dro-cell { display: flex; align-items: baseline; gap: 6px; }
-  .prob-dro-axis { font-family: var(--cond); font-weight: 700; font-size: 11px; color: var(--text3); width: 12px; }
-  .prob-dro-val { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); }
-  .prob-preview-label { font-family: var(--cond); font-size: 10px; color: var(--text3); letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .prob-preview-btns { display: flex; align-items: center; gap: 5px; }
-  .prob-prev-btn { background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); font-family: var(--mono); font-size: 12px; padding: 5px 9px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.1s; }
-  .prob-prev-btn:hover:not(:disabled) { background: var(--border); color: var(--text); }
-  .prob-prev-btn:disabled { opacity: 0.3; cursor: default; }
-  .prob-prev-counter { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-left: 4px; }
 
   .wcs-outer { flex: 1; overflow-y: auto; background: var(--bg); }
   .wcs-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
@@ -2425,7 +2409,7 @@
 </div><!-- /tab-panel-offsets -->
 
 <!-- TAB: PROBING -->
-<div class="tab-panel" id="tabpanel-probing" style="flex-direction:column;overflow:hidden;background:var(--bg);display:flex;">
+<div class="tab-panel" id="tabpanel-probing" style="flex-direction:column;overflow:hidden;background:var(--bg);">
   <div class="prob-subtab-bar">
     <button class="prob-subtab-btn active" data-subtab="toollength">Tool Length</button>
     <button class="prob-subtab-btn" data-subtab="edgefinder">Edge Finder</button>
@@ -7509,389 +7493,6 @@ var init_rotation = __esm({
   }
 });
 
-// src/probing/preview.ts
-function waypointsTouchplate(cfg) {
-  const { probeDistance, latchDistance } = cfg;
-  return [
-    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
-    { x: 0, y: 0, z: -probeDistance, type: "probe", label: "Fast probe" },
-    { x: 0, y: 0, z: -(probeDistance - latchDistance), type: "contact", label: "Contact" },
-    { x: 0, y: 0, z: -(probeDistance - latchDistance) + latchDistance, type: "retract", label: "Retract" },
-    { x: 0, y: 0, z: -(probeDistance - latchDistance) + latchDistance - latchDistance * 2, type: "probe", label: "Slow probe" },
-    { x: 0, y: 0, z: -(probeDistance - latchDistance), type: "contact", label: "Final contact" },
-    { x: 0, y: 0, z: 0, type: "retract", label: "Return" }
-  ];
-}
-function waypointsToolsetter(cfg) {
-  const { toolsetterDepth, latchDistance, tsOffX, tsOffY, tsOffZ } = cfg;
-  const approachZ = tsOffZ + toolsetterDepth;
-  return [
-    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
-    { x: 0, y: 0, z: 20, type: "rapid", label: "Z home" },
-    { x: tsOffX, y: tsOffY, z: 20, type: "rapid", label: "Move to toolsetter XY" },
-    { x: tsOffX, y: tsOffY, z: approachZ, type: "rapid", label: "Approach Z" },
-    { x: tsOffX, y: tsOffY, z: tsOffZ, type: "probe", label: "Fast probe" },
-    { x: tsOffX, y: tsOffY, z: tsOffZ, type: "contact", label: "Contact" },
-    { x: tsOffX, y: tsOffY, z: tsOffZ + latchDistance, type: "retract", label: "Retract" },
-    { x: tsOffX, y: tsOffY, z: tsOffZ - latchDistance, type: "probe", label: "Slow probe" },
-    { x: tsOffX, y: tsOffY, z: tsOffZ, type: "contact", label: "Final contact" },
-    { x: tsOffX, y: tsOffY, z: 20, type: "retract", label: "Return Z" },
-    { x: 0, y: 0, z: 20, type: "rapid", label: "Return XY" },
-    { x: 0, y: 0, z: 0, type: "rapid", label: "Return Z" }
-  ];
-}
-function waypointsEdgeSingle(cfg) {
-  const { edge, mode, xyClr, depth, probeDistance, latchDistance, probeDiameter } = cfg;
-  const isX = edge === "AD" || edge === "CB";
-  const axis = isX ? "X" : "Y";
-  const external = mode === "external";
-  const clr = xyClr + probeDiameter / 2;
-  const dir = edge === "AD" || edge === "AB" ? external ? 1 : -1 : external ? -1 : 1;
-  const ax = isX ? -dir * clr : 0;
-  const ay = !isX ? -dir * clr : 0;
-  const px = isX ? dir * probeDistance : 0;
-  const py = !isX ? dir * probeDistance : 0;
-  const rx = isX ? -dir * latchDistance : 0;
-  const ry = !isX ? -dir * latchDistance : 0;
-  const contactX = isX ? ax + px : 0;
-  const contactY = !isX ? ay + py : 0;
-  return [
-    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
-    { x: ax, y: ay, z: 0, type: "rapid", label: "Move to clearance" },
-    { x: ax, y: ay, z: -depth, type: "rapid", label: "Plunge to depth" },
-    { x: ax + px, y: ay + py, z: -depth, type: "probe", label: "Fast probe" },
-    { x: contactX, y: contactY, z: -depth, type: "contact", label: "Contact" },
-    { x: contactX + rx, y: contactY + ry, z: -depth, type: "retract", label: "Retract" },
-    { x: contactX, y: contactY, z: -depth, type: "probe", label: "Slow probe" },
-    { x: contactX, y: contactY, z: -depth, type: "contact", label: "Final contact" },
-    { x: contactX, y: contactY, z: 0, type: "retract", label: "Lift" },
-    { x: 0, y: 0, z: 0, type: "rapid", label: "Return" }
-  ];
-}
-function waypointsEdgeCorner(cfg) {
-  const { edge, mode, xyClr, depth, offset, probeDistance, latchDistance, probeDiameter } = cfg;
-  const external = mode === "external";
-  const signs = {
-    A: { x: 1, y: 1 },
-    B: { x: -1, y: 1 },
-    C: { x: -1, y: -1 },
-    D: { x: 1, y: -1 }
-  };
-  const s = external ? signs[edge] : { x: -signs[edge].x, y: -signs[edge].y };
-  const clr = xyClr + probeDiameter / 2;
-  const xContact = s.x * probeDistance;
-  const yContact = s.y * probeDistance;
-  return [
-    { x: 0, y: s.y * offset, z: 0, type: "start", label: "Start" },
-    { x: -s.x * clr, y: s.y * offset, z: 0, type: "rapid", label: "X clearance" },
-    { x: -s.x * clr, y: s.y * offset, z: -depth, type: "rapid", label: "Plunge" },
-    { x: xContact, y: s.y * offset, z: -depth, type: "probe", label: "Probe X" },
-    { x: xContact, y: s.y * offset, z: -depth, type: "contact", label: "X contact" },
-    { x: xContact - s.x * latchDistance, y: s.y * offset, z: -depth, type: "retract", label: "Retract X" },
-    { x: xContact, y: s.y * offset, z: -depth, type: "probe", label: "Slow X" },
-    { x: xContact, y: s.y * offset, z: 0, type: "retract", label: "Lift" },
-    { x: s.x * offset, y: 0, z: 0, type: "rapid", label: "Move to Y" },
-    { x: s.x * offset, y: -s.y * clr, z: 0, type: "rapid", label: "Y clearance" },
-    { x: s.x * offset, y: -s.y * clr, z: -depth, type: "rapid", label: "Plunge" },
-    { x: s.x * offset, y: yContact, z: -depth, type: "probe", label: "Probe Y" },
-    { x: s.x * offset, y: yContact, z: -depth, type: "contact", label: "Y contact" },
-    { x: s.x * offset, y: yContact - s.y * latchDistance, z: -depth, type: "retract", label: "Retract Y" },
-    { x: s.x * offset, y: yContact, z: -depth, type: "probe", label: "Slow Y" },
-    { x: s.x * offset, y: yContact, z: 0, type: "retract", label: "Lift" },
-    { x: xContact, y: yContact, z: 0, type: "result", label: "Found corner" }
-  ];
-}
-function waypointsCenter(cfg) {
-  const { centerMode, axes, sizeX, sizeY, xyClr, depth, probeDistance, latchDistance, probeDiameter } = cfg;
-  const clr = xyClr + probeDiameter / 2;
-  const halfX = sizeX / 2;
-  const halfY = sizeY / 2;
-  const r = probeDiameter / 2;
-  const wps = [
-    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
-    { x: 0, y: 0, z: -depth, type: "rapid", label: "Plunge" }
-  ];
-  if (axes !== "Y") {
-    const inside = centerMode === "inside";
-    const x1 = inside ? -(halfX - clr) : -(halfX + clr);
-    const c1 = inside ? -(halfX - probeDistance) : -halfX + r;
-    const x2 = inside ? halfX - clr : halfX + clr;
-    const c2 = inside ? halfX - probeDistance : halfX - r;
-    wps.push(
-      { x: x1, y: 0, z: -depth, type: "rapid", label: "X- approach" },
-      { x: c1, y: 0, z: -depth, type: "probe", label: "Probe X-" },
-      { x: c1, y: 0, z: -depth, type: "contact", label: "X- contact" },
-      { x: c1 + latchDistance, y: 0, z: -depth, type: "retract", label: "Retract" },
-      { x: c1, y: 0, z: -depth, type: "probe", label: "Slow X-" },
-      { x: x2, y: 0, z: -depth, type: "rapid", label: "X+ approach" },
-      { x: c2, y: 0, z: -depth, type: "probe", label: "Probe X+" },
-      { x: c2, y: 0, z: -depth, type: "contact", label: "X+ contact" },
-      { x: c2 - latchDistance, y: 0, z: -depth, type: "retract", label: "Retract" },
-      { x: c2, y: 0, z: -depth, type: "probe", label: "Slow X+" },
-      { x: (c1 + c2) / 2, y: 0, z: -depth, type: "rapid", label: "Move to X center" }
-    );
-  }
-  if (axes !== "X") {
-    const inside = centerMode === "inside";
-    const y1 = inside ? -(halfY - clr) : -(halfY + clr);
-    const c1 = inside ? -(halfY - probeDistance) : -halfY + r;
-    const y2 = inside ? halfY - clr : halfY + clr;
-    const c2 = inside ? halfY - probeDistance : halfY - r;
-    wps.push(
-      { x: 0, y: y1, z: -depth, type: "rapid", label: "Y- approach" },
-      { x: 0, y: c1, z: -depth, type: "probe", label: "Probe Y-" },
-      { x: 0, y: c1, z: -depth, type: "contact", label: "Y- contact" },
-      { x: 0, y: c1 + latchDistance, z: -depth, type: "retract", label: "Retract" },
-      { x: 0, y: c1, z: -depth, type: "probe", label: "Slow Y-" },
-      { x: 0, y: y2, z: -depth, type: "rapid", label: "Y+ approach" },
-      { x: 0, y: c2, z: -depth, type: "probe", label: "Probe Y+" },
-      { x: 0, y: c2, z: -depth, type: "contact", label: "Y+ contact" },
-      { x: 0, y: c2 - latchDistance, z: -depth, type: "retract", label: "Retract" },
-      { x: 0, y: c2, z: -depth, type: "probe", label: "Slow Y+" },
-      { x: 0, y: (c1 + c2) / 2, z: -depth, type: "rapid", label: "Move to Y center" }
-    );
-  }
-  wps.push(
-    { x: 0, y: 0, z: -depth, type: "rapid", label: "At center" },
-    { x: 0, y: 0, z: 0, type: "retract", label: "Lift" },
-    { x: 0, y: 0, z: 0, type: "result", label: "Center found" }
-  );
-  return wps;
-}
-function waypointsRotation(cfg) {
-  const { edge, xyClr, depth, offset, probeDistance, latchDistance, probeDiameter } = cfg;
-  const clr = xyClr + probeDiameter / 2;
-  const probeX = edge === "AB" || edge === "CD";
-  const dir = edge === "AB" || edge === "AD" ? 1 : -1;
-  const ax1 = probeX ? -dir * clr : 0;
-  const ay1 = !probeX ? -dir * clr : 0;
-  const px = probeX ? dir * probeDistance : 0;
-  const py = !probeX ? dir * probeDistance : 0;
-  const c1x = ax1 + px;
-  const c1y = ay1 + py;
-  const ax2 = probeX ? -dir * clr : offset;
-  const ay2 = !probeX ? -dir * clr : offset;
-  const c2x = ax2 + px;
-  const c2y = ay2 + py;
-  return [
-    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
-    { x: ax1, y: ay1, z: 0, type: "rapid", label: "P1 approach" },
-    { x: ax1, y: ay1, z: -depth, type: "rapid", label: "Plunge" },
-    { x: c1x, y: c1y, z: -depth, type: "probe", label: "Probe P1" },
-    { x: c1x, y: c1y, z: -depth, type: "contact", label: "P1 contact" },
-    { x: c1x - px * latchDistance / probeDistance, y: c1y - py * latchDistance / probeDistance, z: -depth, type: "retract", label: "Retract" },
-    { x: c1x, y: c1y, z: -depth, type: "probe", label: "Slow P1" },
-    { x: c1x, y: c1y, z: 0, type: "retract", label: "Lift" },
-    { x: ax2, y: ay2, z: 0, type: "rapid", label: "P2 approach" },
-    { x: ax2, y: ay2, z: -depth, type: "rapid", label: "Plunge" },
-    { x: c2x, y: c2y, z: -depth, type: "probe", label: "Probe P2" },
-    { x: c2x, y: c2y, z: -depth, type: "contact", label: "P2 contact" },
-    { x: c2x - px * latchDistance / probeDistance, y: c2y - py * latchDistance / probeDistance, z: -depth, type: "retract", label: "Retract" },
-    { x: c2x, y: c2y, z: -depth, type: "probe", label: "Slow P2" },
-    { x: c2x, y: c2y, z: 0, type: "retract", label: "Lift" },
-    { x: 0, y: 0, z: 0, type: "rapid", label: "Return" },
-    { x: c1x, y: c1y, z: -depth, type: "result", label: `P1: X${c1x.toFixed(2)} Y${c1y.toFixed(2)}` },
-    { x: c2x, y: c2y, z: -depth, type: "result", label: `P2: X${c2x.toFixed(2)} Y${c2y.toFixed(2)}` }
-  ];
-}
-function loadPreview(waypoints) {
-  stopPreviewAnim();
-  _ps.waypoints = waypoints;
-  _ps.currentStep = 0;
-  renderPreview();
-  updatePreviewDRO();
-  updatePreviewControls();
-}
-function stepPreview(delta) {
-  _ps.currentStep = Math.max(0, Math.min(_ps.waypoints.length - 1, _ps.currentStep + delta));
-  renderPreview();
-  updatePreviewDRO();
-  updatePreviewControls();
-}
-function playPreview() {
-  if (_ps.playing) {
-    stopPreviewAnim();
-    return;
-  }
-  if (_ps.currentStep >= _ps.waypoints.length - 1) _ps.currentStep = 0;
-  _ps.playing = true;
-  updatePreviewControls();
-  _ps.animTimer = setInterval(() => {
-    if (_ps.currentStep >= _ps.waypoints.length - 1) {
-      stopPreviewAnim();
-      return;
-    }
-    _ps.currentStep++;
-    renderPreview();
-    updatePreviewDRO();
-    updatePreviewControls();
-  }, 300);
-}
-function stopPreviewAnim() {
-  if (_ps.animTimer) {
-    clearInterval(_ps.animTimer);
-    _ps.animTimer = null;
-  }
-  _ps.playing = false;
-  updatePreviewControls();
-}
-function updatePreviewControls() {
-  const playBtn = document.getElementById("previewPlayBtn");
-  const stepFwd = document.getElementById("previewStepFwd");
-  const stepBck = document.getElementById("previewStepBck");
-  const counter = document.getElementById("previewCounter");
-  if (playBtn) playBtn.textContent = _ps.playing ? "\u23F8" : "\u25B6";
-  if (stepFwd) stepFwd.disabled = _ps.currentStep >= _ps.waypoints.length - 1;
-  if (stepBck) stepBck.disabled = _ps.currentStep <= 0;
-  if (counter) counter.textContent = _ps.waypoints.length > 0 ? `${_ps.currentStep + 1} / ${_ps.waypoints.length}` : "\u2014";
-}
-function updatePreviewDRO() {
-  const wp = _ps.waypoints[_ps.currentStep];
-  if (!wp) return;
-  const dx = document.getElementById("previewDroX");
-  const dy = document.getElementById("previewDroY");
-  const dz = document.getElementById("previewDroZ");
-  const dl = document.getElementById("previewDroLabel");
-  if (dx) dx.textContent = wp.x.toFixed(3);
-  if (dy) dy.textContent = wp.y.toFixed(3);
-  if (dz) dz.textContent = wp.z.toFixed(3);
-  if (dl) dl.textContent = wp.label || "";
-}
-function renderPreview() {
-  const xyCanvas = document.getElementById("previewXY");
-  const xzCanvas = document.getElementById("previewXZ");
-  if (!xyCanvas || !xzCanvas || _ps.waypoints.length === 0) return;
-  drawView(xyCanvas, "XY");
-  drawView(xzCanvas, "XZ");
-}
-function drawView(canvas, view) {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-  const W = canvas.width;
-  const H = canvas.height;
-  const wps = _ps.waypoints;
-  const cur = _ps.currentStep;
-  const xs = wps.map((w2) => view === "XY" ? w2.x : w2.x);
-  const ys = wps.map((w2) => view === "XY" ? w2.y : w2.z);
-  let minX = Math.min(...xs), maxX = Math.max(...xs);
-  let minY = Math.min(...ys), maxY = Math.max(...ys);
-  const padX = Math.max((maxX - minX) * 0.2, 5);
-  const padY = Math.max((maxY - minY) * 0.2, 5);
-  minX -= padX;
-  maxX += padX;
-  minY -= padY;
-  maxY += padY;
-  const scaleX = W / (maxX - minX || 1);
-  const scaleY = H / (maxY - minY || 1);
-  const scale = Math.min(scaleX, scaleY) * 0.85;
-  const offX = W / 2 - (maxX + minX) / 2 * scale;
-  const offY = H / 2 + (maxY + minY) / 2 * scale;
-  const tx = (x) => x * scale + offX;
-  const ty = (y) => -y * scale + offY;
-  ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = "#0f0e0c";
-  ctx.fillRect(0, 0, W, H);
-  ctx.strokeStyle = "rgba(255,255,255,0.05)";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(tx(0), 0);
-  ctx.lineTo(tx(0), H);
-  ctx.moveTo(0, ty(0));
-  ctx.lineTo(W, ty(0));
-  ctx.stroke();
-  ctx.fillStyle = "rgba(255,255,255,0.25)";
-  ctx.font = "10px monospace";
-  ctx.fillText(view, 6, 14);
-  for (let i = 1; i <= Math.min(cur, wps.length - 1); i++) {
-    const a = wps[i - 1];
-    const b = wps[i];
-    const ax = view === "XY" ? a.x : a.x;
-    const ay = view === "XY" ? a.y : a.z;
-    const bx = view === "XY" ? b.x : b.x;
-    const by = view === "XY" ? b.y : b.z;
-    ctx.beginPath();
-    ctx.moveTo(tx(ax), ty(ay));
-    ctx.lineTo(tx(bx), ty(by));
-    const color = TYPE_COLOR[b.type] || "#888";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = b.type === "probe" ? 2 : 1.5;
-    if (b.type === "rapid" || b.type === "retract") {
-      ctx.setLineDash([4, 3]);
-    } else {
-      ctx.setLineDash([]);
-    }
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-  for (let i = Math.max(1, cur + 1); i < wps.length; i++) {
-    const a = wps[i - 1];
-    const b = wps[i];
-    const ax = view === "XY" ? a.x : a.x;
-    const ay = view === "XY" ? a.y : a.z;
-    const bx = view === "XY" ? b.x : b.x;
-    const by = view === "XY" ? b.y : b.z;
-    ctx.beginPath();
-    ctx.moveTo(tx(ax), ty(ay));
-    ctx.lineTo(tx(bx), ty(by));
-    ctx.strokeStyle = "rgba(255,255,255,0.08)";
-    ctx.lineWidth = 1;
-    ctx.setLineDash([2, 4]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-  for (let i = 0; i <= Math.min(cur, wps.length - 1); i++) {
-    const wp = wps[i];
-    if (wp.type !== "contact" && wp.type !== "result") continue;
-    const wx = view === "XY" ? wp.x : wp.x;
-    const wy = view === "XY" ? wp.y : wp.z;
-    ctx.beginPath();
-    ctx.arc(tx(wx), ty(wy), 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = TYPE_COLOR[wp.type];
-    ctx.fill();
-  }
-  if (wps[cur]) {
-    const wp = wps[cur];
-    const cx = view === "XY" ? wp.x : wp.x;
-    const cy = view === "XY" ? wp.y : wp.z;
-    const px = tx(cx);
-    const py2 = ty(cy);
-    const sz = 6;
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([]);
-    ctx.beginPath();
-    ctx.moveTo(px - sz, py2);
-    ctx.lineTo(px + sz, py2);
-    ctx.moveTo(px, py2 - sz);
-    ctx.lineTo(px, py2 + sz);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(px, py2, 3, 0, Math.PI * 2);
-    ctx.strokeStyle = "#ffffff";
-    ctx.stroke();
-  }
-}
-var TYPE_COLOR, _ps;
-var init_preview = __esm({
-  "src/probing/preview.ts"() {
-    "use strict";
-    TYPE_COLOR = {
-      start: "#64748b",
-      rapid: "#3b82f6",
-      probe: "#f97316",
-      retract: "#6366f1",
-      contact: "#22c55e",
-      result: "#f43f5e"
-    };
-    _ps = {
-      waypoints: [],
-      currentStep: 0,
-      animTimer: null,
-      playing: false
-    };
-  }
-});
-
 // src/probing/probing-tab.tsx
 function loadCfg(sub, defaults) {
   return { ...defaults, ...lsGet(`${SAVE_KEY}-${sub}`, {}) };
@@ -7946,7 +7547,7 @@ function buildToolLengthTab() {
     toolsetterDepth: 10,
     tloReference: null
   });
-  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-toollength", style: "display:flex;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeTouch", value: "touchplate", checked: tlCfg.mode === "touchplate" }), "Touch Plate"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeToolsetter", value: "toolsetter", checked: tlCfg.mode === "toolsetter" }), "Toolsetter (G59.3)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeFeed", value: String(tlCfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchFeed", value: String(tlCfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeDist", value: String(tlCfg.probeDistance), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchDist", value: String(tlCfg.latchDistance), min: "0.1", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlTouchSection", style: tlCfg.mode === "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Touch Plate"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlPlateHeight", value: String(tlCfg.touchPlateHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlToolsetterSection", style: tlCfg.mode !== "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Toolsetter"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Approach depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlTsDepth", value: String(tlCfg.toolsetterDepth), min: "1", step: "1" })), /* @__PURE__ */ h("div", { style: "font-family:var(--mono);font-size:10px;color:var(--text3);" }, "Position from G59.3 in Offsets tab")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Reference Tool"), /* @__PURE__ */ h("div", { class: "prob-ref-display", id: "probTlRefDisplay" }, tlCfg.tloReference !== null ? `Ref: ${tlCfg.tloReference.toFixed(4)} mm` : "No reference set"), /* @__PURE__ */ h("div", { style: "display:flex;gap:5px;margin-top:5px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;font-size:10px;padding:5px", id: "probTlSetRef" }, "SET REF TOOL"), /* @__PURE__ */ h("button", { class: "tb-btn danger", id: "probTlClearRef", style: `font-size:10px;padding:5px;display:${tlCfg.tloReference === null ? "none" : "inline-block"}` }, "CLEAR"))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probTlStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probTlResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probTlPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probTlProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probTlCancel", disabled: true }, "\u2715")));
+  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-toollength", style: "display:flex;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeTouch", value: "touchplate", checked: tlCfg.mode === "touchplate" }), "Touch Plate"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeToolsetter", value: "toolsetter", checked: tlCfg.mode === "toolsetter" }), "Toolsetter (G59.3)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeFeed", value: String(tlCfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchFeed", value: String(tlCfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeDist", value: String(tlCfg.probeDistance), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchDist", value: String(tlCfg.latchDistance), min: "0.1", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlTouchSection", style: tlCfg.mode === "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Touch Plate"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlPlateHeight", value: String(tlCfg.touchPlateHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlToolsetterSection", style: tlCfg.mode !== "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Toolsetter"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Approach depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlTsDepth", value: String(tlCfg.toolsetterDepth), min: "1", step: "1" })), /* @__PURE__ */ h("div", { style: "font-family:var(--mono);font-size:10px;color:var(--text3);" }, "Position from G59.3 in Offsets tab")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Reference Tool"), /* @__PURE__ */ h("div", { class: "prob-ref-display", id: "probTlRefDisplay" }, tlCfg.tloReference !== null ? `Ref: ${tlCfg.tloReference.toFixed(4)} mm` : "No reference set"), /* @__PURE__ */ h("div", { style: "display:flex;gap:5px;margin-top:5px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;font-size:10px;padding:5px", id: "probTlSetRef" }, "SET REF TOOL"), /* @__PURE__ */ h("button", { class: "tb-btn danger", id: "probTlClearRef", style: `font-size:10px;padding:5px;display:${tlCfg.tloReference === null ? "none" : "inline-block"}` }, "CLEAR"))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probTlStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probTlResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probTlProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probTlCancel", disabled: true }, "\u2715")));
 }
 function buildEdgeFinderTab() {
   const cfg = loadCfg("ef", {
@@ -7976,7 +7577,7 @@ function buildEdgeFinderTab() {
   ];
   return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-edgefinder", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probEfMode", id: "probEfModeExt", value: "external", checked: cfg.mode === "external" }), "External"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probEfMode", id: "probEfModeInt", value: "internal", checked: cfg.mode === "internal" }), "Internal"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Select Edge / Corner"), /* @__PURE__ */ h("div", { class: "prob-edge-grid" }, edgeButtons.map(
     (e) => /* @__PURE__ */ h("button", { class: "prob-edge-btn", id: `probEfEdge-${e.id}`, "data-edge": e.id, title: e.title }, e.label)
-  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "D\u2014\u2014C", /* @__PURE__ */ h("br", null), "|  |", /* @__PURE__ */ h("br", null), "A\u2014\u2014B")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Corner offset (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfOffset", value: String(cfg.offset), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Also probe Z"), /* @__PURE__ */ h("label", { class: "prob-toggle" }, /* @__PURE__ */ h("input", { type: "checkbox", id: "probEfProbeZ", checked: cfg.probeZ }), " Yes"))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probEfZSection", style: cfg.probeZ ? "" : "display:none" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Z Probe"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Touch plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfPlateHeight", value: String(cfg.touchPlateHeight), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Workpiece height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfWpHeight", value: String(cfg.workpieceHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probEfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probEfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probEfStatus" }, "Select an edge or corner, then click PROBE"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probEfPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probEfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probEfCancel", disabled: true }, "\u2715")));
+  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "D\u2014\u2014C", /* @__PURE__ */ h("br", null), "|  |", /* @__PURE__ */ h("br", null), "A\u2014\u2014B")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Corner offset (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfOffset", value: String(cfg.offset), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Also probe Z"), /* @__PURE__ */ h("label", { class: "prob-toggle" }, /* @__PURE__ */ h("input", { type: "checkbox", id: "probEfProbeZ", checked: cfg.probeZ }), " Yes"))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probEfZSection", style: cfg.probeZ ? "" : "display:none" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Z Probe"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Touch plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfPlateHeight", value: String(cfg.touchPlateHeight), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Workpiece height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfWpHeight", value: String(cfg.workpieceHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probEfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probEfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probEfStatus" }, "Select an edge or corner, then click PROBE"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probEfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probEfCancel", disabled: true }, "\u2715")));
 }
 function buildCenterFinderTab() {
   const cfg = loadCfg("cf", {
@@ -7993,7 +7594,7 @@ function buildCenterFinderTab() {
     workpieceSizeY: 50,
     passes: 1
   });
-  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-centerfinder", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Center Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeInside", value: "inside", checked: cfg.centerMode === "inside" }), "Inside (bore)"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeOutside", value: "outside", checked: cfg.centerMode === "outside" }), "Outside (boss)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Axes"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesXY", value: "XY", checked: cfg.axes === "XY" }), "XY"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesX", value: "X", checked: cfg.axes === "X" }), "X only"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesY", value: "Y", checked: cfg.axes === "Y" }), "Y only"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Workpiece Size"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "X size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeX", value: String(cfg.workpieceSizeX), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Y size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeY", value: String(cfg.workpieceSizeY), min: "1", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Passes"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfPasses", value: String(cfg.passes), min: "1", max: "5", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probCfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probCfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probCfStatus" }, "Ready"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probCfPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probCfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probCfCancel", disabled: true }, "\u2715")));
+  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-centerfinder", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Center Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeInside", value: "inside", checked: cfg.centerMode === "inside" }), "Inside (bore)"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeOutside", value: "outside", checked: cfg.centerMode === "outside" }), "Outside (boss)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Axes"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesXY", value: "XY", checked: cfg.axes === "XY" }), "XY"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesX", value: "X", checked: cfg.axes === "X" }), "X only"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesY", value: "Y", checked: cfg.axes === "Y" }), "Y only"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Workpiece Size"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "X size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeX", value: String(cfg.workpieceSizeX), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Y size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeY", value: String(cfg.workpieceSizeY), min: "1", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Passes"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfPasses", value: String(cfg.passes), min: "1", max: "5", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probCfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probCfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probCfStatus" }, "Ready"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probCfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probCfCancel", disabled: true }, "\u2715")));
 }
 function buildRotationTab() {
   const cfg = loadCfg("rot", {
@@ -8009,7 +7610,7 @@ function buildRotationTab() {
   });
   return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-rotation", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Edge to Probe Along"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;flex-wrap:wrap;" }, ["AB", "AD", "CB", "CD"].map(
     (e) => /* @__PURE__ */ h("label", { class: "prob-mode-btn", style: "flex:0 0 auto" }, /* @__PURE__ */ h("input", { type: "radio", name: "probRotEdge", value: e, checked: cfg.edge === e }), e)
-  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "AB=bottom edge \xB7 AD=left edge \xB7 CB=right edge \xB7 CD=top edge")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Point spacing (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotOffset", value: String(cfg.offset), min: "5", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probRotStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probRotResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probRotPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probRotProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:10px;font-size:13px", id: "probRotApply", disabled: true }, "\u21BB APPLY ROTATION"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probRotCancel", disabled: true }, "\u2715")));
+  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "AB=bottom edge \xB7 AD=left edge \xB7 CB=right edge \xB7 CD=top edge")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Point spacing (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotOffset", value: String(cfg.offset), min: "5", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probRotStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probRotResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probRotProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:10px;font-size:13px", id: "probRotApply", disabled: true }, "\u21BB APPLY ROTATION"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probRotCancel", disabled: true }, "\u2715")));
 }
 function wireTlEvents(container) {
   const statusId = "probTlStatus";
@@ -8255,9 +7856,6 @@ function wireRotEvents(container) {
     setStatus3(statusId, "Cancelled", "idle");
   });
 }
-function buildPreviewPanel() {
-  return /* @__PURE__ */ h("div", { class: "prob-preview-panel", id: "probPreviewPanel" }, /* @__PURE__ */ h("div", { class: "prob-preview-canvases" }, /* @__PURE__ */ h("canvas", { id: "previewXY", class: "prob-preview-canvas", width: "220", height: "160" }), /* @__PURE__ */ h("canvas", { id: "previewXZ", class: "prob-preview-canvas", width: "220", height: "160" })), /* @__PURE__ */ h("div", { class: "prob-preview-controls" }, /* @__PURE__ */ h("div", { class: "prob-preview-dro" }, /* @__PURE__ */ h("div", { class: "prob-dro-cell" }, /* @__PURE__ */ h("span", { class: "prob-dro-axis" }, "X"), /* @__PURE__ */ h("span", { class: "prob-dro-val", id: "previewDroX" }, "\u2014")), /* @__PURE__ */ h("div", { class: "prob-dro-cell" }, /* @__PURE__ */ h("span", { class: "prob-dro-axis" }, "Y"), /* @__PURE__ */ h("span", { class: "prob-dro-val", id: "previewDroY" }, "\u2014")), /* @__PURE__ */ h("div", { class: "prob-dro-cell" }, /* @__PURE__ */ h("span", { class: "prob-dro-axis" }, "Z"), /* @__PURE__ */ h("span", { class: "prob-dro-val", id: "previewDroZ" }, "\u2014"))), /* @__PURE__ */ h("div", { class: "prob-preview-label", id: "previewDroLabel" }, "Load a preview"), /* @__PURE__ */ h("div", { class: "prob-preview-btns" }, /* @__PURE__ */ h("button", { class: "prob-prev-btn", id: "previewStepBck", onClick: () => stepPreview(-1), disabled: true }, "\u25C0"), /* @__PURE__ */ h("button", { class: "prob-prev-btn", id: "previewPlayBtn", onClick: () => playPreview() }, "\u25B6"), /* @__PURE__ */ h("button", { class: "prob-prev-btn", id: "previewStepFwd", onClick: () => stepPreview(1), disabled: true }, "\u25B6|"), /* @__PURE__ */ h("span", { class: "prob-prev-counter", id: "previewCounter" }, "\u2014"))));
-}
 function initProbingTab() {
   const container = document.getElementById("tabpanel-probing");
   if (!container) return;
@@ -8265,7 +7863,6 @@ function initProbingTab() {
   const efPanel = buildEdgeFinderTab();
   const cfPanel = buildCenterFinderTab();
   const rotPanel = buildRotationTab();
-  const previewPanel = buildPreviewPanel();
   const panelWrap = container.querySelector(".prob-panels");
   if (panelWrap) {
     panelWrap.appendChild(tlPanel);
@@ -8273,84 +7870,11 @@ function initProbingTab() {
     panelWrap.appendChild(cfPanel);
     panelWrap.appendChild(rotPanel);
   }
-  container.appendChild(previewPanel);
   initSubTabs(container);
   wireTlEvents(container);
   wireEfEvents(container);
   wireCfEvents(container);
   wireRotEvents(container);
-  wirePreviewBtns(container);
-}
-function wirePreviewBtns(container) {
-  container.querySelector("#probTlPreview")?.addEventListener("click", () => {
-    const mode = document.querySelector('input[name="probTlMode"]:checked')?.value || "touchplate";
-    if (mode === "toolsetter") {
-      const ts = state.wcsOffsets["G59.3"] || { x: 50, y: 50, z: -20 };
-      loadPreview(waypointsToolsetter({
-        probeDistance: numVal("probTlProbeDist"),
-        latchDistance: numVal("probTlLatchDist"),
-        toolsetterDepth: numVal("probTlTsDepth"),
-        tsOffX: ts.x - state.machineX,
-        tsOffY: ts.y - state.machineY,
-        tsOffZ: ts.z - state.machineZ
-      }));
-    } else {
-      loadPreview(waypointsTouchplate({
-        probeDistance: numVal("probTlProbeDist"),
-        latchDistance: numVal("probTlLatchDist"),
-        touchPlateHeight: numVal("probTlPlateHeight")
-      }));
-    }
-  });
-  container.querySelector("#probEfPreview")?.addEventListener("click", () => {
-    const edge = container.querySelector(".prob-edge-btn.active")?.dataset.edge || "AB";
-    const mode = document.querySelector('input[name="probEfMode"]:checked')?.value || "external";
-    const cfg = {
-      edge,
-      mode,
-      xyClr: numVal("probEfXYClr"),
-      depth: numVal("probEfDepth"),
-      offset: numVal("probEfOffset"),
-      probeDistance: numVal("probEfProbeDist"),
-      latchDistance: numVal("probEfLatchDist"),
-      probeDiameter: numVal("probEfDiameter")
-    };
-    const isCorner = edge.length === 1 && edge !== "Z";
-    if (edge === "Z") {
-      loadPreview(waypointsTouchplate({ probeDistance: cfg.probeDistance, latchDistance: cfg.latchDistance, touchPlateHeight: 0 }));
-    } else if (isCorner) {
-      loadPreview(waypointsEdgeCorner(cfg));
-    } else {
-      loadPreview(waypointsEdgeSingle(cfg));
-    }
-  });
-  container.querySelector("#probCfPreview")?.addEventListener("click", () => {
-    const centerMode = document.querySelector('input[name="probCfMode"]:checked')?.value || "inside";
-    const axes = document.querySelector('input[name="probCfAxes"]:checked')?.value || "XY";
-    loadPreview(waypointsCenter({
-      centerMode,
-      axes,
-      sizeX: numVal("probCfSizeX"),
-      sizeY: numVal("probCfSizeY"),
-      xyClr: numVal("probCfXYClr"),
-      depth: numVal("probCfDepth"),
-      probeDistance: numVal("probCfProbeDist"),
-      latchDistance: numVal("probCfLatchDist"),
-      probeDiameter: numVal("probCfDiameter")
-    }));
-  });
-  container.querySelector("#probRotPreview")?.addEventListener("click", () => {
-    const edge = document.querySelector('input[name="probRotEdge"]:checked')?.value || "AB";
-    loadPreview(waypointsRotation({
-      edge,
-      xyClr: numVal("probRotXYClr"),
-      depth: numVal("probRotDepth"),
-      offset: numVal("probRotOffset"),
-      probeDistance: numVal("probRotProbeDist"),
-      latchDistance: numVal("probRotLatchDist"),
-      probeDiameter: numVal("probRotDiameter")
-    }));
-  });
 }
 var SAVE_KEY;
 var init_probing_tab = __esm({
@@ -8366,7 +7890,6 @@ var init_probing_tab = __esm({
     init_edge_finder();
     init_center_finder();
     init_rotation();
-    init_preview();
     SAVE_KEY = "fs-probing-tab";
   }
 });
