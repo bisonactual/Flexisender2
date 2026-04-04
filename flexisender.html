@@ -1148,6 +1148,53 @@
   .tl-result { font-family: var(--mono); font-size: 11px; color: var(--accent); text-align: center; min-height: 16px; }
   .tl-ref-display { font-family: var(--mono); font-size: 11px; color: var(--text3); padding: 4px 0; }
 
+  /* ── Probing Tab ─────────────────────────────────────────────────────────── */
+  .prob-subtab-bar { display: flex; gap: 0; background: var(--surface); border-bottom: 2px solid var(--border); flex-shrink: 0; overflow-x: auto; }
+  .prob-subtab-btn { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 16px; cursor: pointer; white-space: nowrap; margin-bottom: -2px; transition: all 0.15s; }
+  .prob-subtab-btn:hover { color: var(--text); background: var(--surface2); }
+  .prob-subtab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .prob-panels { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
+  .prob-subtab-panel { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+  .prob-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; }
+  .prob-section-label { font-family: var(--cond); font-weight: 700; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 2px; }
+  .prob-row { display: flex; align-items: center; gap: 8px; }
+  .prob-label { font-family: var(--cond); font-size: 10px; letter-spacing: 0.5px; color: var(--text2); flex: 1; }
+  .prob-input { background: var(--surface3); border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 4px 8px; width: 80px; text-align: right; outline: none; border-radius: var(--radius-sm); transition: border-color 0.15s; -moz-appearance: textfield; }
+  .prob-input::-webkit-inner-spin-button, .prob-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .prob-input:focus { border-color: var(--accent); }
+  .prob-select { background: var(--surface3); border: 1px solid var(--border2); color: var(--text); font-family: var(--cond); font-size: 11px; padding: 4px 8px; outline: none; border-radius: var(--radius-sm); flex: 1; }
+  .prob-mode-btn { display: flex; align-items: center; gap: 5px; font-family: var(--cond); font-weight: 700; font-size: 11px; color: var(--text2); cursor: pointer; background: var(--surface3); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 6px 10px; transition: all 0.12s; flex: 1; justify-content: center; }
+  .prob-mode-btn:has(input:checked) { background: rgba(229,92,0,0.2); border-color: var(--accent2); color: var(--accent); }
+  .prob-mode-btn input[type=radio], .prob-mode-btn input[type=checkbox] { display: none; }
+  .prob-toggle { display: flex; align-items: center; gap: 5px; font-family: var(--cond); font-size: 11px; color: var(--text2); cursor: pointer; }
+  .prob-status { font-family: var(--cond); font-size: 11px; letter-spacing: 0.5px; padding: 6px 8px; border-radius: var(--radius-sm); text-align: center; }
+  .prob-status-idle    { background: var(--surface2); color: var(--text3); }
+  .prob-status-running { background: rgba(245,158,11,0.15); color: var(--yellow); animation: pulse 1s infinite; }
+  .prob-status-ok      { background: rgba(34,197,94,0.15); color: var(--green); }
+  .prob-status-err     { background: rgba(239,68,68,0.15); color: var(--red); }
+  .prob-result { font-family: var(--mono); font-size: 11px; color: var(--accent); text-align: center; min-height: 16px; }
+  .prob-ref-display { font-family: var(--mono); font-size: 11px; color: var(--text3); padding: 4px 0; }
+  .prob-edge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .prob-edge-btn { font-family: var(--cond); font-weight: 700; font-size: 12px; letter-spacing: 1px; background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); padding: 8px 4px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.12s; text-align: center; }
+  .prob-edge-btn:hover { background: var(--border); color: var(--text); }
+  .prob-edge-btn.active { background: rgba(229,92,0,0.25); border-color: var(--accent2); color: var(--accent); }
+
+  /* ── Probe preview panel ─────────────────────────────────────────────────── */
+  .prob-preview-panel { height: 200px; flex-shrink: 0; display: flex; gap: 0; border-top: 1px solid var(--border2); background: var(--surface); }
+  .prob-preview-canvases { display: flex; gap: 1px; background: var(--border); flex-shrink: 0; }
+  .prob-preview-canvas { display: block; background: #0f0e0c; }
+  .prob-preview-controls { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 12px; min-width: 0; }
+  .prob-preview-dro { display: flex; flex-direction: column; gap: 4px; }
+  .prob-dro-cell { display: flex; align-items: baseline; gap: 6px; }
+  .prob-dro-axis { font-family: var(--cond); font-weight: 700; font-size: 11px; color: var(--text3); width: 12px; }
+  .prob-dro-val { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); }
+  .prob-preview-label { font-family: var(--cond); font-size: 10px; color: var(--text3); letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .prob-preview-btns { display: flex; align-items: center; gap: 5px; }
+  .prob-prev-btn { background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); font-family: var(--mono); font-size: 12px; padding: 5px 9px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.1s; }
+  .prob-prev-btn:hover:not(:disabled) { background: var(--border); color: var(--text); }
+  .prob-prev-btn:disabled { opacity: 0.3; cursor: default; }
+  .prob-prev-counter { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-left: 4px; }
+
   .wcs-outer { flex: 1; overflow-y: auto; background: var(--bg); }
   .wcs-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .wcs-toolbar-title { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); flex: 1; }
@@ -1289,6 +1336,7 @@
   <button class="tab-btn" id="tab-camera" data-tab="camera">CAMERA</button>
   <button class="tab-btn" id="tab-tooltable" data-tab="tooltable">TOOL TABLE</button>
   <button class="tab-btn" id="tab-offsets" data-tab="offsets">OFFSETS</button>
+  <button class="tab-btn" id="tab-probing" data-tab="probing">PROBING</button>
   <button class="tab-btn" id="tab-modules" data-tab="modules">MODULES</button>
   <button class="tab-btn" id="tab-options" data-tab="options">⚙ OPTIONS</button>
   <button class="mod-lock-btn" id="modLockBtn" title="Lock / unlock module positions">
@@ -2376,6 +2424,17 @@
   </div>
 </div><!-- /tab-panel-offsets -->
 
+<!-- TAB: PROBING -->
+<div class="tab-panel" id="tabpanel-probing" style="flex-direction:column;overflow:hidden;background:var(--bg);display:flex;">
+  <div class="prob-subtab-bar">
+    <button class="prob-subtab-btn active" data-subtab="toollength">Tool Length</button>
+    <button class="prob-subtab-btn" data-subtab="edgefinder">Edge Finder</button>
+    <button class="prob-subtab-btn" data-subtab="centerfinder">Center Finder</button>
+    <button class="prob-subtab-btn" data-subtab="rotation">Rotation</button>
+  </div>
+  <div class="prob-panels" style="flex:1;overflow:hidden;position:relative;"></div>
+</div><!-- /tab-panel-probing -->
+
 
 <script type="module">
 var __defProp = Object.defineProperty;
@@ -2450,6 +2509,7 @@ var init_state = __esm({
       tloOffset: 0,
       tloActive: false,
       wcsPhase: "idle",
+      activeWcs: "G54",
       currentToolNumber: 0,
       ttPhase: "idle",
       _ttLines: [],
@@ -2481,6 +2541,7 @@ var init_state = __esm({
       camMeasuring: false,
       camMeasureStartPos: null,
       _camTabInited: false,
+      _probingTabInited: false,
       // Keyboard jog
       kbJogActive: false,
       kbJogKey: null,
@@ -5472,6 +5533,36 @@ var init_offsets = __esm({
 });
 
 // src/probing/probe-program.ts
+function getActiveWcs() {
+  return state.activeWcs || "G54";
+}
+function applyXYResult(x, y, axes, opts) {
+  const wcs = opts.wcs || getActiveWcs();
+  const xOff = opts.xOffset ?? 0;
+  const yOff = opts.yOffset ?? 0;
+  const fx = (x + xOff).toFixed(4);
+  const fy = (y + yOff).toFixed(4);
+  if (opts.mode === "G92") {
+    const parts = axes === "XY" ? `X${fx}Y${fy}` : axes === "X" ? `X${fx}` : `Y${fy}`;
+    sendCmd(`G92${parts}`);
+  } else if (opts.mode === "G10") {
+    const p = WCS_P[wcs] ?? 1;
+    const parts = axes === "XY" ? `X${fx}Y${fy}` : axes === "X" ? `X${fx}` : `Y${fy}`;
+    sendCmd(`G10L2P${p}${parts}`);
+  }
+  log("info", `Probed ${axes}: X=${fx} Y=${fy} \u2192 ${wcs} (${opts.mode})`);
+}
+function applyZResult(z, plateHeight, wcsHeight, opts) {
+  const wcs = opts.wcs || getActiveWcs();
+  const fz = (z - plateHeight - wcsHeight).toFixed(4);
+  if (opts.mode === "G92") {
+    sendCmd(`G92Z${fz}`);
+  } else if (opts.mode === "G10") {
+    const p = WCS_P[wcs] ?? 1;
+    sendCmd(`G10L2P${p}Z${fz}`);
+  }
+  log("info", `Probed Z: raw=${z.toFixed(4)} plate=${plateHeight} \u2192 Z${fz} \u2192 ${wcs} (${opts.mode})`);
+}
 function isProbingRunning() {
   return _running;
 }
@@ -5571,6 +5662,31 @@ async function runToolLengthProbe(seq) {
     _running = false;
   }
 }
+async function probeAxis(axis, direction, probeFeedRate, latchFeedRate, probeDistance, latchDistance) {
+  if (_cancelled) return null;
+  const sign = direction < 0 ? "-" : "";
+  const dist = probeDistance.toFixed(4);
+  const latch = latchDistance.toFixed(4);
+  const latch2 = (latchDistance * 2).toFixed(4);
+  sendCmd(`G38.3G91F${probeFeedRate}${axis}${sign}${dist}`);
+  const fast = await waitProbe();
+  if (!fast || !fast.success) return null;
+  const retractSign = direction < 0 ? "" : "-";
+  if (!await sendAndWait(`G91G0${axis}${retractSign}${latch}`)) return null;
+  sendCmd(`G38.3G91F${latchFeedRate}${axis}${sign}${latch2}`);
+  const slow = await waitProbe();
+  if (!slow || !slow.success) return null;
+  if (!await sendAndWait(`G91G0${axis}${retractSign}${latch}`)) return null;
+  return slow;
+}
+async function rapidToMPos(x, y, z) {
+  if (_cancelled) return false;
+  let cmd = "G53G0";
+  if (x !== null) cmd += `X${x.toFixed(4)}`;
+  if (y !== null) cmd += `Y${y.toFixed(4)}`;
+  if (z !== null) cmd += `Z${z.toFixed(4)}`;
+  return sendAndWait(cmd);
+}
 async function runTouchplateSequence(seq) {
   log("info", "\u2295 Touch plate probe starting\u2026");
   const fastCmd = `G38.3G91F${seq.probeFeedRate}Z-${seq.probeDistance.toFixed(4)}`;
@@ -5648,13 +5764,24 @@ async function runToolsetterSequence(seq) {
   log("info", `\u2713 Toolsetter probe: Z=${slowResult.z.toFixed(4)}`);
   return slowResult;
 }
-var _running, _cancelled, _probeResult, _probeResolve, _idleResolve, _idleTimeout;
+var WCS_P, _running, _cancelled, _probeResult, _probeResolve, _idleResolve, _idleTimeout;
 var init_probe_program = __esm({
   "src/probing/probe-program.ts"() {
     "use strict";
     init_state();
     init_console();
     init_connection();
+    WCS_P = {
+      G54: 1,
+      G55: 2,
+      G56: 3,
+      G57: 4,
+      G58: 5,
+      G59: 6,
+      "G59.1": 7,
+      "G59.2": 8,
+      "G59.3": 9
+    };
     _running = false;
     _cancelled = false;
     _probeResult = null;
@@ -5823,6 +5950,7 @@ function parseStatus(s) {
       const wcs = vals[0] && vals[0].toUpperCase();
       report.wcs = wcs;
       tags.add("wcs");
+      if (wcs) state.activeWcs = wcs;
     }
     if (key === "Pn") {
       hasPn = true;
@@ -7015,6 +7143,1234 @@ var init_tool_length = __esm({
   }
 });
 
+// src/probing/edge-finder.ts
+function startPos() {
+  return { x: state.machineX, y: state.machineY, z: state.machineZ };
+}
+async function runEdgeFinder(cfg) {
+  if (!state.connected) {
+    log("err", "Not connected");
+    return false;
+  }
+  if (isProbingRunning()) {
+    log("err", "Probe already running");
+    return false;
+  }
+  const sp = startPos();
+  const clr = cfg.xyClr + cfg.probeDiameter / 2;
+  let ok = false;
+  if (cfg.edge === "Z") {
+    ok = await probeZEdge(cfg, sp);
+  } else if (cfg.edge.length === 2) {
+    ok = await probeSingleEdge(cfg, sp, clr);
+  } else {
+    ok = await probeCorner(cfg, sp, clr);
+  }
+  return ok;
+}
+async function probeZEdge(cfg, sp) {
+  log("info", "Edge finder: probing Z surface\u2026");
+  const result = await probeAxis("Z", -1, cfg.probeFeedRate, cfg.latchFeedRate, cfg.probeDistance, cfg.latchDistance);
+  if (!result) {
+    log("err", "\u2717 Z probe failed");
+    return false;
+  }
+  await rapidToMPos(null, null, sp.z);
+  const opts = { mode: cfg.coordMode, wcs: cfg.wcs };
+  applyZResult(result.z, cfg.touchPlateHeight, cfg.workpieceHeight, opts);
+  log("info", `\u2713 Z edge: ${result.z.toFixed(4)}`);
+  return true;
+}
+async function probeSingleEdge(cfg, sp, clr) {
+  const edge = cfg.edge;
+  const isX = edge === "AD" || edge === "CB";
+  const axis = isX ? "X" : "Y";
+  const dir = edge === "AD" || edge === "AB" ? cfg.mode === "external" ? 1 : -1 : cfg.mode === "external" ? -1 : 1;
+  log("info", `Edge finder: probing ${edge} (${axis} ${dir > 0 ? "+" : "-"})\u2026`);
+  const approachX = isX ? sp.x - dir * clr : null;
+  const approachY = !isX ? sp.y - dir * clr : null;
+  await rapidToMPos(null, null, sp.z - cfg.depth);
+  if (approachX !== null) await rapidToMPos(approachX, null, null);
+  if (approachY !== null) await rapidToMPos(null, approachY, null);
+  const result = await probeAxis(axis, dir, cfg.probeFeedRate, cfg.latchFeedRate, cfg.probeDistance, cfg.latchDistance);
+  if (!result) {
+    await rapidToMPos(null, null, sp.z);
+    log("err", `\u2717 ${edge} probe failed`);
+    return false;
+  }
+  await rapidToMPos(null, null, sp.z);
+  await rapidToMPos(sp.x, sp.y, null);
+  const radius = cfg.probeDiameter / 2;
+  const ex = isX ? result.x - dir * radius : result.x;
+  const ey = !isX ? result.y - dir * radius : result.y;
+  const opts = { mode: cfg.coordMode, wcs: cfg.wcs };
+  applyXYResult(ex, ey, axis, opts);
+  log("info", `\u2713 Edge ${edge}: X=${ex.toFixed(4)} Y=${ey.toFixed(4)}`);
+  return true;
+}
+async function probeCorner(cfg, sp, clr) {
+  const edge = cfg.edge;
+  const signs = {
+    A: { x: 1, y: 1 },
+    B: { x: -1, y: 1 },
+    C: { x: -1, y: -1 },
+    D: { x: 1, y: -1 }
+  };
+  const s = cfg.mode === "external" ? signs[edge] : { x: -signs[edge].x, y: -signs[edge].y };
+  log("info", `Edge finder: probing corner ${edge}\u2026`);
+  await rapidToMPos(null, sp.y + cfg.offset * s.y, null);
+  await rapidToMPos(sp.x - s.x * clr, null, null);
+  await rapidToMPos(null, null, sp.z - cfg.depth);
+  const rx = await probeAxis("X", s.x, cfg.probeFeedRate, cfg.latchFeedRate, cfg.probeDistance, cfg.latchDistance);
+  if (!rx) {
+    await rapidToMPos(null, null, sp.z);
+    log("err", `\u2717 Corner ${edge} X probe failed`);
+    return false;
+  }
+  await rapidToMPos(null, null, sp.z);
+  await rapidToMPos(sp.x, sp.y, null);
+  await rapidToMPos(sp.x + cfg.offset * s.x, null, null);
+  await rapidToMPos(null, sp.y - s.y * clr, null);
+  await rapidToMPos(null, null, sp.z - cfg.depth);
+  const ry = await probeAxis("Y", s.y, cfg.probeFeedRate, cfg.latchFeedRate, cfg.probeDistance, cfg.latchDistance);
+  if (!ry) {
+    await rapidToMPos(null, null, sp.z);
+    log("err", `\u2717 Corner ${edge} Y probe failed`);
+    return false;
+  }
+  await rapidToMPos(null, null, sp.z);
+  const radius = cfg.probeDiameter / 2;
+  const ex = rx.x - s.x * radius;
+  const ey = ry.y - s.y * radius;
+  let ez = null;
+  if (cfg.probeZ) {
+    await rapidToMPos(ex + s.x * radius, ey + s.y * radius, null);
+    const rz = await probeAxis("Z", -1, cfg.probeFeedRate, cfg.latchFeedRate, cfg.probeDistance, cfg.latchDistance);
+    if (rz) ez = rz.z;
+    await rapidToMPos(null, null, sp.z);
+  }
+  await rapidToMPos(ex, ey, null);
+  const opts = { mode: cfg.coordMode, wcs: cfg.wcs };
+  applyXYResult(ex, ey, "XY", opts);
+  if (ez !== null) applyZResult(ez, cfg.touchPlateHeight, cfg.workpieceHeight, opts);
+  log("info", `\u2713 Corner ${edge}: X=${ex.toFixed(4)} Y=${ey.toFixed(4)}${ez !== null ? " Z=" + ez.toFixed(4) : ""}`);
+  return true;
+}
+var init_edge_finder = __esm({
+  "src/probing/edge-finder.ts"() {
+    "use strict";
+    init_state();
+    init_console();
+    init_probe_program();
+  }
+});
+
+// src/probing/center-finder.ts
+function startPos2() {
+  return { x: state.machineX, y: state.machineY, z: state.machineZ };
+}
+async function runCenterFinder(cfg) {
+  if (!state.connected) {
+    log("err", "Not connected");
+    return false;
+  }
+  if (isProbingRunning()) {
+    log("err", "Probe already running");
+    return false;
+  }
+  const sp = startPos2();
+  let centerX = sp.x;
+  let centerY = sp.y;
+  for (let pass = 0; pass < cfg.passes; pass++) {
+    if (pass > 0) log("info", `Center finder: pass ${pass + 1}/${cfg.passes}`);
+    const result = await probeCenter(cfg, { x: centerX, y: centerY, z: sp.z });
+    if (!result) return false;
+    centerX = result.x;
+    centerY = result.y;
+    if (pass < cfg.passes - 1) {
+      await rapidToMPos(centerX, centerY, null);
+    }
+  }
+  await rapidToMPos(centerX, centerY, null);
+  const opts = { mode: cfg.coordMode, wcs: cfg.wcs };
+  applyXYResult(centerX, centerY, cfg.axes === "X" ? "X" : cfg.axes === "Y" ? "Y" : "XY", opts);
+  log("info", `\u2713 Center found: X=${centerX.toFixed(4)} Y=${centerY.toFixed(4)}`);
+  return true;
+}
+async function probeCenter(cfg, sp) {
+  const clr = cfg.xyClr + cfg.probeDiameter / 2;
+  const radius = cfg.probeDiameter / 2;
+  let x1 = null, x2 = null;
+  let y1 = null, y2 = null;
+  await rapidToMPos(null, null, sp.z - cfg.depth);
+  if (cfg.axes !== "Y") {
+    const halfX = cfg.workpieceSizeX / 2;
+    if (cfg.centerMode === "inside") {
+      const rapid = halfX - clr;
+      if (rapid > 1) await rapidToMPos(sp.x - rapid, null, null);
+      const r1 = await probeAxis("X", 1, cfg.probeFeedRate, cfg.latchFeedRate, halfX + clr, cfg.latchDistance);
+      if (!r1) {
+        await rapidToMPos(null, null, sp.z);
+        log("err", "\u2717 Center X- probe failed");
+        return null;
+      }
+      x1 = r1.x + radius;
+      await rapidToMPos(sp.x + rapid, null, null);
+      const r2 = await probeAxis("X", -1, cfg.probeFeedRate, cfg.latchFeedRate, halfX + clr, cfg.latchDistance);
+      if (!r2) {
+        await rapidToMPos(null, null, sp.z);
+        log("err", "\u2717 Center X+ probe failed");
+        return null;
+      }
+      x2 = r2.x - radius;
+    } else {
+      await rapidToMPos(sp.x - halfX - clr, null, null);
+      const r1 = await probeAxis("X", 1, cfg.probeFeedRate, cfg.latchFeedRate, halfX + clr + 5, cfg.latchDistance);
+      if (!r1) {
+        await rapidToMPos(null, null, sp.z);
+        log("err", "\u2717 Center X- probe failed");
+        return null;
+      }
+      x1 = r1.x - radius;
+      await rapidToMPos(null, null, sp.z);
+      await rapidToMPos(sp.x + halfX + clr, null, null);
+      await rapidToMPos(null, null, sp.z - cfg.depth);
+      const r2 = await probeAxis("X", -1, cfg.probeFeedRate, cfg.latchFeedRate, halfX + clr + 5, cfg.latchDistance);
+      if (!r2) {
+        await rapidToMPos(null, null, sp.z);
+        log("err", "\u2717 Center X+ probe failed");
+        return null;
+      }
+      x2 = r2.x + radius;
+    }
+    await rapidToMPos(sp.x, null, null);
+  }
+  if (cfg.axes !== "X") {
+    const halfY = cfg.workpieceSizeY / 2;
+    if (cfg.centerMode === "inside") {
+      const rapid = halfY - clr;
+      if (rapid > 1) await rapidToMPos(null, sp.y - rapid, null);
+      const r1 = await probeAxis("Y", 1, cfg.probeFeedRate, cfg.latchFeedRate, halfY + clr, cfg.latchDistance);
+      if (!r1) {
+        await rapidToMPos(null, null, sp.z);
+        log("err", "\u2717 Center Y- probe failed");
+        return null;
+      }
+      y1 = r1.y + radius;
+      await rapidToMPos(null, sp.y + rapid, null);
+      const r2 = await probeAxis("Y", -1, cfg.probeFeedRate, cfg.latchFeedRate, halfY + clr, cfg.latchDistance);
+      if (!r2) {
+        await rapidToMPos(null, null, sp.z);
+        log("err", "\u2717 Center Y+ probe failed");
+        return null;
+      }
+      y2 = r2.y - radius;
+    } else {
+      await rapidToMPos(null, sp.y - halfY - clr, null);
+      const r1 = await probeAxis("Y", 1, cfg.probeFeedRate, cfg.latchFeedRate, halfY + clr + 5, cfg.latchDistance);
+      if (!r1) {
+        await rapidToMPos(null, null, sp.z);
+        log("err", "\u2717 Center Y- probe failed");
+        return null;
+      }
+      y1 = r1.y - radius;
+      await rapidToMPos(null, null, sp.z);
+      await rapidToMPos(null, sp.y + halfY + clr, null);
+      await rapidToMPos(null, null, sp.z - cfg.depth);
+      const r2 = await probeAxis("Y", -1, cfg.probeFeedRate, cfg.latchFeedRate, halfY + clr + 5, cfg.latchDistance);
+      if (!r2) {
+        await rapidToMPos(null, null, sp.z);
+        log("err", "\u2717 Center Y+ probe failed");
+        return null;
+      }
+      y2 = r2.y + radius;
+    }
+    await rapidToMPos(null, sp.y, null);
+  }
+  await rapidToMPos(null, null, sp.z);
+  const cx = x1 !== null && x2 !== null ? (x1 + x2) / 2 : sp.x;
+  const cy = y1 !== null && y2 !== null ? (y1 + y2) / 2 : sp.y;
+  const xDist = x1 !== null && x2 !== null ? Math.abs(x2 - x1) : null;
+  const yDist = y1 !== null && y2 !== null ? Math.abs(y2 - y1) : null;
+  if (xDist !== null || yDist !== null) {
+    log("info", `Center size:${xDist !== null ? " X=" + xDist.toFixed(3) : ""}${yDist !== null ? " Y=" + yDist.toFixed(3) : ""} mm`);
+  }
+  return { x: cx, y: cy };
+}
+var init_center_finder = __esm({
+  "src/probing/center-finder.ts"() {
+    "use strict";
+    init_state();
+    init_console();
+    init_probe_program();
+  }
+});
+
+// src/probing/rotation.ts
+function startPos3() {
+  return { x: state.machineX, y: state.machineY, z: state.machineZ };
+}
+async function runRotation(cfg) {
+  if (!state.connected) {
+    log("err", "Not connected");
+    return null;
+  }
+  if (isProbingRunning()) {
+    log("err", "Probe already running");
+    return null;
+  }
+  const sp = startPos3();
+  const clr = cfg.xyClr + cfg.probeDiameter / 2;
+  const probeX = cfg.edge === "AB" || cfg.edge === "CD";
+  const probeAxis2 = probeX ? "X" : "Y";
+  const dirMap = { AB: 1, CD: -1, AD: 1, CB: -1 };
+  const dir = dirMap[cfg.edge];
+  const offAxisIsY = cfg.edge === "AB" || cfg.edge === "CD";
+  log("info", `Rotation: probing two points along ${probeAxis2} edge (${cfg.edge})\u2026`);
+  const approachX1 = probeX ? sp.x - dir * clr : null;
+  const approachY1 = !probeX ? sp.y - dir * clr : null;
+  await rapidToMPos(approachX1, approachY1, null);
+  await rapidToMPos(null, null, sp.z - cfg.depth);
+  const r1 = await probeAxis(probeAxis2, dir, cfg.probeFeedRate, cfg.latchFeedRate, cfg.probeDistance, cfg.latchDistance);
+  if (!r1) {
+    await rapidToMPos(null, null, sp.z);
+    log("err", "\u2717 Rotation: point 1 probe failed");
+    return null;
+  }
+  await rapidToMPos(null, null, sp.z);
+  const approachX2 = probeX ? sp.x - dir * clr : sp.x + cfg.offset;
+  const approachY2 = !probeX ? sp.y - dir * clr : sp.y + cfg.offset;
+  await rapidToMPos(approachX2, approachY2, null);
+  await rapidToMPos(null, null, sp.z - cfg.depth);
+  const r2 = await probeAxis(probeAxis2, dir, cfg.probeFeedRate, cfg.latchFeedRate, cfg.probeDistance, cfg.latchDistance);
+  if (!r2) {
+    await rapidToMPos(null, null, sp.z);
+    log("err", "\u2717 Rotation: point 2 probe failed");
+    return null;
+  }
+  await rapidToMPos(null, null, sp.z);
+  await rapidToMPos(sp.x, sp.y, null);
+  const p1 = { x: r1.x, y: r1.y };
+  const p2 = { x: r2.x, y: r2.y };
+  let angleRad;
+  if (probeX) {
+    const dy = p2.y - p1.y;
+    const dx = p2.x - p1.x;
+    angleRad = dy !== 0 ? Math.atan(dx / dy) : 0;
+  } else {
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    angleRad = dx !== 0 ? Math.atan(dy / dx) : 0;
+    if (cfg.edge === "CB" || cfg.edge === "AD") angleRad = -1 / (angleRad || 1e-10);
+  }
+  const angleDeg = angleRad * 180 / Math.PI;
+  log("info", `\u2713 Rotation measured: ${angleDeg.toFixed(3)}\xB0`);
+  log("info", `  P1: X=${p1.x.toFixed(4)} Y=${p1.y.toFixed(4)}`);
+  log("info", `  P2: X=${p2.x.toFixed(4)} Y=${p2.y.toFixed(4)}`);
+  return { angleDeg, p1, p2 };
+}
+function applyRotationToGcode(angleDeg) {
+  if (!state.gcodeLines || state.gcodeLines.length === 0) {
+    log("err", "No G-code loaded to rotate");
+    return;
+  }
+  const angleRad = angleDeg * Math.PI / 180;
+  const cos = Math.cos(angleRad);
+  const sin = Math.sin(angleRad);
+  const rotated = [];
+  let curX = 0, curY = 0;
+  for (const line of state.gcodeLines) {
+    const xm = line.match(/X([+-]?[\d.]+)/i);
+    const ym = line.match(/Y([+-]?[\d.]+)/i);
+    if (!xm && !ym) {
+      rotated.push(line);
+      continue;
+    }
+    const ox = xm ? parseFloat(xm[1]) : curX;
+    const oy = ym ? parseFloat(ym[1]) : curY;
+    const rx = ox * cos - oy * sin;
+    const ry = ox * sin + oy * cos;
+    let newLine = line;
+    if (xm) newLine = newLine.replace(xm[0], "X" + rx.toFixed(4));
+    if (ym) newLine = newLine.replace(ym[0], "Y" + ry.toFixed(4));
+    curX = ox;
+    curY = oy;
+    rotated.push(newLine);
+  }
+  state.gcodeLines = rotated;
+  log("info", `G-code rotated by ${angleDeg.toFixed(3)}\xB0 (${state.gcodeLines.length} lines)`);
+}
+var init_rotation = __esm({
+  "src/probing/rotation.ts"() {
+    "use strict";
+    init_state();
+    init_console();
+    init_probe_program();
+  }
+});
+
+// src/probing/preview.ts
+function waypointsTouchplate(cfg) {
+  const { probeDistance, latchDistance } = cfg;
+  return [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: 0, y: 0, z: -probeDistance, type: "probe", label: "Fast probe" },
+    { x: 0, y: 0, z: -(probeDistance - latchDistance), type: "contact", label: "Contact" },
+    { x: 0, y: 0, z: -(probeDistance - latchDistance) + latchDistance, type: "retract", label: "Retract" },
+    { x: 0, y: 0, z: -(probeDistance - latchDistance) + latchDistance - latchDistance * 2, type: "probe", label: "Slow probe" },
+    { x: 0, y: 0, z: -(probeDistance - latchDistance), type: "contact", label: "Final contact" },
+    { x: 0, y: 0, z: 0, type: "retract", label: "Return" }
+  ];
+}
+function waypointsToolsetter(cfg) {
+  const { toolsetterDepth, latchDistance, tsOffX, tsOffY, tsOffZ } = cfg;
+  const approachZ = tsOffZ + toolsetterDepth;
+  return [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: 0, y: 0, z: 20, type: "rapid", label: "Z home" },
+    { x: tsOffX, y: tsOffY, z: 20, type: "rapid", label: "Move to toolsetter XY" },
+    { x: tsOffX, y: tsOffY, z: approachZ, type: "rapid", label: "Approach Z" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ, type: "probe", label: "Fast probe" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ, type: "contact", label: "Contact" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ + latchDistance, type: "retract", label: "Retract" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ - latchDistance, type: "probe", label: "Slow probe" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ, type: "contact", label: "Final contact" },
+    { x: tsOffX, y: tsOffY, z: 20, type: "retract", label: "Return Z" },
+    { x: 0, y: 0, z: 20, type: "rapid", label: "Return XY" },
+    { x: 0, y: 0, z: 0, type: "rapid", label: "Return Z" }
+  ];
+}
+function waypointsEdgeSingle(cfg) {
+  const { edge, mode, xyClr, depth, probeDistance, latchDistance, probeDiameter } = cfg;
+  const isX = edge === "AD" || edge === "CB";
+  const axis = isX ? "X" : "Y";
+  const external = mode === "external";
+  const clr = xyClr + probeDiameter / 2;
+  const dir = edge === "AD" || edge === "AB" ? external ? 1 : -1 : external ? -1 : 1;
+  const ax = isX ? -dir * clr : 0;
+  const ay = !isX ? -dir * clr : 0;
+  const px = isX ? dir * probeDistance : 0;
+  const py = !isX ? dir * probeDistance : 0;
+  const rx = isX ? -dir * latchDistance : 0;
+  const ry = !isX ? -dir * latchDistance : 0;
+  const contactX = isX ? ax + px : 0;
+  const contactY = !isX ? ay + py : 0;
+  return [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: ax, y: ay, z: 0, type: "rapid", label: "Move to clearance" },
+    { x: ax, y: ay, z: -depth, type: "rapid", label: "Plunge to depth" },
+    { x: ax + px, y: ay + py, z: -depth, type: "probe", label: "Fast probe" },
+    { x: contactX, y: contactY, z: -depth, type: "contact", label: "Contact" },
+    { x: contactX + rx, y: contactY + ry, z: -depth, type: "retract", label: "Retract" },
+    { x: contactX, y: contactY, z: -depth, type: "probe", label: "Slow probe" },
+    { x: contactX, y: contactY, z: -depth, type: "contact", label: "Final contact" },
+    { x: contactX, y: contactY, z: 0, type: "retract", label: "Lift" },
+    { x: 0, y: 0, z: 0, type: "rapid", label: "Return" }
+  ];
+}
+function waypointsEdgeCorner(cfg) {
+  const { edge, mode, xyClr, depth, offset, probeDistance, latchDistance, probeDiameter } = cfg;
+  const external = mode === "external";
+  const signs = {
+    A: { x: 1, y: 1 },
+    B: { x: -1, y: 1 },
+    C: { x: -1, y: -1 },
+    D: { x: 1, y: -1 }
+  };
+  const s = external ? signs[edge] : { x: -signs[edge].x, y: -signs[edge].y };
+  const clr = xyClr + probeDiameter / 2;
+  const xContact = s.x * probeDistance;
+  const yContact = s.y * probeDistance;
+  return [
+    { x: 0, y: s.y * offset, z: 0, type: "start", label: "Start" },
+    { x: -s.x * clr, y: s.y * offset, z: 0, type: "rapid", label: "X clearance" },
+    { x: -s.x * clr, y: s.y * offset, z: -depth, type: "rapid", label: "Plunge" },
+    { x: xContact, y: s.y * offset, z: -depth, type: "probe", label: "Probe X" },
+    { x: xContact, y: s.y * offset, z: -depth, type: "contact", label: "X contact" },
+    { x: xContact - s.x * latchDistance, y: s.y * offset, z: -depth, type: "retract", label: "Retract X" },
+    { x: xContact, y: s.y * offset, z: -depth, type: "probe", label: "Slow X" },
+    { x: xContact, y: s.y * offset, z: 0, type: "retract", label: "Lift" },
+    { x: s.x * offset, y: 0, z: 0, type: "rapid", label: "Move to Y" },
+    { x: s.x * offset, y: -s.y * clr, z: 0, type: "rapid", label: "Y clearance" },
+    { x: s.x * offset, y: -s.y * clr, z: -depth, type: "rapid", label: "Plunge" },
+    { x: s.x * offset, y: yContact, z: -depth, type: "probe", label: "Probe Y" },
+    { x: s.x * offset, y: yContact, z: -depth, type: "contact", label: "Y contact" },
+    { x: s.x * offset, y: yContact - s.y * latchDistance, z: -depth, type: "retract", label: "Retract Y" },
+    { x: s.x * offset, y: yContact, z: -depth, type: "probe", label: "Slow Y" },
+    { x: s.x * offset, y: yContact, z: 0, type: "retract", label: "Lift" },
+    { x: xContact, y: yContact, z: 0, type: "result", label: "Found corner" }
+  ];
+}
+function waypointsCenter(cfg) {
+  const { centerMode, axes, sizeX, sizeY, xyClr, depth, probeDistance, latchDistance, probeDiameter } = cfg;
+  const clr = xyClr + probeDiameter / 2;
+  const halfX = sizeX / 2;
+  const halfY = sizeY / 2;
+  const r = probeDiameter / 2;
+  const wps = [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: 0, y: 0, z: -depth, type: "rapid", label: "Plunge" }
+  ];
+  if (axes !== "Y") {
+    const inside = centerMode === "inside";
+    const x1 = inside ? -(halfX - clr) : -(halfX + clr);
+    const c1 = inside ? -(halfX - probeDistance) : -halfX + r;
+    const x2 = inside ? halfX - clr : halfX + clr;
+    const c2 = inside ? halfX - probeDistance : halfX - r;
+    wps.push(
+      { x: x1, y: 0, z: -depth, type: "rapid", label: "X- approach" },
+      { x: c1, y: 0, z: -depth, type: "probe", label: "Probe X-" },
+      { x: c1, y: 0, z: -depth, type: "contact", label: "X- contact" },
+      { x: c1 + latchDistance, y: 0, z: -depth, type: "retract", label: "Retract" },
+      { x: c1, y: 0, z: -depth, type: "probe", label: "Slow X-" },
+      { x: x2, y: 0, z: -depth, type: "rapid", label: "X+ approach" },
+      { x: c2, y: 0, z: -depth, type: "probe", label: "Probe X+" },
+      { x: c2, y: 0, z: -depth, type: "contact", label: "X+ contact" },
+      { x: c2 - latchDistance, y: 0, z: -depth, type: "retract", label: "Retract" },
+      { x: c2, y: 0, z: -depth, type: "probe", label: "Slow X+" },
+      { x: (c1 + c2) / 2, y: 0, z: -depth, type: "rapid", label: "Move to X center" }
+    );
+  }
+  if (axes !== "X") {
+    const inside = centerMode === "inside";
+    const y1 = inside ? -(halfY - clr) : -(halfY + clr);
+    const c1 = inside ? -(halfY - probeDistance) : -halfY + r;
+    const y2 = inside ? halfY - clr : halfY + clr;
+    const c2 = inside ? halfY - probeDistance : halfY - r;
+    wps.push(
+      { x: 0, y: y1, z: -depth, type: "rapid", label: "Y- approach" },
+      { x: 0, y: c1, z: -depth, type: "probe", label: "Probe Y-" },
+      { x: 0, y: c1, z: -depth, type: "contact", label: "Y- contact" },
+      { x: 0, y: c1 + latchDistance, z: -depth, type: "retract", label: "Retract" },
+      { x: 0, y: c1, z: -depth, type: "probe", label: "Slow Y-" },
+      { x: 0, y: y2, z: -depth, type: "rapid", label: "Y+ approach" },
+      { x: 0, y: c2, z: -depth, type: "probe", label: "Probe Y+" },
+      { x: 0, y: c2, z: -depth, type: "contact", label: "Y+ contact" },
+      { x: 0, y: c2 - latchDistance, z: -depth, type: "retract", label: "Retract" },
+      { x: 0, y: c2, z: -depth, type: "probe", label: "Slow Y+" },
+      { x: 0, y: (c1 + c2) / 2, z: -depth, type: "rapid", label: "Move to Y center" }
+    );
+  }
+  wps.push(
+    { x: 0, y: 0, z: -depth, type: "rapid", label: "At center" },
+    { x: 0, y: 0, z: 0, type: "retract", label: "Lift" },
+    { x: 0, y: 0, z: 0, type: "result", label: "Center found" }
+  );
+  return wps;
+}
+function waypointsRotation(cfg) {
+  const { edge, xyClr, depth, offset, probeDistance, latchDistance, probeDiameter } = cfg;
+  const clr = xyClr + probeDiameter / 2;
+  const probeX = edge === "AB" || edge === "CD";
+  const dir = edge === "AB" || edge === "AD" ? 1 : -1;
+  const ax1 = probeX ? -dir * clr : 0;
+  const ay1 = !probeX ? -dir * clr : 0;
+  const px = probeX ? dir * probeDistance : 0;
+  const py = !probeX ? dir * probeDistance : 0;
+  const c1x = ax1 + px;
+  const c1y = ay1 + py;
+  const ax2 = probeX ? -dir * clr : offset;
+  const ay2 = !probeX ? -dir * clr : offset;
+  const c2x = ax2 + px;
+  const c2y = ay2 + py;
+  return [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: ax1, y: ay1, z: 0, type: "rapid", label: "P1 approach" },
+    { x: ax1, y: ay1, z: -depth, type: "rapid", label: "Plunge" },
+    { x: c1x, y: c1y, z: -depth, type: "probe", label: "Probe P1" },
+    { x: c1x, y: c1y, z: -depth, type: "contact", label: "P1 contact" },
+    { x: c1x - px * latchDistance / probeDistance, y: c1y - py * latchDistance / probeDistance, z: -depth, type: "retract", label: "Retract" },
+    { x: c1x, y: c1y, z: -depth, type: "probe", label: "Slow P1" },
+    { x: c1x, y: c1y, z: 0, type: "retract", label: "Lift" },
+    { x: ax2, y: ay2, z: 0, type: "rapid", label: "P2 approach" },
+    { x: ax2, y: ay2, z: -depth, type: "rapid", label: "Plunge" },
+    { x: c2x, y: c2y, z: -depth, type: "probe", label: "Probe P2" },
+    { x: c2x, y: c2y, z: -depth, type: "contact", label: "P2 contact" },
+    { x: c2x - px * latchDistance / probeDistance, y: c2y - py * latchDistance / probeDistance, z: -depth, type: "retract", label: "Retract" },
+    { x: c2x, y: c2y, z: -depth, type: "probe", label: "Slow P2" },
+    { x: c2x, y: c2y, z: 0, type: "retract", label: "Lift" },
+    { x: 0, y: 0, z: 0, type: "rapid", label: "Return" },
+    { x: c1x, y: c1y, z: -depth, type: "result", label: `P1: X${c1x.toFixed(2)} Y${c1y.toFixed(2)}` },
+    { x: c2x, y: c2y, z: -depth, type: "result", label: `P2: X${c2x.toFixed(2)} Y${c2y.toFixed(2)}` }
+  ];
+}
+function loadPreview(waypoints) {
+  stopPreviewAnim();
+  _ps.waypoints = waypoints;
+  _ps.currentStep = 0;
+  renderPreview();
+  updatePreviewDRO();
+  updatePreviewControls();
+}
+function stepPreview(delta) {
+  _ps.currentStep = Math.max(0, Math.min(_ps.waypoints.length - 1, _ps.currentStep + delta));
+  renderPreview();
+  updatePreviewDRO();
+  updatePreviewControls();
+}
+function playPreview() {
+  if (_ps.playing) {
+    stopPreviewAnim();
+    return;
+  }
+  if (_ps.currentStep >= _ps.waypoints.length - 1) _ps.currentStep = 0;
+  _ps.playing = true;
+  updatePreviewControls();
+  _ps.animTimer = setInterval(() => {
+    if (_ps.currentStep >= _ps.waypoints.length - 1) {
+      stopPreviewAnim();
+      return;
+    }
+    _ps.currentStep++;
+    renderPreview();
+    updatePreviewDRO();
+    updatePreviewControls();
+  }, 300);
+}
+function stopPreviewAnim() {
+  if (_ps.animTimer) {
+    clearInterval(_ps.animTimer);
+    _ps.animTimer = null;
+  }
+  _ps.playing = false;
+  updatePreviewControls();
+}
+function updatePreviewControls() {
+  const playBtn = document.getElementById("previewPlayBtn");
+  const stepFwd = document.getElementById("previewStepFwd");
+  const stepBck = document.getElementById("previewStepBck");
+  const counter = document.getElementById("previewCounter");
+  if (playBtn) playBtn.textContent = _ps.playing ? "\u23F8" : "\u25B6";
+  if (stepFwd) stepFwd.disabled = _ps.currentStep >= _ps.waypoints.length - 1;
+  if (stepBck) stepBck.disabled = _ps.currentStep <= 0;
+  if (counter) counter.textContent = _ps.waypoints.length > 0 ? `${_ps.currentStep + 1} / ${_ps.waypoints.length}` : "\u2014";
+}
+function updatePreviewDRO() {
+  const wp = _ps.waypoints[_ps.currentStep];
+  if (!wp) return;
+  const dx = document.getElementById("previewDroX");
+  const dy = document.getElementById("previewDroY");
+  const dz = document.getElementById("previewDroZ");
+  const dl = document.getElementById("previewDroLabel");
+  if (dx) dx.textContent = wp.x.toFixed(3);
+  if (dy) dy.textContent = wp.y.toFixed(3);
+  if (dz) dz.textContent = wp.z.toFixed(3);
+  if (dl) dl.textContent = wp.label || "";
+}
+function renderPreview() {
+  const xyCanvas = document.getElementById("previewXY");
+  const xzCanvas = document.getElementById("previewXZ");
+  if (!xyCanvas || !xzCanvas || _ps.waypoints.length === 0) return;
+  drawView(xyCanvas, "XY");
+  drawView(xzCanvas, "XZ");
+}
+function drawView(canvas, view) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  const W = canvas.width;
+  const H = canvas.height;
+  const wps = _ps.waypoints;
+  const cur = _ps.currentStep;
+  const xs = wps.map((w2) => view === "XY" ? w2.x : w2.x);
+  const ys = wps.map((w2) => view === "XY" ? w2.y : w2.z);
+  let minX = Math.min(...xs), maxX = Math.max(...xs);
+  let minY = Math.min(...ys), maxY = Math.max(...ys);
+  const padX = Math.max((maxX - minX) * 0.2, 5);
+  const padY = Math.max((maxY - minY) * 0.2, 5);
+  minX -= padX;
+  maxX += padX;
+  minY -= padY;
+  maxY += padY;
+  const scaleX = W / (maxX - minX || 1);
+  const scaleY = H / (maxY - minY || 1);
+  const scale = Math.min(scaleX, scaleY) * 0.85;
+  const offX = W / 2 - (maxX + minX) / 2 * scale;
+  const offY = H / 2 + (maxY + minY) / 2 * scale;
+  const tx = (x) => x * scale + offX;
+  const ty = (y) => -y * scale + offY;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#0f0e0c";
+  ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = "rgba(255,255,255,0.05)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(tx(0), 0);
+  ctx.lineTo(tx(0), H);
+  ctx.moveTo(0, ty(0));
+  ctx.lineTo(W, ty(0));
+  ctx.stroke();
+  ctx.fillStyle = "rgba(255,255,255,0.25)";
+  ctx.font = "10px monospace";
+  ctx.fillText(view, 6, 14);
+  for (let i = 1; i <= Math.min(cur, wps.length - 1); i++) {
+    const a = wps[i - 1];
+    const b = wps[i];
+    const ax = view === "XY" ? a.x : a.x;
+    const ay = view === "XY" ? a.y : a.z;
+    const bx = view === "XY" ? b.x : b.x;
+    const by = view === "XY" ? b.y : b.z;
+    ctx.beginPath();
+    ctx.moveTo(tx(ax), ty(ay));
+    ctx.lineTo(tx(bx), ty(by));
+    const color = TYPE_COLOR[b.type] || "#888";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = b.type === "probe" ? 2 : 1.5;
+    if (b.type === "rapid" || b.type === "retract") {
+      ctx.setLineDash([4, 3]);
+    } else {
+      ctx.setLineDash([]);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  for (let i = Math.max(1, cur + 1); i < wps.length; i++) {
+    const a = wps[i - 1];
+    const b = wps[i];
+    const ax = view === "XY" ? a.x : a.x;
+    const ay = view === "XY" ? a.y : a.z;
+    const bx = view === "XY" ? b.x : b.x;
+    const by = view === "XY" ? b.y : b.z;
+    ctx.beginPath();
+    ctx.moveTo(tx(ax), ty(ay));
+    ctx.lineTo(tx(bx), ty(by));
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  for (let i = 0; i <= Math.min(cur, wps.length - 1); i++) {
+    const wp = wps[i];
+    if (wp.type !== "contact" && wp.type !== "result") continue;
+    const wx = view === "XY" ? wp.x : wp.x;
+    const wy = view === "XY" ? wp.y : wp.z;
+    ctx.beginPath();
+    ctx.arc(tx(wx), ty(wy), 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = TYPE_COLOR[wp.type];
+    ctx.fill();
+  }
+  if (wps[cur]) {
+    const wp = wps[cur];
+    const cx = view === "XY" ? wp.x : wp.x;
+    const cy = view === "XY" ? wp.y : wp.z;
+    const px = tx(cx);
+    const py2 = ty(cy);
+    const sz = 6;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(px - sz, py2);
+    ctx.lineTo(px + sz, py2);
+    ctx.moveTo(px, py2 - sz);
+    ctx.lineTo(px, py2 + sz);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(px, py2, 3, 0, Math.PI * 2);
+    ctx.strokeStyle = "#ffffff";
+    ctx.stroke();
+  }
+}
+var TYPE_COLOR, _ps;
+var init_preview = __esm({
+  "src/probing/preview.ts"() {
+    "use strict";
+    TYPE_COLOR = {
+      start: "#64748b",
+      rapid: "#3b82f6",
+      probe: "#f97316",
+      retract: "#6366f1",
+      contact: "#22c55e",
+      result: "#f43f5e"
+    };
+    _ps = {
+      waypoints: [],
+      currentStep: 0,
+      animTimer: null,
+      playing: false
+    };
+  }
+});
+
+// src/probing/probing-tab.tsx
+function loadCfg(sub, defaults) {
+  return { ...defaults, ...lsGet(`${SAVE_KEY}-${sub}`, {}) };
+}
+function saveCfg(sub, cfg) {
+  lsSet(`${SAVE_KEY}-${sub}`, cfg);
+}
+function WcsSelector({ id }) {
+  const options = ["G54", "G55", "G56", "G57", "G58", "G59", "G59.1", "G59.2", "G59.3"];
+  return /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Write to WCS"), /* @__PURE__ */ h("select", { class: "prob-select", id }, /* @__PURE__ */ h("option", { value: "" }, "\u2014 use active (", state.activeWcs || "G54", ") \u2014"), options.map((o) => /* @__PURE__ */ h("option", { value: o }, o, o === "G59.3" ? " (Toolsetter)" : ""))));
+}
+function CoordModeSelector({ id }) {
+  return /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Coordinate mode"), /* @__PURE__ */ h("select", { class: "prob-select", id }, /* @__PURE__ */ h("option", { value: "G10" }, "G10 \u2014 Persistent WCS"), /* @__PURE__ */ h("option", { value: "G92" }, "G92 \u2014 Session offset"), /* @__PURE__ */ h("option", { value: "measure" }, "Measure only")));
+}
+function getWcs(selectId) {
+  const el = document.getElementById(selectId);
+  return el?.value || getActiveWcs();
+}
+function getCoordMode(selectId) {
+  const el = document.getElementById(selectId);
+  return el?.value || "G10";
+}
+function numVal(id) {
+  return parseFloat(document.getElementById(id)?.value || "0") || 0;
+}
+function setStatus3(id, msg, type = "idle") {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `prob-status prob-status-${type}`;
+}
+function initSubTabs(container) {
+  container.querySelectorAll(".prob-subtab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.subtab;
+      container.querySelectorAll(".prob-subtab-btn").forEach((b) => b.classList.remove("active"));
+      container.querySelectorAll(".prob-subtab-panel").forEach((p) => p.style.display = "none");
+      btn.classList.add("active");
+      const panel = container.querySelector(`#probpanel-${tab}`);
+      if (panel) panel.style.display = "flex";
+    });
+  });
+}
+function buildToolLengthTab() {
+  const tlCfg = loadCfg("tl", {
+    mode: "touchplate",
+    probeFeedRate: 100,
+    latchFeedRate: 25,
+    probeDistance: 50,
+    latchDistance: 1,
+    touchPlateHeight: 0,
+    toolsetterDepth: 10,
+    tloReference: null
+  });
+  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-toollength", style: "display:flex;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeTouch", value: "touchplate", checked: tlCfg.mode === "touchplate" }), "Touch Plate"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeToolsetter", value: "toolsetter", checked: tlCfg.mode === "toolsetter" }), "Toolsetter (G59.3)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeFeed", value: String(tlCfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchFeed", value: String(tlCfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeDist", value: String(tlCfg.probeDistance), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchDist", value: String(tlCfg.latchDistance), min: "0.1", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlTouchSection", style: tlCfg.mode === "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Touch Plate"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlPlateHeight", value: String(tlCfg.touchPlateHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlToolsetterSection", style: tlCfg.mode !== "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Toolsetter"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Approach depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlTsDepth", value: String(tlCfg.toolsetterDepth), min: "1", step: "1" })), /* @__PURE__ */ h("div", { style: "font-family:var(--mono);font-size:10px;color:var(--text3);" }, "Position from G59.3 in Offsets tab")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Reference Tool"), /* @__PURE__ */ h("div", { class: "prob-ref-display", id: "probTlRefDisplay" }, tlCfg.tloReference !== null ? `Ref: ${tlCfg.tloReference.toFixed(4)} mm` : "No reference set"), /* @__PURE__ */ h("div", { style: "display:flex;gap:5px;margin-top:5px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;font-size:10px;padding:5px", id: "probTlSetRef" }, "SET REF TOOL"), /* @__PURE__ */ h("button", { class: "tb-btn danger", id: "probTlClearRef", style: `font-size:10px;padding:5px;display:${tlCfg.tloReference === null ? "none" : "inline-block"}` }, "CLEAR"))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probTlStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probTlResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probTlPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probTlProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probTlCancel", disabled: true }, "\u2715")));
+}
+function buildEdgeFinderTab() {
+  const cfg = loadCfg("ef", {
+    mode: "external",
+    probeFeedRate: 100,
+    latchFeedRate: 25,
+    probeDistance: 10,
+    latchDistance: 1,
+    xyClr: 5,
+    depth: 3,
+    offset: 5,
+    probeDiameter: 2,
+    probeZ: false,
+    touchPlateHeight: 0,
+    workpieceHeight: 0
+  });
+  const edgeButtons = [
+    { id: "A", label: "A", title: "Corner A (bottom-left)" },
+    { id: "AB", label: "AB", title: "Edge AB (bottom)" },
+    { id: "B", label: "B", title: "Corner B (bottom-right)" },
+    { id: "AD", label: "AD", title: "Edge AD (left)" },
+    { id: "Z", label: "Z", title: "Z surface" },
+    { id: "CB", label: "CB", title: "Edge CB (right)" },
+    { id: "D", label: "D", title: "Corner D (top-left)" },
+    { id: "CD", label: "CD", title: "Edge CD (top)" },
+    { id: "C", label: "C", title: "Corner C (top-right)" }
+  ];
+  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-edgefinder", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probEfMode", id: "probEfModeExt", value: "external", checked: cfg.mode === "external" }), "External"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probEfMode", id: "probEfModeInt", value: "internal", checked: cfg.mode === "internal" }), "Internal"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Select Edge / Corner"), /* @__PURE__ */ h("div", { class: "prob-edge-grid" }, edgeButtons.map(
+    (e) => /* @__PURE__ */ h("button", { class: "prob-edge-btn", id: `probEfEdge-${e.id}`, "data-edge": e.id, title: e.title }, e.label)
+  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "D\u2014\u2014C", /* @__PURE__ */ h("br", null), "|  |", /* @__PURE__ */ h("br", null), "A\u2014\u2014B")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Corner offset (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfOffset", value: String(cfg.offset), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Also probe Z"), /* @__PURE__ */ h("label", { class: "prob-toggle" }, /* @__PURE__ */ h("input", { type: "checkbox", id: "probEfProbeZ", checked: cfg.probeZ }), " Yes"))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probEfZSection", style: cfg.probeZ ? "" : "display:none" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Z Probe"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Touch plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfPlateHeight", value: String(cfg.touchPlateHeight), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Workpiece height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfWpHeight", value: String(cfg.workpieceHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probEfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probEfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probEfStatus" }, "Select an edge or corner, then click PROBE"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probEfPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probEfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probEfCancel", disabled: true }, "\u2715")));
+}
+function buildCenterFinderTab() {
+  const cfg = loadCfg("cf", {
+    centerMode: "inside",
+    axes: "XY",
+    probeFeedRate: 100,
+    latchFeedRate: 25,
+    probeDistance: 10,
+    latchDistance: 1,
+    xyClr: 5,
+    depth: 3,
+    probeDiameter: 2,
+    workpieceSizeX: 50,
+    workpieceSizeY: 50,
+    passes: 1
+  });
+  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-centerfinder", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Center Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeInside", value: "inside", checked: cfg.centerMode === "inside" }), "Inside (bore)"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeOutside", value: "outside", checked: cfg.centerMode === "outside" }), "Outside (boss)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Axes"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesXY", value: "XY", checked: cfg.axes === "XY" }), "XY"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesX", value: "X", checked: cfg.axes === "X" }), "X only"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesY", value: "Y", checked: cfg.axes === "Y" }), "Y only"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Workpiece Size"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "X size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeX", value: String(cfg.workpieceSizeX), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Y size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeY", value: String(cfg.workpieceSizeY), min: "1", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Passes"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfPasses", value: String(cfg.passes), min: "1", max: "5", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probCfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probCfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probCfStatus" }, "Ready"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probCfPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probCfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probCfCancel", disabled: true }, "\u2715")));
+}
+function buildRotationTab() {
+  const cfg = loadCfg("rot", {
+    edge: "AB",
+    probeFeedRate: 100,
+    latchFeedRate: 25,
+    probeDistance: 10,
+    latchDistance: 1,
+    xyClr: 5,
+    depth: 3,
+    offset: 50,
+    probeDiameter: 2
+  });
+  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-rotation", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Edge to Probe Along"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;flex-wrap:wrap;" }, ["AB", "AD", "CB", "CD"].map(
+    (e) => /* @__PURE__ */ h("label", { class: "prob-mode-btn", style: "flex:0 0 auto" }, /* @__PURE__ */ h("input", { type: "radio", name: "probRotEdge", value: e, checked: cfg.edge === e }), e)
+  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "AB=bottom edge \xB7 AD=left edge \xB7 CB=right edge \xB7 CD=top edge")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Point spacing (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotOffset", value: String(cfg.offset), min: "5", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probRotStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probRotResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probRotPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probRotProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:10px;font-size:13px", id: "probRotApply", disabled: true }, "\u21BB APPLY ROTATION"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probRotCancel", disabled: true }, "\u2715")));
+}
+function wireTlEvents(container) {
+  const statusId = "probTlStatus";
+  container.querySelector("#probTlModeTouch")?.addEventListener("change", () => {
+    document.getElementById("probTlTouchSection").style.display = "";
+    document.getElementById("probTlToolsetterSection").style.display = "none";
+  });
+  container.querySelector("#probTlModeToolsetter")?.addEventListener("change", () => {
+    document.getElementById("probTlTouchSection").style.display = "none";
+    document.getElementById("probTlToolsetterSection").style.display = "";
+  });
+  let tloRef = loadCfg("tl", { tloReference: null }).tloReference;
+  const updateRefDisplay2 = () => {
+    const el = document.getElementById("probTlRefDisplay");
+    const clearBtn = document.getElementById("probTlClearRef");
+    if (el) el.textContent = tloRef !== null ? `Ref: ${tloRef.toFixed(4)} mm` : "No reference set";
+    if (clearBtn) clearBtn.style.display = tloRef !== null ? "" : "none";
+  };
+  container.querySelector("#probTlClearRef")?.addEventListener("click", () => {
+    tloRef = null;
+    saveCfg("tl", { ...loadCfg("tl", {}), tloReference: null });
+    updateRefDisplay2();
+    sendCmd("G49");
+    setStatus3(statusId, "Reference cleared", "idle");
+  });
+  const probeBtn = container.querySelector("#probTlProbe");
+  const cancelBtn = container.querySelector("#probTlCancel");
+  const runProbe = async (asReference) => {
+    if (!state.connected) {
+      log("err", "Not connected");
+      return;
+    }
+    const mode = document.querySelector('input[name="probTlMode"]:checked')?.value || "touchplate";
+    const ts = state.wcsOffsets["G59.3"];
+    if (mode === "toolsetter" && !ts) {
+      setStatus3(statusId, "G59.3 not set \u2014 configure in Offsets tab", "err");
+      return;
+    }
+    const cfg = {
+      mode,
+      probeFeedRate: numVal("probTlProbeFeed"),
+      latchFeedRate: numVal("probTlLatchFeed"),
+      probeDistance: numVal("probTlProbeDist"),
+      latchDistance: numVal("probTlLatchDist"),
+      touchPlateHeight: numVal("probTlPlateHeight"),
+      toolsetterDepth: numVal("probTlTsDepth"),
+      tloReference: tloRef
+    };
+    saveCfg("tl", { ...cfg, tloReference: tloRef });
+    probeBtn.disabled = true;
+    cancelBtn.disabled = false;
+    setStatus3(statusId, asReference ? "Measuring reference\u2026" : "Probing\u2026", "running");
+    const result = await runToolLengthProbe({
+      mode: cfg.mode,
+      probeFeedRate: cfg.probeFeedRate,
+      latchFeedRate: cfg.latchFeedRate,
+      probeDistance: cfg.probeDistance,
+      latchDistance: cfg.latchDistance,
+      touchPlateHeight: cfg.touchPlateHeight,
+      toolsetterX: ts?.x,
+      toolsetterY: ts?.y,
+      toolsetterZ: ts?.z,
+      toolsetterDepth: cfg.toolsetterDepth
+    });
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+    if (!result || !result.success) {
+      setStatus3(statusId, "Probe failed", "err");
+      return;
+    }
+    if (asReference) {
+      tloRef = result.z;
+      saveCfg("tl", { ...cfg, tloReference: tloRef });
+      updateRefDisplay2();
+      sendCmd("G49");
+      setStatus3(statusId, "\u2713 Reference set", "ok");
+    } else {
+      let tlo = result.z;
+      if (tloRef !== null) tlo -= tloRef + cfg.touchPlateHeight;
+      else if (mode === "touchplate") tlo -= cfg.touchPlateHeight;
+      sendCmd(`G43.1Z${tlo.toFixed(4)}`);
+      const resEl = document.getElementById("probTlResult");
+      if (resEl) resEl.textContent = `Z=${result.z.toFixed(4)}  TLO=${tlo.toFixed(4)} mm`;
+      setStatus3(statusId, "\u2713 Complete \u2014 TLO applied", "ok");
+      setTimeout(() => Promise.resolve().then(() => (init_offsets(), offsets_exports)).then((o) => o.loadOffsets()), 300);
+    }
+  };
+  container.querySelector("#probTlSetRef")?.addEventListener("click", () => runProbe(true));
+  probeBtn.addEventListener("click", () => runProbe(false));
+  cancelBtn.addEventListener("click", () => {
+    cancelProbing();
+    setStatus3(statusId, "Cancelled", "idle");
+  });
+}
+function wireEfEvents(container) {
+  let selectedEdge = null;
+  const statusId = "probEfStatus";
+  container.querySelectorAll(".prob-edge-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      container.querySelectorAll(".prob-edge-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedEdge = btn.dataset.edge;
+      setStatus3(statusId, `Edge: ${selectedEdge} selected`, "idle");
+    });
+  });
+  container.querySelector("#probEfProbeZ")?.addEventListener("change", function() {
+    const sec = document.getElementById("probEfZSection");
+    if (sec) sec.style.display = this.checked ? "" : "none";
+  });
+  const probeBtn = container.querySelector("#probEfProbe");
+  const cancelBtn = container.querySelector("#probEfCancel");
+  probeBtn.addEventListener("click", async () => {
+    if (!state.connected) {
+      log("err", "Not connected");
+      return;
+    }
+    if (!selectedEdge) {
+      setStatus3(statusId, "Select an edge or corner first", "err");
+      return;
+    }
+    const mode = document.querySelector('input[name="probEfMode"]:checked')?.value || "external";
+    const cfg = {
+      mode,
+      edge: selectedEdge,
+      probeFeedRate: numVal("probEfProbeFeed"),
+      latchFeedRate: numVal("probEfLatchFeed"),
+      probeDistance: numVal("probEfProbeDist"),
+      latchDistance: numVal("probEfLatchDist"),
+      xyClr: numVal("probEfXYClr"),
+      depth: numVal("probEfDepth"),
+      offset: numVal("probEfOffset"),
+      probeDiameter: numVal("probEfDiameter"),
+      probeZ: document.getElementById("probEfProbeZ")?.checked ?? false,
+      touchPlateHeight: numVal("probEfPlateHeight"),
+      workpieceHeight: numVal("probEfWpHeight"),
+      coordMode: getCoordMode("probEfCoordMode"),
+      wcs: getWcs("probEfWcs")
+    };
+    saveCfg("ef", cfg);
+    probeBtn.disabled = true;
+    cancelBtn.disabled = false;
+    setStatus3(statusId, `Probing ${selectedEdge}\u2026`, "running");
+    const ok = await runEdgeFinder(cfg);
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+    setStatus3(statusId, ok ? `\u2713 ${selectedEdge} complete` : "\u2717 Probe failed", ok ? "ok" : "err");
+  });
+  cancelBtn.addEventListener("click", () => {
+    cancelProbing();
+    setStatus3(statusId, "Cancelled", "idle");
+  });
+}
+function wireCfEvents(container) {
+  const statusId = "probCfStatus";
+  const probeBtn = container.querySelector("#probCfProbe");
+  const cancelBtn = container.querySelector("#probCfCancel");
+  probeBtn.addEventListener("click", async () => {
+    if (!state.connected) {
+      log("err", "Not connected");
+      return;
+    }
+    const centerMode = document.querySelector('input[name="probCfMode"]:checked')?.value || "inside";
+    const axes = document.querySelector('input[name="probCfAxes"]:checked')?.value || "XY";
+    const cfg = {
+      centerMode,
+      axes,
+      probeFeedRate: numVal("probCfProbeFeed"),
+      latchFeedRate: numVal("probCfLatchFeed"),
+      probeDistance: numVal("probCfProbeDist"),
+      latchDistance: numVal("probCfLatchDist"),
+      xyClr: numVal("probCfXYClr"),
+      depth: numVal("probCfDepth"),
+      probeDiameter: numVal("probCfDiameter"),
+      workpieceSizeX: numVal("probCfSizeX"),
+      workpieceSizeY: numVal("probCfSizeY"),
+      passes: numVal("probCfPasses") || 1,
+      coordMode: getCoordMode("probCfCoordMode"),
+      wcs: getWcs("probCfWcs")
+    };
+    saveCfg("cf", cfg);
+    probeBtn.disabled = true;
+    cancelBtn.disabled = false;
+    setStatus3(statusId, "Finding center\u2026", "running");
+    const ok = await runCenterFinder(cfg);
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+    setStatus3(statusId, ok ? "\u2713 Center found" : "\u2717 Probe failed", ok ? "ok" : "err");
+  });
+  cancelBtn.addEventListener("click", () => {
+    cancelProbing();
+    setStatus3(statusId, "Cancelled", "idle");
+  });
+}
+function wireRotEvents(container) {
+  const statusId = "probRotStatus";
+  const probeBtn = container.querySelector("#probRotProbe");
+  const applyBtn = container.querySelector("#probRotApply");
+  const cancelBtn = container.querySelector("#probRotCancel");
+  let lastAngle = null;
+  probeBtn.addEventListener("click", async () => {
+    if (!state.connected) {
+      log("err", "Not connected");
+      return;
+    }
+    const edge = document.querySelector('input[name="probRotEdge"]:checked')?.value || "AB";
+    const cfg = {
+      edge,
+      probeFeedRate: numVal("probRotProbeFeed"),
+      latchFeedRate: numVal("probRotLatchFeed"),
+      probeDistance: numVal("probRotProbeDist"),
+      latchDistance: numVal("probRotLatchDist"),
+      xyClr: numVal("probRotXYClr"),
+      depth: numVal("probRotDepth"),
+      offset: numVal("probRotOffset"),
+      probeDiameter: numVal("probRotDiameter")
+    };
+    saveCfg("rot", cfg);
+    probeBtn.disabled = true;
+    cancelBtn.disabled = false;
+    applyBtn.disabled = true;
+    lastAngle = null;
+    setStatus3(statusId, "Probing\u2026", "running");
+    const result = await runRotation(cfg);
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+    if (result) {
+      lastAngle = result.angleDeg;
+      const resEl = document.getElementById("probRotResult");
+      if (resEl) resEl.textContent = `Angle: ${result.angleDeg.toFixed(3)}\xB0`;
+      applyBtn.disabled = !state.gcodeLines?.length;
+      setStatus3(statusId, `\u2713 Measured: ${result.angleDeg.toFixed(3)}\xB0`, "ok");
+    } else {
+      setStatus3(statusId, "\u2717 Probe failed", "err");
+    }
+  });
+  applyBtn.addEventListener("click", () => {
+    if (lastAngle === null) return;
+    applyRotationToGcode(lastAngle);
+    setStatus3(statusId, `\u2713 G-code rotated by ${lastAngle.toFixed(3)}\xB0`, "ok");
+  });
+  cancelBtn.addEventListener("click", () => {
+    cancelProbing();
+    setStatus3(statusId, "Cancelled", "idle");
+  });
+}
+function buildPreviewPanel() {
+  return /* @__PURE__ */ h("div", { class: "prob-preview-panel", id: "probPreviewPanel" }, /* @__PURE__ */ h("div", { class: "prob-preview-canvases" }, /* @__PURE__ */ h("canvas", { id: "previewXY", class: "prob-preview-canvas", width: "220", height: "160" }), /* @__PURE__ */ h("canvas", { id: "previewXZ", class: "prob-preview-canvas", width: "220", height: "160" })), /* @__PURE__ */ h("div", { class: "prob-preview-controls" }, /* @__PURE__ */ h("div", { class: "prob-preview-dro" }, /* @__PURE__ */ h("div", { class: "prob-dro-cell" }, /* @__PURE__ */ h("span", { class: "prob-dro-axis" }, "X"), /* @__PURE__ */ h("span", { class: "prob-dro-val", id: "previewDroX" }, "\u2014")), /* @__PURE__ */ h("div", { class: "prob-dro-cell" }, /* @__PURE__ */ h("span", { class: "prob-dro-axis" }, "Y"), /* @__PURE__ */ h("span", { class: "prob-dro-val", id: "previewDroY" }, "\u2014")), /* @__PURE__ */ h("div", { class: "prob-dro-cell" }, /* @__PURE__ */ h("span", { class: "prob-dro-axis" }, "Z"), /* @__PURE__ */ h("span", { class: "prob-dro-val", id: "previewDroZ" }, "\u2014"))), /* @__PURE__ */ h("div", { class: "prob-preview-label", id: "previewDroLabel" }, "Load a preview"), /* @__PURE__ */ h("div", { class: "prob-preview-btns" }, /* @__PURE__ */ h("button", { class: "prob-prev-btn", id: "previewStepBck", onClick: () => stepPreview(-1), disabled: true }, "\u25C0"), /* @__PURE__ */ h("button", { class: "prob-prev-btn", id: "previewPlayBtn", onClick: () => playPreview() }, "\u25B6"), /* @__PURE__ */ h("button", { class: "prob-prev-btn", id: "previewStepFwd", onClick: () => stepPreview(1), disabled: true }, "\u25B6|"), /* @__PURE__ */ h("span", { class: "prob-prev-counter", id: "previewCounter" }, "\u2014"))));
+}
+function initProbingTab() {
+  const container = document.getElementById("tabpanel-probing");
+  if (!container) return;
+  const tlPanel = buildToolLengthTab();
+  const efPanel = buildEdgeFinderTab();
+  const cfPanel = buildCenterFinderTab();
+  const rotPanel = buildRotationTab();
+  const previewPanel = buildPreviewPanel();
+  const panelWrap = container.querySelector(".prob-panels");
+  if (panelWrap) {
+    panelWrap.appendChild(tlPanel);
+    panelWrap.appendChild(efPanel);
+    panelWrap.appendChild(cfPanel);
+    panelWrap.appendChild(rotPanel);
+  }
+  container.appendChild(previewPanel);
+  initSubTabs(container);
+  wireTlEvents(container);
+  wireEfEvents(container);
+  wireCfEvents(container);
+  wireRotEvents(container);
+  wirePreviewBtns(container);
+}
+function wirePreviewBtns(container) {
+  container.querySelector("#probTlPreview")?.addEventListener("click", () => {
+    const mode = document.querySelector('input[name="probTlMode"]:checked')?.value || "touchplate";
+    if (mode === "toolsetter") {
+      const ts = state.wcsOffsets["G59.3"] || { x: 50, y: 50, z: -20 };
+      loadPreview(waypointsToolsetter({
+        probeDistance: numVal("probTlProbeDist"),
+        latchDistance: numVal("probTlLatchDist"),
+        toolsetterDepth: numVal("probTlTsDepth"),
+        tsOffX: ts.x - state.machineX,
+        tsOffY: ts.y - state.machineY,
+        tsOffZ: ts.z - state.machineZ
+      }));
+    } else {
+      loadPreview(waypointsTouchplate({
+        probeDistance: numVal("probTlProbeDist"),
+        latchDistance: numVal("probTlLatchDist"),
+        touchPlateHeight: numVal("probTlPlateHeight")
+      }));
+    }
+  });
+  container.querySelector("#probEfPreview")?.addEventListener("click", () => {
+    const edge = container.querySelector(".prob-edge-btn.active")?.dataset.edge || "AB";
+    const mode = document.querySelector('input[name="probEfMode"]:checked')?.value || "external";
+    const cfg = {
+      edge,
+      mode,
+      xyClr: numVal("probEfXYClr"),
+      depth: numVal("probEfDepth"),
+      offset: numVal("probEfOffset"),
+      probeDistance: numVal("probEfProbeDist"),
+      latchDistance: numVal("probEfLatchDist"),
+      probeDiameter: numVal("probEfDiameter")
+    };
+    const isCorner = edge.length === 1 && edge !== "Z";
+    if (edge === "Z") {
+      loadPreview(waypointsTouchplate({ probeDistance: cfg.probeDistance, latchDistance: cfg.latchDistance, touchPlateHeight: 0 }));
+    } else if (isCorner) {
+      loadPreview(waypointsEdgeCorner(cfg));
+    } else {
+      loadPreview(waypointsEdgeSingle(cfg));
+    }
+  });
+  container.querySelector("#probCfPreview")?.addEventListener("click", () => {
+    const centerMode = document.querySelector('input[name="probCfMode"]:checked')?.value || "inside";
+    const axes = document.querySelector('input[name="probCfAxes"]:checked')?.value || "XY";
+    loadPreview(waypointsCenter({
+      centerMode,
+      axes,
+      sizeX: numVal("probCfSizeX"),
+      sizeY: numVal("probCfSizeY"),
+      xyClr: numVal("probCfXYClr"),
+      depth: numVal("probCfDepth"),
+      probeDistance: numVal("probCfProbeDist"),
+      latchDistance: numVal("probCfLatchDist"),
+      probeDiameter: numVal("probCfDiameter")
+    }));
+  });
+  container.querySelector("#probRotPreview")?.addEventListener("click", () => {
+    const edge = document.querySelector('input[name="probRotEdge"]:checked')?.value || "AB";
+    loadPreview(waypointsRotation({
+      edge,
+      xyClr: numVal("probRotXYClr"),
+      depth: numVal("probRotDepth"),
+      offset: numVal("probRotOffset"),
+      probeDistance: numVal("probRotProbeDist"),
+      latchDistance: numVal("probRotLatchDist"),
+      probeDiameter: numVal("probRotDiameter")
+    }));
+  });
+}
+var SAVE_KEY;
+var init_probing_tab = __esm({
+  "src/probing/probing-tab.tsx"() {
+    "use strict";
+    init_jsx();
+    init_state();
+    init_connection();
+    init_console();
+    init_ui();
+    init_probe_program();
+    init_probe_program();
+    init_edge_finder();
+    init_center_finder();
+    init_rotation();
+    init_preview();
+    SAVE_KEY = "fs-probing-tab";
+  }
+});
+
 // src/sd.ts
 function getHttpBase() {
   const wsUrl = document.getElementById("wsUrl").value.trim();
@@ -7602,12 +8958,12 @@ function reparentModules(node) {
 function startResize(e, node, container) {
   e.preventDefault();
   const isH = node.direction === "horizontal";
-  const startPos = isH ? e.clientX : e.clientY;
+  const startPos4 = isH ? e.clientX : e.clientY;
   const rect = container.getBoundingClientRect();
   const totalSize = isH ? rect.width : rect.height;
   const startRatio = node.ratio;
   const onMove = (ev) => {
-    const delta = (isH ? ev.clientX : ev.clientY) - startPos;
+    const delta = (isH ? ev.clientX : ev.clientY) - startPos4;
     node.ratio = Math.max(0.1, Math.min(0.9, startRatio + delta / totalSize));
     const children = container.querySelectorAll(":scope > .dock-node");
     if (children[0]) children[0].style.flex = `${node.ratio} 0 0%`;
@@ -8033,6 +9389,10 @@ function switchTab(tab) {
   }
   if (tab === "tooltable") loadToolTable();
   if (tab === "offsets") loadOffsets();
+  if (tab === "probing" && !state._probingTabInited) {
+    state._probingTabInited = true;
+    initProbingTab();
+  }
 }
 function on2(id, evt, fn) {
   const el = document.getElementById(id);
@@ -8266,6 +9626,7 @@ var init_main = __esm({
     init_settings();
     init_tooltable();
     init_offsets();
+    init_probing_tab();
     init_sd();
     init_camera();
     init_keyboard();
