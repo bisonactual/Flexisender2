@@ -1116,6 +1116,56 @@
   .vp-copy-btn:hover { background: var(--surface3); color: var(--text); border-color: var(--accent); }
   .vp-copy-btn.copied { background: rgba(34,197,94,0.2); border-color: var(--green); color: var(--green); }
 
+  /* ── WCS Coordinate Offset Table ─────────────────────────────────────────── */
+  .wcs-outer { flex: 1; overflow-y: auto; background: var(--bg); }
+  .wcs-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .wcs-toolbar-title { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); flex: 1; }
+  .wcs-table-wrap { flex: 1; overflow-y: auto; padding: 12px 16px; }
+  #wcsTable { width: 100%; border-collapse: collapse; }
+  .wcs-th { font-family: var(--cond); font-weight: 700; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border2); white-space: nowrap; }
+  .wcs-th-num { text-align: right; }
+  .wcs-row { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  .wcs-row:last-child { border-bottom: none; }
+  .wcs-row:hover { background: var(--surface2); }
+  .wcs-row.wcs-dirty { background: rgba(245,158,11,0.06); }
+  .wcs-row.wcs-dirty .wcs-val-input { border-color: var(--yellow); }
+  .wcs-row.wcs-toolsetter { background: rgba(20,184,166,0.07); border-left: 3px solid var(--teal); }
+  .wcs-row.wcs-toolsetter:hover { background: rgba(20,184,166,0.13); }
+  .wcs-row.wcs-tlo { background: rgba(255,140,66,0.07); border-left: 3px solid var(--accent2); }
+  .wcs-row.wcs-home { background: rgba(59,130,246,0.05); border-left: 3px solid var(--blue2); }
+  .wcs-td { font-family: var(--mono); font-size: 12px; color: var(--text2); padding: 8px 12px; white-space: nowrap; }
+  .wcs-td-label { font-family: var(--cond); font-weight: 700; font-size: 12px; color: var(--text); min-width: 180px; display: flex; align-items: center; gap: 6px; }
+  .wcs-td-num { text-align: right; }
+  .wcs-td-actions { text-align: right; white-space: nowrap; }
+  .wcs-td.wcs-disabled { color: var(--text3); opacity: 0.4; }
+  .wcs-toolsetter-badge { font-size: 14px; line-height: 1; color: var(--teal); }
+  .wcs-val-input {
+    background: var(--surface3); border: 1px solid var(--border2); color: var(--text);
+    font-family: var(--mono); font-size: 12px; padding: 4px 8px; width: 90px;
+    text-align: right; outline: none; border-radius: var(--radius-sm);
+    transition: border-color 0.15s; -moz-appearance: textfield;
+  }
+  .wcs-val-input::-webkit-inner-spin-button,
+  .wcs-val-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .wcs-val-input:focus { border-color: var(--accent); color: #fff; }
+  .wcs-btn {
+    font-family: var(--cond); font-weight: 700; font-size: 10px; letter-spacing: 1px;
+    text-transform: uppercase; padding: 4px 10px; cursor: pointer;
+    border-radius: var(--radius-sm); transition: all 0.12s; white-space: nowrap;
+    background: var(--surface3); border: 1px solid var(--border2); color: var(--text2);
+    margin-left: 4px;
+  }
+  .wcs-btn:hover { background: var(--border); color: var(--text); }
+  .wcs-btn-write { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.4); color: var(--blue); }
+  .wcs-btn-write:hover { background: rgba(59,130,246,0.3); border-color: var(--blue); }
+  .wcs-btn-pos { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.35); color: var(--green); }
+  .wcs-btn-pos:hover { background: rgba(34,197,94,0.25); border-color: var(--green); }
+  .wcs-btn-clear { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); color: var(--red); }
+  .wcs-btn-clear:hover { background: rgba(239,68,68,0.25); border-color: var(--red); }
+  #wcsEmpty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--text3); gap: 12px; }
+  #wcsEmpty .wcs-empty-icon { font-size: 32px; opacity: 0.2; }
+  #wcsEmpty .wcs-empty-text { font-family: var(--cond); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+
 </style>
 <!-- CSS extracted to style.css — build.ts inlines it for distribution -->
 </head>
@@ -1188,6 +1238,7 @@
   <button class="tab-btn" id="tab-settings" data-tab="settings">SETTINGS: GRBL</button>
   <button class="tab-btn" id="tab-camera" data-tab="camera">CAMERA</button>
   <button class="tab-btn" id="tab-tooltable" data-tab="tooltable">TOOL TABLE</button>
+  <button class="tab-btn" id="tab-offsets" data-tab="offsets">OFFSETS</button>
   <button class="tab-btn" id="tab-modules" data-tab="modules">MODULES</button>
   <button class="tab-btn" id="tab-options" data-tab="options">⚙ OPTIONS</button>
   <button class="mod-lock-btn" id="modLockBtn" title="Lock / unlock module positions">
@@ -2233,6 +2284,33 @@
   </div>
 </div><!-- /tab-panel-tooltable -->
 
+<!-- TAB: OFFSETS -->
+<div class="tab-panel" id="tabpanel-offsets" style="flex-direction:column;overflow:hidden;background:var(--bg);">
+  <div class="wcs-toolbar">
+    <span class="wcs-toolbar-title">Coordinate Offsets</span>
+    <span id="wcsStatus" style="font-family:var(--mono);font-size:11px;color:var(--text3);flex:1"></span>
+    <button class="tb-btn" id="btnWcsRefresh">↻ REFRESH</button>
+  </div>
+  <div class="wcs-table-wrap">
+    <table id="wcsTable" style="display:none;">
+      <thead>
+        <tr style="background:var(--surface2);">
+          <th class="wcs-th">SYSTEM</th>
+          <th class="wcs-th wcs-th-num">X</th>
+          <th class="wcs-th wcs-th-num">Y</th>
+          <th class="wcs-th wcs-th-num">Z</th>
+          <th class="wcs-th wcs-th-num">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody id="wcsTableBody"></tbody>
+    </table>
+    <div id="wcsEmpty" style="display:flex;">
+      <div class="wcs-empty-icon">⊕</div>
+      <div class="wcs-empty-text">Connect and the offsets will load automatically</div>
+    </div>
+  </div>
+</div><!-- /tab-panel-offsets -->
+
 
 <script type="module">
 var __defProp = Object.defineProperty;
@@ -2302,8 +2380,11 @@ var init_state = __esm({
       toolpathSegments: [],
       totalMoves: 0,
       totalRapids: 0,
-      // Tool table
-      ttEntries: [],
+      // Work coordinate offsets ($# table)
+      wcsOffsets: {},
+      tloOffset: 0,
+      tloActive: false,
+      wcsPhase: "idle",
       currentToolNumber: 0,
       ttPhase: "idle",
       _ttLines: [],
@@ -5064,6 +5145,263 @@ var init_tooltable = __esm({
   }
 });
 
+// src/offsets.ts
+var offsets_exports = {};
+__export(offsets_exports, {
+  WCS_ENTRIES: () => WCS_ENTRIES,
+  loadOffsets: () => loadOffsets,
+  offsetsIntercept: () => offsetsIntercept,
+  offsetsInterceptOk: () => offsetsInterceptOk,
+  renderOffsetsTable: () => renderOffsetsTable
+});
+function loadOffsets() {
+  if (!state.connected) {
+    log("err", "Not connected");
+    return;
+  }
+  state.wcsPhase = "loading";
+  cmdSend("$#");
+}
+function offsetsIntercept(raw) {
+  const m = raw.match(/^\[([A-Z0-9.]+):([^\]]+)\]$/);
+  if (!m) return false;
+  const key = m[1];
+  const vals = m[2].split(",").map(Number);
+  const knownKeys = /* @__PURE__ */ new Set([
+    "G54",
+    "G55",
+    "G56",
+    "G57",
+    "G58",
+    "G59",
+    "G59.1",
+    "G59.2",
+    "G59.3",
+    "G28",
+    "G28.1",
+    "G30",
+    "G30.1",
+    "G92",
+    "TLO",
+    "PRB"
+  ]);
+  if (!knownKeys.has(key)) return false;
+  if (key === "TLO") {
+    state.tloOffset = vals.length === 1 ? vals[0] : vals[2] ?? vals[0];
+    state.tloActive = state.tloOffset !== 0;
+    renderOffsetsTable();
+    return true;
+  }
+  if (key === "PRB") return false;
+  state.wcsOffsets[key] = {
+    x: vals[0] ?? 0,
+    y: vals[1] ?? 0,
+    z: vals[2] ?? 0
+  };
+  renderOffsetsTable();
+  return true;
+}
+function offsetsInterceptOk() {
+  if (state.wcsPhase === "loading") {
+    state.wcsPhase = "idle";
+    renderOffsetsTable();
+  }
+}
+function renderOffsetsTable() {
+  const tbody = document.getElementById("wcsTableBody");
+  const empty = document.getElementById("wcsEmpty");
+  const table = document.getElementById("wcsTable");
+  if (!tbody || !empty || !table) return;
+  const hasData = Object.keys(state.wcsOffsets).length > 0 || state.tloOffset !== 0;
+  if (!hasData) {
+    table.style.display = "none";
+    empty.style.display = "flex";
+    return;
+  }
+  table.style.display = "";
+  empty.style.display = "none";
+  tbody.innerHTML = WCS_ENTRIES.map((entry) => {
+    const isTlo = entry.code === "TLO";
+    const isToolsetter = entry.code === "G59.3";
+    const isHome = entry.code === "G28" || entry.code === "G30";
+    let x, y, z;
+    if (isTlo) {
+      x = 0;
+      y = 0;
+      z = state.tloOffset;
+    } else {
+      const d = state.wcsOffsets[entry.code];
+      if (!d) return "";
+      x = d.x;
+      y = d.y;
+      z = d.z;
+    }
+    const fmt = (v) => v.toFixed(3);
+    const rowClass = isToolsetter ? "wcs-row wcs-toolsetter" : isTlo ? "wcs-row wcs-tlo" : isHome ? "wcs-row wcs-home" : "wcs-row";
+    const axisCell = (axis, val) => {
+      if (isTlo && axis !== "z") return `<td class="wcs-td wcs-td-num wcs-disabled">${fmt(val)}</td>`;
+      return `<td class="wcs-td wcs-td-num">
+        <input type="number" class="wcs-val-input" step="0.001"
+          data-code="${entry.code}" data-axis="${axis}"
+          value="${fmt(val)}" />
+      </td>`;
+    };
+    return `<tr class="${rowClass}" data-code="${entry.code}">
+      <td class="wcs-td wcs-td-label">
+        ${isToolsetter ? '<span class="wcs-toolsetter-badge">\u2295</span>' : ""}
+        ${entry.label}
+      </td>
+      ${axisCell("x", x)}
+      ${axisCell("y", y)}
+      ${axisCell("z", z)}
+      <td class="wcs-td wcs-td-actions">
+        ${isTlo ? `
+          <button class="wcs-btn wcs-btn-clear" data-code="TLO" title="Cancel TLO (G49)">G49</button>
+        ` : `
+          <button class="wcs-btn wcs-btn-pos" data-code="${entry.code}" title="Set to current machine position">POS</button>
+          <button class="wcs-btn wcs-btn-write" data-code="${entry.code}" title="Write values to controller">WRITE</button>
+          <button class="wcs-btn wcs-btn-clear" data-code="${entry.code}" title="Zero all axes">ZERO</button>
+        `}
+      </td>
+    </tr>`;
+  }).join("");
+  wireOffsetEvents();
+}
+function wireOffsetEvents() {
+  const tbody = document.getElementById("wcsTableBody");
+  if (!tbody) return;
+  tbody.querySelectorAll(".wcs-btn-write").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const code = btn.dataset.code;
+      writeOffset(code);
+    });
+  });
+  tbody.querySelectorAll(".wcs-btn-clear").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const code = btn.dataset.code;
+      if (code === "TLO") {
+        sendCmd("G49");
+        state.tloOffset = 0;
+        state.tloActive = false;
+        renderOffsetsTable();
+      } else {
+        zeroOffset(code);
+      }
+    });
+  });
+  tbody.querySelectorAll(".wcs-btn-pos").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const code = btn.dataset.code;
+      setToCurrentPos(code);
+    });
+  });
+  tbody.querySelectorAll(".wcs-val-input").forEach((inp) => {
+    inp.addEventListener("change", () => {
+      const row = inp.closest("tr");
+      if (row) row.classList.add("wcs-dirty");
+    });
+    inp.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") writeOffset(inp.dataset.code);
+    });
+  });
+}
+function getInputVals(code) {
+  const tbody = document.getElementById("wcsTableBody");
+  if (!tbody) return null;
+  const xInp = tbody.querySelector(`input[data-code="${code}"][data-axis="x"]`);
+  const yInp = tbody.querySelector(`input[data-code="${code}"][data-axis="y"]`);
+  const zInp = tbody.querySelector(`input[data-code="${code}"][data-axis="z"]`);
+  return {
+    x: parseFloat(xInp?.value || "0") || 0,
+    y: parseFloat(yInp?.value || "0") || 0,
+    z: parseFloat(zInp?.value || "0") || 0
+  };
+}
+function writeOffset(code) {
+  if (!state.connected) {
+    log("err", "Not connected");
+    return;
+  }
+  const vals = getInputVals(code);
+  if (!vals) return;
+  let cmd;
+  if (code === "G28" || code === "G30") {
+    cmd = `G90G0X${vals.x.toFixed(4)}Y${vals.y.toFixed(4)}Z${vals.z.toFixed(4)}`;
+    sendCmd(cmd);
+    sendCmd(code + ".1");
+  } else {
+    const entry = WCS_ENTRIES.find((e) => e.code === code);
+    if (!entry) return;
+    const p = entry.id;
+    cmd = `G10L2P${p}X${vals.x.toFixed(4)}Y${vals.y.toFixed(4)}Z${vals.z.toFixed(4)}`;
+    sendCmd(cmd);
+  }
+  state.wcsOffsets[code] = { x: vals.x, y: vals.y, z: vals.z };
+  const row = document.querySelector(`tr[data-code="${code}"]`);
+  if (row) row.classList.remove("wcs-dirty");
+  log("info", `Offset written: ${code} X${vals.x.toFixed(3)} Y${vals.y.toFixed(3)} Z${vals.z.toFixed(3)}`);
+  setTimeout(() => loadOffsets(), 300);
+}
+function zeroOffset(code) {
+  if (!state.connected) {
+    log("err", "Not connected");
+    return;
+  }
+  const entry = WCS_ENTRIES.find((e) => e.code === code);
+  if (!entry) return;
+  if (code === "G28" || code === "G30") {
+    sendCmd(`G0X0Y0Z0`);
+    sendCmd(code + ".1");
+  } else {
+    sendCmd(`G10L2P${entry.id}X0Y0Z0`);
+  }
+  state.wcsOffsets[code] = { x: 0, y: 0, z: 0 };
+  renderOffsetsTable();
+  log("info", `Offset zeroed: ${code}`);
+  setTimeout(() => loadOffsets(), 300);
+}
+function setToCurrentPos(code) {
+  if (!state.connected) {
+    log("err", "Not connected");
+    return;
+  }
+  const entry = WCS_ENTRIES.find((e) => e.code === code);
+  if (!entry) return;
+  const x = state.machineX, y = state.machineY, z = state.machineZ;
+  if (code === "G28" || code === "G30") {
+    sendCmd(code + ".1");
+  } else {
+    sendCmd(`G10L2P${entry.id}X${x.toFixed(4)}Y${y.toFixed(4)}Z${z.toFixed(4)}`);
+  }
+  state.wcsOffsets[code] = { x, y, z };
+  renderOffsetsTable();
+  log("info", `Offset set to machine pos: ${code} X${x.toFixed(3)} Y${y.toFixed(3)} Z${z.toFixed(3)}`);
+  setTimeout(() => loadOffsets(), 300);
+}
+var WCS_ENTRIES;
+var init_offsets = __esm({
+  "src/offsets.ts"() {
+    "use strict";
+    init_state();
+    init_console();
+    init_connection();
+    WCS_ENTRIES = [
+      { code: "G54", label: "G54", id: 1 },
+      { code: "G55", label: "G55", id: 2 },
+      { code: "G56", label: "G56", id: 3 },
+      { code: "G57", label: "G57", id: 4 },
+      { code: "G58", label: "G58", id: 5 },
+      { code: "G59", label: "G59", id: 6 },
+      { code: "G59.1", label: "G59.1", id: 7 },
+      { code: "G59.2", label: "G59.2", id: 8 },
+      { code: "G59.3", label: "G59.3 \u2014 Toolsetter", id: 9 },
+      { code: "G28", label: "G28 \u2014 Home 1", id: 0 },
+      { code: "G30", label: "G30 \u2014 Home 2", id: 0 },
+      { code: "TLO", label: "TLO \u2014 Tool Length Offset", id: 0 }
+    ];
+  }
+});
+
 // src/parser.ts
 function parseResponse(raw) {
   if (raw.startsWith("<") && raw.endsWith(">")) {
@@ -5081,7 +5419,12 @@ function parseResponse(raw) {
   if (state.esPhase !== "idle" && settingsIntercept(raw)) return;
   if (state.ttPhase === "loading" && toolTableIntercept(raw)) return;
   if (bearIntercept(raw)) return;
+  if (offsetsIntercept(raw)) {
+    log("rx", raw);
+    return;
+  }
   if (raw === "ok" || raw.startsWith("error:")) {
+    offsetsInterceptOk();
     if (raw.startsWith("error:")) {
       log("err", raw + (_dequeuedSent ? '  \u2190 "' + _dequeuedSent.line + '"' : ""));
       onSettingWriteErr(raw);
@@ -5260,6 +5603,7 @@ var init_parser = __esm({
     init_tooltable();
     init_bear();
     init_bus();
+    init_offsets();
   }
 });
 
@@ -5416,6 +5760,12 @@ function onOpen() {
     } catch (_) {
     }
   }, 1500);
+  setTimeout(() => {
+    try {
+      Promise.resolve().then(() => (init_offsets(), offsets_exports)).then((o) => o.loadOffsets());
+    } catch (_) {
+    }
+  }, 1800);
   const fb = document.getElementById("limitsFrameBtn");
   if (fb && state.progLimits) fb.disabled = false;
 }
@@ -5435,6 +5785,14 @@ function onClose() {
   state.machineHomed = false;
   state._prevMachineStateSl = "";
   _updateHomeBtnHomed();
+  state.wcsOffsets = {};
+  state.tloOffset = 0;
+  state.tloActive = false;
+  state.wcsPhase = "idle";
+  try {
+    Promise.resolve().then(() => (init_offsets(), offsets_exports)).then((o) => o.renderOffsetsTable());
+  } catch (_) {
+  }
 }
 function rtSend(char) {
   if (state.connMode === "serial") {
@@ -7111,6 +7469,7 @@ function switchTab(tab) {
     initCameraTab();
   }
   if (tab === "tooltable") loadToolTable();
+  if (tab === "offsets") loadOffsets();
 }
 function on2(id, evt, fn) {
   const el = document.getElementById(id);
@@ -7285,6 +7644,7 @@ function initChunk1Events() {
   on2("sdRefreshBtn", "click", () => sdRefreshFiles());
   on2("sdCloseBtn", "click", () => closeSdPanel());
   on2("sdRunBtn", "click", () => sdRunSelected());
+  on2("btnWcsRefresh", "click", () => loadOffsets());
   document.querySelectorAll(".tab-btn[data-tab]").forEach((btn) => {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
@@ -7341,6 +7701,7 @@ var init_main = __esm({
     init_signals();
     init_settings();
     init_tooltable();
+    init_offsets();
     init_sd();
     init_camera();
     init_keyboard();
