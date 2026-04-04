@@ -14,7 +14,7 @@ declare const THREE: any;
 
 // ── Element refs (set during mount) ───────────────────────────────────────────
 let _feedSlider: HTMLInputElement;
-let _feedVal: HTMLElement;
+let _feedVal: HTMLInputElement;
 let _clickLabel: HTMLElement;
 let _holdLabel: HTMLElement;
 let _xyStepContainer: HTMLElement;
@@ -191,12 +191,12 @@ function startPreviewAnim(): void {
 
 export function setStepXY(v: number): void {
   state.jogStepXY = v;
-  _xyStepContainer?.querySelectorAll('.xy-step-btn').forEach(b => b.classList.toggle('active', parseFloat(b.textContent!) === v));
+  _xyStepContainer?.querySelectorAll('.xy-step-btn').forEach(b => b.classList.toggle('active', parseFloat((b as HTMLElement).dataset.step || b.childNodes[0]?.textContent || '') === v));
 }
 
 export function setStepZ(v: number): void {
   state.jogStepZ = v;
-  _zStepContainer?.querySelectorAll('.z-step-btn').forEach(b => b.classList.toggle('active', parseFloat(b.textContent!) === v));
+  _zStepContainer?.querySelectorAll('.z-step-btn').forEach(b => b.classList.toggle('active', parseFloat((b as HTMLElement).dataset.step || b.childNodes[0]?.textContent || '') === v));
 }
 
 export function rebuildSteps(xySteps: number[], zSteps: number[]): void {
@@ -207,20 +207,44 @@ export function rebuildSteps(xySteps: number[], zSteps: number[]): void {
 function buildStepBtns(container: HTMLElement, steps: number[], cls: string, defaultStep: number, setter: (v: number) => void): void {
   container.innerHTML = '';
   for (const v of steps) {
-    const btn = <button class={'step-btn ' + cls + (v === defaultStep ? ' active' : '')} onClick={() => setter(v)}>{v}</button>;
+    const btn = <button class={'step-btn ' + cls + (v === defaultStep ? ' active' : '')} onClick={() => setter(v)}>{v}<span class="step-btn-unit">mm</span></button>;
     container.appendChild(btn);
   }
 }
 
 // ── Jog commands ──────────────────────────────────────────────────────────────
 
-function jogFeedValue(): string { return _feedSlider?.value || '1000'; }
+function clampFeed(raw: number, isZ: boolean): number {
+  const max = isZ ? state.jogMaxSpeedZ : state.jogMaxSpeedXY;
+  return Math.min(Math.max(1, raw), max);
+}
+
+function jogFeedValue(isZ = false): string {
+  const raw = parseInt(_feedSlider?.value || '1000');
+  return String(clampFeed(raw, isZ));
+}
+
+export function updateFeedSliderMax(): void {
+  // Called from options when max speeds change — update slider range and clamp current value
+  const xyMax = state.jogMaxSpeedXY;
+  const zMax  = state.jogMaxSpeedZ;
+  const globalMax = Math.max(xyMax, zMax);
+  if (_feedSlider) {
+    _feedSlider.max = String(globalMax);
+    const cur = parseInt(_feedSlider.value);
+    if (cur > globalMax) {
+      _feedSlider.value = String(globalMax);
+      if (_feedVal) _feedVal.value = String(globalMax);
+    }
+  }
+}
 
 export function startJog(dir: string): void {
   if (!state.connected) return;
-  const f = jogFeedValue();
-  const step = state.jogStepXY;
   const v = jogDirToVec(dir);
+  const isZ = v.z !== 0;
+  const f = jogFeedValue(isZ);
+  const step = state.jogStepXY;
   const color = jogDirColor(v);
 
   // Sync predicted to actual if stale
@@ -385,14 +409,26 @@ export function mount(parent: HTMLElement): void {
           <span class="feed-label">JOG F</span>
           <input type="range" class="feed-slider" min="100" max="3000" value="1000"
             ref={(el: HTMLInputElement) => { _feedSlider = el; }}
-            onInput={() => { _feedVal.textContent = _feedSlider.value; }} />
-          <span class="feed-val" ref={(el: HTMLElement) => { _feedVal = el; }}>1000</span>
+            onInput={() => {
+              _feedVal.value = _feedSlider.value;
+            }} />
+          <input type="number" class="feed-val feed-val-input" min="1" max="3000" value="1000"
+            ref={(el: HTMLInputElement) => { _feedVal = el; }}
+            onInput={() => {
+              const v = Math.max(1, parseInt(_feedVal.value) || 1);
+              _feedSlider.value = String(Math.min(v, parseInt(_feedSlider.max)));
+            }}
+            onBlur={() => {
+              const v = Math.max(1, parseInt(_feedVal.value) || 1);
+              _feedVal.value = String(v);
+              _feedSlider.value = String(Math.min(v, parseInt(_feedSlider.max)));
+            }} />
         </div>
         <div class="jog-step-axis-row">
           <span class="jog-step-axis-label">XY</span>
           <div class="jog-step-axis-btns" ref={(el: HTMLElement) => { _xyStepContainer = el; }}>
             {[0.01, 0.1, 1, 10, 50].map(v =>
-              <button class={'step-btn xy-step-btn' + (v === 10 ? ' active' : '')} onClick={() => setStepXY(v)}>{v}</button>
+              <button class={'step-btn xy-step-btn' + (v === 10 ? ' active' : '')} onClick={() => setStepXY(v)}>{v}<span class="step-btn-unit">mm</span></button>
             )}
           </div>
         </div>
@@ -400,7 +436,7 @@ export function mount(parent: HTMLElement): void {
           <span class="jog-step-axis-label">Z</span>
           <div class="jog-step-axis-btns" ref={(el: HTMLElement) => { _zStepContainer = el; }}>
             {[0.01, 0.1, 1, 5, 10].map(v =>
-              <button class={'step-btn z-step-btn' + (v === 1 ? ' active' : '')} onClick={() => setStepZ(v)}>{v}</button>
+              <button class={'step-btn z-step-btn' + (v === 1 ? ' active' : '')} onClick={() => setStepZ(v)}>{v}<span class="step-btn-unit">mm</span></button>
             )}
           </div>
         </div>
@@ -430,8 +466,8 @@ export function initKeyboardJog(): void {
     state.kbJogKey = e.key;
     setJogging(true);
 
-    const f = jogFeedValue();
     const axis = dir[0], sign = dir[1] === '+' ? '' : '-';
+    const f = jogFeedValue(axis === 'Z');
     highlightJogBtn(dir, true);
     sendCmd('$J=G91 ' + axis + sign + KEYBOARD_JOG_DIST + ' F' + f);
   });
