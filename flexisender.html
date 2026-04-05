@@ -993,19 +993,57 @@
   .modules-page-title { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text3); }
   .modules-page-hint { font-family: var(--sans); font-size: 12px; color: var(--text3); margin-top: 6px; }
   .modules-config-grid { display: flex; flex-direction: column; gap: 8px; padding: 16px 20px; max-width: 560px; }
+
+  /* ── Module groups ─────────────────────────────────────────────────────────── */
+  .mod-group { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin: 8px 16px; max-width: 560px; }
+  .mod-group-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--surface2); border-bottom: 1px solid var(--border); user-select: none; }
+  .mod-group-chevron { background: none; border: none; color: var(--text3); font-size: 10px; cursor: pointer; padding: 2px 4px; transition: transform 0.2s, color 0.15s; flex-shrink: 0; line-height: 1; }
+  .mod-group-chevron:hover { color: var(--text); }
+  .mod-group.collapsed .mod-group-chevron { transform: rotate(-90deg); }
+  .mod-group-name { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text2); flex: 1; cursor: pointer; }
+  .mod-group-name:hover { color: var(--text); }
+  .mod-group-badge { font-family: var(--mono); font-size: 9px; background: var(--surface3); border: 1px solid var(--border2); color: var(--text3); padding: 2px 7px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .mod-group-badge.has-active { background: rgba(229,92,0,0.15); border-color: var(--accent2); color: var(--accent); }
+  .mod-group-toggle { width: 32px; height: 18px; border-radius: 9px; background: var(--surface3); border: 1px solid var(--border2); cursor: pointer; position: relative; transition: all 0.2s; flex-shrink: 0; }
+  .mod-group-toggle::after { content: ''; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--text3); transition: all 0.2s; }
+  .mod-group-toggle.enabled { background: rgba(229,92,0,0.3); border-color: var(--accent2); }
+  .mod-group-toggle.enabled::after { left: 16px; background: var(--accent); }
+  .mod-group-body { display: flex; flex-direction: column; gap: 0; background: var(--bg); }
+  .mod-group.collapsed .mod-group-body { display: none; }
+  .mod-group-body .mod-toggle-card { border: none; border-bottom: 1px solid var(--border); border-radius: 0; margin: 0; border-left: 3px solid transparent; }
+  .mod-group-body .mod-toggle-card:last-child { border-bottom: none; }
+  .mod-toggle-card.group-disabled { opacity: 0.45; pointer-events: none; }
+
+  /* ── Module cards — compact by default, expand on click ─────────────────── */
   .mod-toggle-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 14px 16px; display: flex; align-items: center; gap: 14px;
-    transition: border-color 0.15s, background 0.15s;
+    background: var(--card); padding: 10px 14px; display: flex; align-items: center; gap: 12px;
+    transition: border-color 0.15s, background 0.15s; cursor: pointer;
   }
-  .mod-toggle-card:hover { border-color: var(--border2); background: var(--surface2); }
-  .mod-toggle-card.enabled { border-color: var(--accent2); background: rgba(229,92,0,0.06); }
+  .mod-toggle-card:hover { background: var(--surface2); }
+
+  /* Disabled (not enabled) */
+  .mod-toggle-card:not(.enabled) .mod-toggle-icon { opacity: 0.35; filter: grayscale(1); }
+  .mod-toggle-card:not(.enabled) .mod-toggle-name { color: var(--text3); }
+
+  /* Enabled */
+  .mod-toggle-card.enabled { border-left-color: var(--accent2) !important; background: rgba(229,92,0,0.05); }
+  .mod-toggle-card.enabled:hover { background: rgba(229,92,0,0.09); }
+  .mod-toggle-card.enabled .mod-toggle-name { color: var(--accent); }
+
+  /* Description and size row: hidden until expanded */
+  .mod-toggle-card .mod-toggle-desc { display: none; }
+  .mod-toggle-card .mod-size-row { display: none; }
+  .mod-toggle-card .mod-extra-row { display: none; }
+  .mod-toggle-card.expanded .mod-toggle-desc { display: block; }
+  .mod-toggle-card.expanded .mod-size-row { display: flex; }
+  .mod-toggle-card.expanded .mod-extra-row { display: flex; }
+
   .mod-toggle-card .mod-switch { cursor: pointer; }
   .mod-toggle-card .mod-switch:hover { opacity: 0.85; }
-  .mod-toggle-icon { font-size: 22px; flex-shrink: 0; width: 30px; text-align: center; }
+  .mod-toggle-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; transition: opacity 0.2s, filter 0.2s; }
   .mod-toggle-info { flex: 1; min-width: 0; }
-  .mod-toggle-name { font-family: var(--cond); font-weight: 700; font-size: 13px; letter-spacing: 0.5px; color: var(--text); text-transform: uppercase; }
-  .mod-toggle-desc { font-family: var(--sans); font-size: 11px; color: var(--text3); margin-top: 3px; line-height: 1.4; }
+  .mod-toggle-name { font-family: var(--cond); font-weight: 700; font-size: 12px; letter-spacing: 0.5px; color: var(--text); text-transform: uppercase; transition: color 0.15s; }
+  .mod-toggle-desc { font-family: var(--sans); font-size: 11px; color: var(--text3); margin-top: 4px; line-height: 1.4; }
   .mod-switch {
     width: 42px; height: 24px; border-radius: 12px; background: var(--surface3);
     border: 1px solid var(--border2); position: relative; transition: all 0.2s; flex-shrink: 0;
@@ -1116,6 +1154,29 @@
   .vp-copy-btn:hover { background: var(--surface3); color: var(--text); border-color: var(--accent); }
   .vp-copy-btn.copied { background: rgba(34,197,94,0.2); border-color: var(--green); color: var(--green); }
 
+  /* ── Probe preview 3D overlay ─────────────────────────────────────────────── */
+  .pp-overlay {
+    position: absolute; top: 8px; right: 8px; z-index: 30;
+    background: rgba(15,14,12,0.88); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 8px 10px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-width: 150px; backdrop-filter: blur(4px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  }
+  .pp-dro { display: flex; flex-direction: column; gap: 2px; }
+  .pp-dro-row { display: flex; align-items: baseline; gap: 6px; }
+  .pp-axis { font-family: var(--cond); font-weight: 700; font-size: 10px; color: var(--text3); width: 10px; }
+  .pp-val  { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); }
+  .pp-label { font-family: var(--cond); font-size: 9px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; min-height: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pp-controls { display: flex; align-items: center; gap: 4px; }
+  .pp-btn { background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); font-family: var(--mono); font-size: 11px; padding: 4px 7px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.1s; }
+  .pp-btn:hover:not(:disabled) { background: var(--border); color: var(--text); }
+  .pp-btn:disabled { opacity: 0.3; cursor: default; }
+  .pp-btn-play { background: rgba(229,92,0,0.2); border-color: var(--accent2); color: var(--accent); }
+  .pp-btn-play:hover { background: rgba(229,92,0,0.35) !important; }
+  .pp-btn-close { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: var(--red); margin-left: 2px; }
+  .pp-counter { font-family: var(--mono); font-size: 10px; color: var(--text3); flex: 1; text-align: center; }
+
   .dro-mini-tlo { grid-column: span 2; }
   .dro-mini-tlo-active { background: rgba(229,92,0,0.12); border-color: var(--accent2); }
   .dro-mini-tlo-active .dro-mini-label { color: var(--accent); }
@@ -1153,7 +1214,7 @@
   .prob-subtab-btn { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 16px; cursor: pointer; white-space: nowrap; margin-bottom: -2px; transition: all 0.15s; }
   .prob-subtab-btn:hover { color: var(--text); background: var(--surface2); }
   .prob-subtab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .prob-panels { display: flex; flex-direction: column; overflow: hidden; }
+  .prob-panels { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
   .prob-subtab-panel { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 12px; }
   .prob-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; }
   .prob-section-label { font-family: var(--cond); font-weight: 700; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 2px; }
@@ -1178,6 +1239,33 @@
   .prob-edge-btn { font-family: var(--cond); font-weight: 700; font-size: 12px; letter-spacing: 1px; background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); padding: 8px 4px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.12s; text-align: center; }
   .prob-edge-btn:hover { background: var(--border); color: var(--text); }
   .prob-edge-btn.active { background: rgba(229,92,0,0.25); border-color: var(--accent2); color: var(--accent); }
+  .ef-diagram { display: inline-grid; grid-template-rows: auto 1fr auto; gap: 0; margin-top: 8px; width: 140px; }
+  .ef-diag-top-row, .ef-diag-bot-row { display: grid; grid-template-columns: 18px 1fr 18px; align-items: center; }
+  .ef-diag-mid-row { display: grid; grid-template-columns: 28px 1fr 28px; align-items: stretch; min-height: 44px; }
+  .ef-diag-corner-label { font-family: var(--cond); font-weight: 700; font-size: 11px; color: var(--text); text-align: center; line-height: 1; padding: 2px 0; }
+  .ef-diag-edge-label { font-family: var(--cond); font-size: 8px; letter-spacing: 0.5px; color: var(--text3); text-align: center; line-height: 1.3; }
+  .ef-diag-top { border-bottom: 1.5px solid rgba(255,255,255,0.2); padding-bottom: 3px; margin-bottom: 0; }
+  .ef-diag-bot { border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 3px; margin-top: 0; }
+  .ef-diag-left { border-right: 1.5px solid rgba(255,255,255,0.2); padding-right: 4px; display: flex; align-items: center; justify-content: center; }
+  .ef-diag-right { border-left: 1.5px solid rgba(255,255,255,0.2); padding-left: 4px; display: flex; align-items: center; justify-content: center; }
+  .ef-diag-box { background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; }
+  .ef-diag-z-label { font-family: var(--cond); font-weight: 700; font-size: 11px; color: var(--text3); }
+
+  /* ── Probe preview panel ─────────────────────────────────────────────────── */
+  .prob-preview-panel { height: 200px; flex-shrink: 0; display: flex; gap: 0; border-top: 1px solid var(--border2); background: var(--surface); }
+  .prob-preview-canvases { display: flex; gap: 1px; background: var(--border); flex-shrink: 0; }
+  .prob-preview-canvas { display: block; background: #0f0e0c; }
+  .prob-preview-controls { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 12px; min-width: 0; }
+  .prob-preview-dro { display: flex; flex-direction: column; gap: 4px; }
+  .prob-dro-cell { display: flex; align-items: baseline; gap: 6px; }
+  .prob-dro-axis { font-family: var(--cond); font-weight: 700; font-size: 11px; color: var(--text3); width: 12px; }
+  .prob-dro-val { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); }
+  .prob-preview-label { font-family: var(--cond); font-size: 10px; color: var(--text3); letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .prob-preview-btns { display: flex; align-items: center; gap: 5px; }
+  .prob-prev-btn { background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); font-family: var(--mono); font-size: 12px; padding: 5px 9px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.1s; }
+  .prob-prev-btn:hover:not(:disabled) { background: var(--border); color: var(--text); }
+  .prob-prev-btn:disabled { opacity: 0.3; cursor: default; }
+  .prob-prev-counter { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-left: 4px; }
 
   .wcs-outer { flex: 1; overflow-y: auto; background: var(--bg); }
   .wcs-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
@@ -1438,6 +1526,23 @@
         MOVES: 0&nbsp;&nbsp;RAPIDS: 0
       </div>
       <button class="vp-copy-btn" id="vpCopyBtn" title="Copy debug stats to clipboard">📋</button>
+
+      <!-- Probe preview overlay -->
+      <div class="pp-overlay" id="probePreviewOverlay" style="display:none;">
+        <div class="pp-dro">
+          <div class="pp-dro-row"><span class="pp-axis">X</span><span class="pp-val" id="ppDroX">—</span></div>
+          <div class="pp-dro-row"><span class="pp-axis">Y</span><span class="pp-val" id="ppDroY">—</span></div>
+          <div class="pp-dro-row"><span class="pp-axis">Z</span><span class="pp-val" id="ppDroZ">—</span></div>
+          <div class="pp-label" id="ppDroLabel">—</div>
+        </div>
+        <div class="pp-controls">
+          <button class="pp-btn" id="ppStepBck" title="Previous step" disabled>◀</button>
+          <button class="pp-btn pp-btn-play" id="ppPlay" title="Play">▶</button>
+          <button class="pp-btn" id="ppStepFwd" title="Next step" disabled>▶|</button>
+          <span class="pp-counter" id="ppCounter">—</span>
+          <button class="pp-btn pp-btn-close" id="ppClose" title="Close preview">✕</button>
+        </div>
+      </div>
     </div>
 
     <div class="viewport-legend">
@@ -1618,200 +1723,324 @@
   <div class="modules-page">
     <div class="modules-page-header">
       <div class="modules-page-title">Modules</div>
-      <div class="modules-page-hint">Toggle modules on or off, then pick a size. Enabled modules appear as floating panels on the RUN page — drag their title bar to reposition them.</div>
+      <div class="modules-page-hint">Enable groups or individual modules. Enabled modules appear as floating panels on the RUN page — drag their title bar to reposition them.</div>
     </div>
-    <div class="modules-config-grid">
 
-      <div class="mod-toggle-card" id="modcfg-position">
-        <div class="mod-toggle-icon">📍</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Machine Position</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">DRO axis readouts, WCS selector, machine state and feed/spindle status</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+    <!-- ── GROUP: Basic Functions ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="basic">▼</button>
+        <span class="mod-group-name" data-collapse-group="basic">Basic Functions</span>
+        <span class="mod-group-badge" id="modgrp-badge-basic">0 / 6</span>
+        <div class="mod-group-toggle enabled" data-group-id="basic"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-position" data-module-id="position">
+          <div class="mod-toggle-icon">📍</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Machine Position</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">DRO axis readouts, WCS selector, machine state and feed/spindle status</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-jogging">
-        <div class="mod-toggle-icon">🕹</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Jogging</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">XY/Z jog buttons, step size selectors, and jog feed rate control</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+        <div class="mod-toggle-card" id="modcfg-jogging" data-module-id="jogging">
+          <div class="mod-toggle-icon">🕹</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Jogging</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">XY/Z jog buttons, step size selectors, and jog feed rate control</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-overrides">
-        <div class="mod-toggle-icon">⚡</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Overrides</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Real-time feed rate, rapid, and spindle speed override sliders</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+        <div class="mod-toggle-card" id="modcfg-overrides" data-module-id="overrides">
+          <div class="mod-toggle-icon">⚡</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Overrides</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Real-time feed rate, rapid, and spindle speed override sliders</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-spindle">
-        <div class="mod-toggle-icon">🔄</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Spindle / Coolant</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Spindle direction (CW/CCW/OFF), RPM input, and flood/mist coolant toggles</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+        <div class="mod-toggle-card" id="modcfg-spindle" data-module-id="spindle">
+          <div class="mod-toggle-icon">🔄</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Spindle / Coolant</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Spindle direction (CW/CCW/OFF), RPM input, and flood/mist coolant toggles</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-macros">
-        <div class="mod-toggle-icon">🔧</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Macros</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Quick-access buttons for common G-code commands and machine routines</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+        <div class="mod-toggle-card" id="modcfg-limits" data-module-id="limits">
+          <div class="mod-toggle-icon">📐</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Program Limits</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Min/max/span of X, Y and Z in the loaded program. Includes a Frame button to trace XY extents.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-console">
-        <div class="mod-toggle-icon">💻</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Console</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Live command log with manual G-code entry and touch keyboard support</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
-          </div>
-          <div class="mod-extra-row">
-            <span class="mod-extra-label">Output lines:</span>
-            <button class="mod-lines-btn active">50</button>
-            <button class="mod-lines-btn">100</button>
-            <button class="mod-lines-btn">200</button>
-            <button class="mod-lines-btn">500</button>
+        <div class="mod-toggle-card" id="modcfg-macros" data-module-id="macros">
+          <div class="mod-toggle-icon">🔧</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Macros</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Quick-access buttons for common G-code commands and machine routines</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-tooltable">
-        <div class="mod-toggle-icon">🔩</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Tool Table</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Live tool library with offsets, pocket assignments and active tool indicator</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
-          </div>
-        </div>
       </div>
-
-      <div class="mod-toggle-card" id="modcfg-limits">
-        <div class="mod-toggle-icon">📐</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Program Limits</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Shows the minimum, maximum and span of X, Y and Z movements in the loaded program. Includes a Frame button to trace the XY extents on the machine.</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="mod-toggle-card" id="modcfg-signals">
-        <div class="mod-toggle-icon">🔴</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Signals</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Live indicator lights for X, Y and Z limit switches, probe, toolsetter, door and E-Stop inputs. Reads the Pn: field from the GRBL status report.</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="mod-toggle-card" id="modcfg-bear" style="display:none">
-        <div class="mod-toggle-icon">🐻</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">MR BEAR DO NOT TOUCH</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Zone management for the MR BEAR plugin. Shows exclusion zones in a table and visualizes them as red boxes on the 3D viewport.</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="mod-toggle-card" id="modcfg-toollength">
-        <div class="mod-toggle-icon">⊕</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Tool Length</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Probe tool length using a touch plate or fixed toolsetter (G59.3). Applies offset with G43.1. Supports reference tool workflow for multi-tool setups.</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-          </div>
-        </div>
-      </div>
-
     </div>
+
+    <!-- ── GROUP: Debug ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="debug">▼</button>
+        <span class="mod-group-name" data-collapse-group="debug">Debug</span>
+        <span class="mod-group-badge" id="modgrp-badge-debug">0 / 2</span>
+        <div class="mod-group-toggle enabled" data-group-id="debug"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-console" data-module-id="console">
+          <div class="mod-toggle-icon">💻</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Console</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Live command log with manual G-code entry and touch keyboard support</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
+            <div class="mod-extra-row">
+              <span class="mod-extra-label">Output lines:</span>
+              <button class="mod-lines-btn active">50</button>
+              <button class="mod-lines-btn">100</button>
+              <button class="mod-lines-btn">200</button>
+              <button class="mod-lines-btn">500</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" id="modcfg-signals" data-module-id="signals">
+          <div class="mod-toggle-icon">🔴</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Signals</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Live indicator lights for limit switches, probe, toolsetter, door and E-Stop inputs.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── GROUP: Tool and Coordinate Control ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="toolcoord">▼</button>
+        <span class="mod-group-name" data-collapse-group="toolcoord">Tool and Coordinate Control</span>
+        <span class="mod-group-badge" id="modgrp-badge-toolcoord">0 / 2</span>
+        <div class="mod-group-toggle enabled" data-group-id="toolcoord"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-tooltable" data-module-id="tooltable">
+          <div class="mod-toggle-icon">🔩</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Tool Table</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Live tool library with offsets, pocket assignments and active tool indicator</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" data-module-id="toollength">
+          <div class="mod-toggle-icon">⊕</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Tool Length</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Probe tool length using a touch plate or fixed toolsetter (G59.3). Applies offset with G43.1.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── GROUP: Probing ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="probing">▼</button>
+        <span class="mod-group-name" data-collapse-group="probing">Probing</span>
+        <span class="mod-group-badge" id="modgrp-badge-probing">0 / 4</span>
+        <div class="mod-group-toggle enabled" data-group-id="probing"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-toollength" data-module-id="toollength">
+          <div class="mod-toggle-icon">⊕</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Tool Length</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Probe tool length using a touch plate or fixed toolsetter (G59.3). Applies offset with G43.1. Supports reference tool workflow for multi-tool setups.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" id="modcfg-edgefinder" data-module-id="edgefinder">
+          <div class="mod-toggle-icon">◈</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Edge Finder</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Find edges and corners of a workpiece. External and internal modes for all four corners and edges, plus Z surface.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" id="modcfg-centerfinder" data-module-id="centerfinder">
+          <div class="mod-toggle-icon">⊙</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Center Finder</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Find the center of a bore or boss in X, Y, or both. Supports multiple passes for accuracy.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" id="modcfg-rotation" data-module-id="rotation">
+          <div class="mod-toggle-icon">⟳</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Rotation</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Measure workpiece rotation angle by probing two points along an edge. Optionally applies the rotation to the loaded G-code.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── GROUP: Exclusion Zones ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="exclusion">▼</button>
+        <span class="mod-group-name" data-collapse-group="exclusion">Exclusion Zones</span>
+        <span class="mod-group-badge" id="modgrp-badge-exclusion">0 / 1</span>
+        <div class="mod-group-toggle enabled" data-group-id="exclusion"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-bear" data-module-id="bear" style="display:none">
+          <div class="mod-toggle-icon">🐻</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">MR BEAR DO NOT TOUCH</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Zone management for the MR BEAR plugin. Shows exclusion zones in a table and visualizes them as red boxes on the 3D viewport.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </div><!-- /tab-panel-modules -->
+
 
 <!-- TAB: SETTINGS -->
 <div class="tab-panel" id="tabpanel-settings" style="flex-direction:column;overflow:hidden;">
@@ -2432,7 +2661,7 @@ var __export = (target2, all) => {
 };
 
 // src/state.ts
-var state, POLL_NORM, KEYBOARD_JOG_DIST, VP_STORAGE_KEY, SD_EXTS, KB_JOG_MAP, DTYPE_MAP, MOD_SIZES, MOD_DEFAULTS, MODULE_DEFS, OPT_COLOR_DEFAULTS, OPT_COLOR_CSS_VARS, OPT_LOCKABLE_TABS, TB_BTN_DEFAULTS;
+var state, POLL_NORM, KEYBOARD_JOG_DIST, VP_STORAGE_KEY, SD_EXTS, KB_JOG_MAP, DTYPE_MAP, MOD_SIZES, MOD_DEFAULTS, MODULE_DEFS, MODULE_GROUPS, OPT_COLOR_DEFAULTS, OPT_COLOR_CSS_VARS, OPT_LOCKABLE_TABS, TB_BTN_DEFAULTS;
 var init_state = __esm({
   "src/state.ts"() {
     "use strict";
@@ -2594,7 +2823,10 @@ var init_state = __esm({
       limits: { x: 302, y: 10, enabled: false, size: "normal" },
       signals: { x: 594, y: 10, enabled: false, size: "normal" },
       bear: { x: 594, y: 10, enabled: false, size: "normal" },
-      toollength: { x: 886, y: 10, enabled: false, size: "normal" }
+      toollength: { x: 886, y: 10, enabled: false, size: "normal" },
+      edgefinder: { x: 10, y: 10, enabled: false, size: "normal" },
+      centerfinder: { x: 302, y: 10, enabled: false, size: "normal" },
+      rotation: { x: 594, y: 10, enabled: false, size: "normal" }
     };
     MODULE_DEFS = [
       { id: "position", icon: "\u{1F4CD}", name: "Machine Position" },
@@ -2607,7 +2839,17 @@ var init_state = __esm({
       { id: "limits", icon: "\u{1F4D0}", name: "Program Limits" },
       { id: "signals", icon: "\u{1F534}", name: "Signals" },
       { id: "bear", icon: "\u{1F43B}", name: "MR BEAR" },
-      { id: "toollength", icon: "\u2295", name: "Tool Length" }
+      { id: "toollength", icon: "\u2295", name: "Tool Length" },
+      { id: "edgefinder", icon: "\u25C8", name: "Edge Finder" },
+      { id: "centerfinder", icon: "\u2299", name: "Center Finder" },
+      { id: "rotation", icon: "\u27F3", name: "Rotation" }
+    ];
+    MODULE_GROUPS = [
+      { id: "basic", name: "Basic Functions", modules: ["position", "jogging", "overrides", "spindle", "limits", "macros"] },
+      { id: "debug", name: "Debug", modules: ["console", "signals"] },
+      { id: "toolcoord", name: "Tool and Coordinate Control", modules: ["tooltable", "toollength"] },
+      { id: "probing", name: "Probing", modules: ["toollength", "edgefinder", "centerfinder", "rotation"] },
+      { id: "exclusion", name: "Exclusion Zones", modules: ["bear"] }
     ];
     OPT_COLOR_DEFAULTS = {
       // UI theme
@@ -5633,6 +5875,7 @@ async function runToolLengthProbe(seq) {
     log("err", "Probing already in progress");
     return null;
   }
+  window.clearPreview3D?.();
   _running = true;
   _cancelled = false;
   _probeResult = null;
@@ -6839,6 +7082,381 @@ var init_signals = __esm({
   }
 });
 
+// src/probing/preview.ts
+function waypointsTouchplate(cfg) {
+  const { probeDistance, latchDistance } = cfg;
+  return [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: 0, y: 0, z: -probeDistance, type: "probe", label: "Fast probe" },
+    { x: 0, y: 0, z: -(probeDistance - latchDistance), type: "contact", label: "Contact" },
+    { x: 0, y: 0, z: -(probeDistance - latchDistance) + latchDistance, type: "retract", label: "Retract" },
+    { x: 0, y: 0, z: -(probeDistance - latchDistance) + latchDistance - latchDistance * 2, type: "probe", label: "Slow probe" },
+    { x: 0, y: 0, z: -(probeDistance - latchDistance), type: "contact", label: "Final contact" },
+    { x: 0, y: 0, z: 0, type: "retract", label: "Return" }
+  ];
+}
+function waypointsToolsetter(cfg) {
+  const { toolsetterDepth, latchDistance, tsOffX, tsOffY, tsOffZ } = cfg;
+  const approachZ = tsOffZ + toolsetterDepth;
+  return [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: 0, y: 0, z: 20, type: "rapid", label: "Z home" },
+    { x: tsOffX, y: tsOffY, z: 20, type: "rapid", label: "Move to toolsetter XY" },
+    { x: tsOffX, y: tsOffY, z: approachZ, type: "rapid", label: "Approach Z" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ, type: "probe", label: "Fast probe" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ, type: "contact", label: "Contact" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ + latchDistance, type: "retract", label: "Retract" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ - latchDistance, type: "probe", label: "Slow probe" },
+    { x: tsOffX, y: tsOffY, z: tsOffZ, type: "contact", label: "Final contact" },
+    { x: tsOffX, y: tsOffY, z: 20, type: "retract", label: "Return Z" },
+    { x: 0, y: 0, z: 20, type: "rapid", label: "Return XY" },
+    { x: 0, y: 0, z: 0, type: "rapid", label: "Return Z" }
+  ];
+}
+function waypointsEdgeSingle(cfg) {
+  const { edge, mode, xyClr, depth, probeDistance, latchDistance, probeDiameter } = cfg;
+  const isX = edge === "AD" || edge === "CB";
+  const axis = isX ? "X" : "Y";
+  const external = mode === "external";
+  const clr = xyClr + probeDiameter / 2;
+  const dir = edge === "AD" || edge === "AB" ? external ? 1 : -1 : external ? -1 : 1;
+  const ax = isX ? -dir * clr : 0;
+  const ay = !isX ? -dir * clr : 0;
+  const px = isX ? dir * probeDistance : 0;
+  const py = !isX ? dir * probeDistance : 0;
+  const rx = isX ? -dir * latchDistance : 0;
+  const ry = !isX ? -dir * latchDistance : 0;
+  const contactX = isX ? ax + px : 0;
+  const contactY = !isX ? ay + py : 0;
+  return [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: ax, y: ay, z: 0, type: "rapid", label: "Move to clearance" },
+    { x: ax, y: ay, z: -depth, type: "rapid", label: "Plunge to depth" },
+    { x: ax + px, y: ay + py, z: -depth, type: "probe", label: "Fast probe" },
+    { x: contactX, y: contactY, z: -depth, type: "contact", label: "Contact" },
+    { x: contactX + rx, y: contactY + ry, z: -depth, type: "retract", label: "Retract" },
+    { x: contactX, y: contactY, z: -depth, type: "probe", label: "Slow probe" },
+    { x: contactX, y: contactY, z: -depth, type: "contact", label: "Final contact" },
+    { x: contactX, y: contactY, z: 0, type: "retract", label: "Lift" },
+    { x: 0, y: 0, z: 0, type: "rapid", label: "Return" }
+  ];
+}
+function waypointsEdgeCorner(cfg) {
+  const { edge, mode, xyClr, depth, offset, probeDistance, latchDistance, probeDiameter } = cfg;
+  const external = mode === "external";
+  const signs = {
+    A: { x: 1, y: 1 },
+    B: { x: -1, y: 1 },
+    C: { x: -1, y: -1 },
+    D: { x: 1, y: -1 }
+  };
+  const s = external ? signs[edge] : { x: -signs[edge].x, y: -signs[edge].y };
+  const clr = xyClr + probeDiameter / 2;
+  const xContact = s.x * probeDistance;
+  const yContact = s.y * probeDistance;
+  return [
+    { x: 0, y: s.y * offset, z: 0, type: "start", label: "Start" },
+    { x: -s.x * clr, y: s.y * offset, z: 0, type: "rapid", label: "X clearance" },
+    { x: -s.x * clr, y: s.y * offset, z: -depth, type: "rapid", label: "Plunge" },
+    { x: xContact, y: s.y * offset, z: -depth, type: "probe", label: "Probe X" },
+    { x: xContact, y: s.y * offset, z: -depth, type: "contact", label: "X contact" },
+    { x: xContact - s.x * latchDistance, y: s.y * offset, z: -depth, type: "retract", label: "Retract X" },
+    { x: xContact, y: s.y * offset, z: -depth, type: "probe", label: "Slow X" },
+    { x: xContact, y: s.y * offset, z: 0, type: "retract", label: "Lift" },
+    { x: s.x * offset, y: 0, z: 0, type: "rapid", label: "Move to Y" },
+    { x: s.x * offset, y: -s.y * clr, z: 0, type: "rapid", label: "Y clearance" },
+    { x: s.x * offset, y: -s.y * clr, z: -depth, type: "rapid", label: "Plunge" },
+    { x: s.x * offset, y: yContact, z: -depth, type: "probe", label: "Probe Y" },
+    { x: s.x * offset, y: yContact, z: -depth, type: "contact", label: "Y contact" },
+    { x: s.x * offset, y: yContact - s.y * latchDistance, z: -depth, type: "retract", label: "Retract Y" },
+    { x: s.x * offset, y: yContact, z: -depth, type: "probe", label: "Slow Y" },
+    { x: s.x * offset, y: yContact, z: 0, type: "retract", label: "Lift" },
+    { x: xContact, y: yContact, z: 0, type: "result", label: "Found corner" }
+  ];
+}
+function waypointsCenter(cfg) {
+  const { centerMode, axes, sizeX, sizeY, xyClr, depth, probeDistance, latchDistance, probeDiameter } = cfg;
+  const clr = xyClr + probeDiameter / 2;
+  const halfX = sizeX / 2;
+  const halfY = sizeY / 2;
+  const r = probeDiameter / 2;
+  const wps = [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: 0, y: 0, z: -depth, type: "rapid", label: "Plunge" }
+  ];
+  if (axes !== "Y") {
+    const inside = centerMode === "inside";
+    const x1 = inside ? -(halfX - clr) : -(halfX + clr);
+    const c1 = inside ? -(halfX - probeDistance) : -halfX + r;
+    const x2 = inside ? halfX - clr : halfX + clr;
+    const c2 = inside ? halfX - probeDistance : halfX - r;
+    wps.push(
+      { x: x1, y: 0, z: -depth, type: "rapid", label: "X- approach" },
+      { x: c1, y: 0, z: -depth, type: "probe", label: "Probe X-" },
+      { x: c1, y: 0, z: -depth, type: "contact", label: "X- contact" },
+      { x: c1 + latchDistance, y: 0, z: -depth, type: "retract", label: "Retract" },
+      { x: c1, y: 0, z: -depth, type: "probe", label: "Slow X-" },
+      { x: x2, y: 0, z: -depth, type: "rapid", label: "X+ approach" },
+      { x: c2, y: 0, z: -depth, type: "probe", label: "Probe X+" },
+      { x: c2, y: 0, z: -depth, type: "contact", label: "X+ contact" },
+      { x: c2 - latchDistance, y: 0, z: -depth, type: "retract", label: "Retract" },
+      { x: c2, y: 0, z: -depth, type: "probe", label: "Slow X+" },
+      { x: (c1 + c2) / 2, y: 0, z: -depth, type: "rapid", label: "Move to X center" }
+    );
+  }
+  if (axes !== "X") {
+    const inside = centerMode === "inside";
+    const y1 = inside ? -(halfY - clr) : -(halfY + clr);
+    const c1 = inside ? -(halfY - probeDistance) : -halfY + r;
+    const y2 = inside ? halfY - clr : halfY + clr;
+    const c2 = inside ? halfY - probeDistance : halfY - r;
+    wps.push(
+      { x: 0, y: y1, z: -depth, type: "rapid", label: "Y- approach" },
+      { x: 0, y: c1, z: -depth, type: "probe", label: "Probe Y-" },
+      { x: 0, y: c1, z: -depth, type: "contact", label: "Y- contact" },
+      { x: 0, y: c1 + latchDistance, z: -depth, type: "retract", label: "Retract" },
+      { x: 0, y: c1, z: -depth, type: "probe", label: "Slow Y-" },
+      { x: 0, y: y2, z: -depth, type: "rapid", label: "Y+ approach" },
+      { x: 0, y: c2, z: -depth, type: "probe", label: "Probe Y+" },
+      { x: 0, y: c2, z: -depth, type: "contact", label: "Y+ contact" },
+      { x: 0, y: c2 - latchDistance, z: -depth, type: "retract", label: "Retract" },
+      { x: 0, y: c2, z: -depth, type: "probe", label: "Slow Y+" },
+      { x: 0, y: (c1 + c2) / 2, z: -depth, type: "rapid", label: "Move to Y center" }
+    );
+  }
+  wps.push(
+    { x: 0, y: 0, z: -depth, type: "rapid", label: "At center" },
+    { x: 0, y: 0, z: 0, type: "retract", label: "Lift" },
+    { x: 0, y: 0, z: 0, type: "result", label: "Center found" }
+  );
+  return wps;
+}
+function waypointsRotation(cfg) {
+  const { edge, xyClr, depth, offset, probeDistance, latchDistance, probeDiameter } = cfg;
+  const clr = xyClr + probeDiameter / 2;
+  const probeX = edge === "AB" || edge === "CD";
+  const dir = edge === "AB" || edge === "AD" ? 1 : -1;
+  const ax1 = probeX ? -dir * clr : 0;
+  const ay1 = !probeX ? -dir * clr : 0;
+  const px = probeX ? dir * probeDistance : 0;
+  const py = !probeX ? dir * probeDistance : 0;
+  const c1x = ax1 + px;
+  const c1y = ay1 + py;
+  const ax2 = probeX ? -dir * clr : offset;
+  const ay2 = !probeX ? -dir * clr : offset;
+  const c2x = ax2 + px;
+  const c2y = ay2 + py;
+  return [
+    { x: 0, y: 0, z: 0, type: "start", label: "Start" },
+    { x: ax1, y: ay1, z: 0, type: "rapid", label: "P1 approach" },
+    { x: ax1, y: ay1, z: -depth, type: "rapid", label: "Plunge" },
+    { x: c1x, y: c1y, z: -depth, type: "probe", label: "Probe P1" },
+    { x: c1x, y: c1y, z: -depth, type: "contact", label: "P1 contact" },
+    { x: c1x - px * latchDistance / probeDistance, y: c1y - py * latchDistance / probeDistance, z: -depth, type: "retract", label: "Retract" },
+    { x: c1x, y: c1y, z: -depth, type: "probe", label: "Slow P1" },
+    { x: c1x, y: c1y, z: 0, type: "retract", label: "Lift" },
+    { x: ax2, y: ay2, z: 0, type: "rapid", label: "P2 approach" },
+    { x: ax2, y: ay2, z: -depth, type: "rapid", label: "Plunge" },
+    { x: c2x, y: c2y, z: -depth, type: "probe", label: "Probe P2" },
+    { x: c2x, y: c2y, z: -depth, type: "contact", label: "P2 contact" },
+    { x: c2x - px * latchDistance / probeDistance, y: c2y - py * latchDistance / probeDistance, z: -depth, type: "retract", label: "Retract" },
+    { x: c2x, y: c2y, z: -depth, type: "probe", label: "Slow P2" },
+    { x: c2x, y: c2y, z: 0, type: "retract", label: "Lift" },
+    { x: 0, y: 0, z: 0, type: "rapid", label: "Return" },
+    { x: c1x, y: c1y, z: -depth, type: "result", label: `P1: X${c1x.toFixed(2)} Y${c1y.toFixed(2)}` },
+    { x: c2x, y: c2y, z: -depth, type: "result", label: `P2: X${c2x.toFixed(2)} Y${c2y.toFixed(2)}` }
+  ];
+}
+function stepPreview(delta) {
+  _ps.currentStep = Math.max(0, Math.min(_ps.waypoints.length - 1, _ps.currentStep + delta));
+  renderPreview();
+  updatePreviewDRO();
+  updatePreviewControls();
+}
+function playPreview() {
+  if (_ps.playing) {
+    stopPreviewAnim();
+    return;
+  }
+  if (_ps.currentStep >= _ps.waypoints.length - 1) _ps.currentStep = 0;
+  _ps.playing = true;
+  updatePreviewControls();
+  _ps.animTimer = setInterval(() => {
+    if (_ps.currentStep >= _ps.waypoints.length - 1) {
+      stopPreviewAnim();
+      return;
+    }
+    _ps.currentStep++;
+    renderPreview();
+    updatePreviewDRO();
+    updatePreviewControls();
+  }, 300);
+}
+function stopPreviewAnim() {
+  if (_ps.animTimer) {
+    clearInterval(_ps.animTimer);
+    _ps.animTimer = null;
+  }
+  _ps.playing = false;
+  updatePreviewControls();
+}
+function updatePreviewControls() {
+  const playBtn = document.getElementById("previewPlayBtn");
+  const stepFwd = document.getElementById("previewStepFwd");
+  const stepBck = document.getElementById("previewStepBck");
+  const counter = document.getElementById("previewCounter");
+  if (playBtn) playBtn.textContent = _ps.playing ? "\u23F8" : "\u25B6";
+  if (stepFwd) stepFwd.disabled = _ps.currentStep >= _ps.waypoints.length - 1;
+  if (stepBck) stepBck.disabled = _ps.currentStep <= 0;
+  if (counter) counter.textContent = _ps.waypoints.length > 0 ? `${_ps.currentStep + 1} / ${_ps.waypoints.length}` : "\u2014";
+}
+function updatePreviewDRO() {
+  const wp = _ps.waypoints[_ps.currentStep];
+  if (!wp) return;
+  const dx = document.getElementById("previewDroX");
+  const dy = document.getElementById("previewDroY");
+  const dz = document.getElementById("previewDroZ");
+  const dl = document.getElementById("previewDroLabel");
+  if (dx) dx.textContent = wp.x.toFixed(3);
+  if (dy) dy.textContent = wp.y.toFixed(3);
+  if (dz) dz.textContent = wp.z.toFixed(3);
+  if (dl) dl.textContent = wp.label || "";
+}
+function renderPreview() {
+  const xyCanvas = document.getElementById("previewXY");
+  const xzCanvas = document.getElementById("previewXZ");
+  if (!xyCanvas || !xzCanvas || _ps.waypoints.length === 0) return;
+  drawView(xyCanvas, "XY");
+  drawView(xzCanvas, "XZ");
+}
+function drawView(canvas, view) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  const W = canvas.width;
+  const H = canvas.height;
+  const wps = _ps.waypoints;
+  const cur = _ps.currentStep;
+  const xs = wps.map((w2) => view === "XY" ? w2.x : w2.x);
+  const ys = wps.map((w2) => view === "XY" ? w2.y : w2.z);
+  let minX = Math.min(...xs), maxX = Math.max(...xs);
+  let minY = Math.min(...ys), maxY = Math.max(...ys);
+  const padX = Math.max((maxX - minX) * 0.2, 5);
+  const padY = Math.max((maxY - minY) * 0.2, 5);
+  minX -= padX;
+  maxX += padX;
+  minY -= padY;
+  maxY += padY;
+  const scaleX = W / (maxX - minX || 1);
+  const scaleY = H / (maxY - minY || 1);
+  const scale = Math.min(scaleX, scaleY) * 0.85;
+  const offX = W / 2 - (maxX + minX) / 2 * scale;
+  const offY = H / 2 + (maxY + minY) / 2 * scale;
+  const tx = (x) => x * scale + offX;
+  const ty = (y) => -y * scale + offY;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#0f0e0c";
+  ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = "rgba(255,255,255,0.05)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(tx(0), 0);
+  ctx.lineTo(tx(0), H);
+  ctx.moveTo(0, ty(0));
+  ctx.lineTo(W, ty(0));
+  ctx.stroke();
+  ctx.fillStyle = "rgba(255,255,255,0.25)";
+  ctx.font = "10px monospace";
+  ctx.fillText(view, 6, 14);
+  for (let i = 1; i <= Math.min(cur, wps.length - 1); i++) {
+    const a = wps[i - 1];
+    const b = wps[i];
+    const ax = view === "XY" ? a.x : a.x;
+    const ay = view === "XY" ? a.y : a.z;
+    const bx = view === "XY" ? b.x : b.x;
+    const by = view === "XY" ? b.y : b.z;
+    ctx.beginPath();
+    ctx.moveTo(tx(ax), ty(ay));
+    ctx.lineTo(tx(bx), ty(by));
+    const color = TYPE_COLOR[b.type] || "#888";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = b.type === "probe" ? 2 : 1.5;
+    if (b.type === "rapid" || b.type === "retract") {
+      ctx.setLineDash([4, 3]);
+    } else {
+      ctx.setLineDash([]);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  for (let i = Math.max(1, cur + 1); i < wps.length; i++) {
+    const a = wps[i - 1];
+    const b = wps[i];
+    const ax = view === "XY" ? a.x : a.x;
+    const ay = view === "XY" ? a.y : a.z;
+    const bx = view === "XY" ? b.x : b.x;
+    const by = view === "XY" ? b.y : b.z;
+    ctx.beginPath();
+    ctx.moveTo(tx(ax), ty(ay));
+    ctx.lineTo(tx(bx), ty(by));
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  for (let i = 0; i <= Math.min(cur, wps.length - 1); i++) {
+    const wp = wps[i];
+    if (wp.type !== "contact" && wp.type !== "result") continue;
+    const wx = view === "XY" ? wp.x : wp.x;
+    const wy = view === "XY" ? wp.y : wp.z;
+    ctx.beginPath();
+    ctx.arc(tx(wx), ty(wy), 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = TYPE_COLOR[wp.type];
+    ctx.fill();
+  }
+  if (wps[cur]) {
+    const wp = wps[cur];
+    const cx = view === "XY" ? wp.x : wp.x;
+    const cy = view === "XY" ? wp.y : wp.z;
+    const px = tx(cx);
+    const py2 = ty(cy);
+    const sz = 6;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(px - sz, py2);
+    ctx.lineTo(px + sz, py2);
+    ctx.moveTo(px, py2 - sz);
+    ctx.lineTo(px, py2 + sz);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(px, py2, 3, 0, Math.PI * 2);
+    ctx.strokeStyle = "#ffffff";
+    ctx.stroke();
+  }
+}
+var TYPE_COLOR, _ps;
+var init_preview = __esm({
+  "src/probing/preview.ts"() {
+    "use strict";
+    TYPE_COLOR = {
+      start: "#64748b",
+      rapid: "#3b82f6",
+      probe: "#f97316",
+      retract: "#6366f1",
+      contact: "#22c55e",
+      result: "#f43f5e"
+    };
+    _ps = {
+      waypoints: [],
+      currentStep: 0,
+      animTimer: null,
+      playing: false
+    };
+  }
+});
+
 // src/probing/tool-length.tsx
 function loadConfig() {
   return { ...DEFAULTS, ...lsGet("fs-tl-config", {}) };
@@ -7069,7 +7687,7 @@ function mount7(parent) {
     _statusEl = el;
   } }, "Ready"), /* @__PURE__ */ h("div", { class: "tl-result", ref: (el) => {
     _resultDisplay = el;
-  } }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h(
+  } }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "padding:10px;font-size:11px", id: "tlPreviewBtn" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h(
     "button",
     {
       class: "tb-btn success",
@@ -7102,6 +7720,26 @@ function mount7(parent) {
     updateModeUI();
   }
   updateRefDisplay();
+  document.getElementById("tlPreviewBtn")?.addEventListener("click", () => {
+    const mode = _cfg.mode;
+    if (mode === "toolsetter") {
+      const ts = state.wcsOffsets["G59.3"] || { x: 50, y: 50, z: -20 };
+      window.loadPreview3D?.(waypointsToolsetter({
+        probeDistance: _cfg.probeDistance,
+        latchDistance: _cfg.latchDistance,
+        toolsetterDepth: _cfg.toolsetterDepth,
+        tsOffX: ts.x - state.machineX,
+        tsOffY: ts.y - state.machineY,
+        tsOffZ: ts.z - state.machineZ
+      }));
+    } else {
+      window.loadPreview3D?.(waypointsTouchplate({
+        probeDistance: _cfg.probeDistance,
+        latchDistance: _cfg.latchDistance,
+        touchPlateHeight: _cfg.touchPlateHeight
+      }));
+    }
+  });
 }
 var DEFAULTS, _cfg, _statusEl, _probeBtn, _cancelBtn, _setRefBtn, _clearRefBtn, _refDisplay, _resultDisplay, _modeTouch, _modeToolsetter, _touchPlateSection, _toolsetterSection;
 var init_tool_length = __esm({
@@ -7113,6 +7751,7 @@ var init_tool_length = __esm({
     init_console();
     init_ui();
     init_probe_program();
+    init_preview();
     DEFAULTS = {
       mode: "touchplate",
       probeFeedRate: 100,
@@ -7249,6 +7888,154 @@ var init_edge_finder = __esm({
   }
 });
 
+// src/probing/edge-finder-module.tsx
+function loadCfg() {
+  return {
+    mode: "external",
+    probeFeedRate: 100,
+    latchFeedRate: 25,
+    probeDistance: 10,
+    latchDistance: 1,
+    xyClr: 5,
+    depth: 3,
+    offset: 5,
+    probeDiameter: 2,
+    probeZ: false,
+    touchPlateHeight: 0,
+    workpieceHeight: 0,
+    ...lsGet(CFG_KEY, {})
+  };
+}
+function saveCfg(cfg) {
+  lsSet(CFG_KEY, cfg);
+}
+function numVal(id) {
+  return parseFloat(document.getElementById(id)?.value || "0") || 0;
+}
+function getWcs(id) {
+  return document.getElementById(id)?.value || getActiveWcs();
+}
+function getCoordMode(id) {
+  return document.getElementById(id)?.value || "G10";
+}
+function setStatus3(id, msg, type = "idle") {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = msg;
+    el.className = `prob-status prob-status-${type}`;
+  }
+}
+function mount8(parent) {
+  const cfg = loadCfg();
+  const card = /* @__PURE__ */ h("div", { class: "module-card mod-hidden", id: "mod-edgefinder", dataset: { modSize: "normal" }, style: "top:10px;left:302px" }, /* @__PURE__ */ h("div", { class: "module-drag-handle" }, /* @__PURE__ */ h("span", { class: "module-drag-dots" }, "\u283F\u283F"), /* @__PURE__ */ h("span", { class: "module-drag-title" }, "Edge Finder"), /* @__PURE__ */ h("button", { class: "module-drag-close", onClick: () => card.classList.add("mod-hidden") }, "\u2715")), /* @__PURE__ */ h("div", { class: "module-body", style: "gap:8px;overflow-y:auto;max-height:80vh" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "modEfMode", id: "modEfModeExt", value: "external", checked: cfg.mode === "external" }), "External"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "modEfMode", id: "modEfModeInt", value: "internal", checked: cfg.mode === "internal" }), "Internal"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Select Edge / Corner"), /* @__PURE__ */ h("div", { class: "prob-edge-grid" }, edgeButtons.map(
+    (e) => /* @__PURE__ */ h("button", { class: "prob-edge-btn", id: `modEfEdge-${e.id}`, "data-edge": e.id, title: e.title }, e.label)
+  )), /* @__PURE__ */ h("div", { class: "ef-diagram" }, /* @__PURE__ */ h("div", { class: "ef-diag-top-row" }, /* @__PURE__ */ h("div", { class: "ef-diag-corner-label" }, "D"), /* @__PURE__ */ h("div", { class: "ef-diag-edge-label ef-diag-top" }, "CD \xA0Y+"), /* @__PURE__ */ h("div", { class: "ef-diag-corner-label" }, "C")), /* @__PURE__ */ h("div", { class: "ef-diag-mid-row" }, /* @__PURE__ */ h("div", { class: "ef-diag-edge-label ef-diag-left" }, "AD", /* @__PURE__ */ h("br", null), "X\u2212"), /* @__PURE__ */ h("div", { class: "ef-diag-box" }, /* @__PURE__ */ h("span", { class: "ef-diag-z-label" }, "Z")), /* @__PURE__ */ h("div", { class: "ef-diag-edge-label ef-diag-right" }, "CB", /* @__PURE__ */ h("br", null), "X+")), /* @__PURE__ */ h("div", { class: "ef-diag-bot-row" }, /* @__PURE__ */ h("div", { class: "ef-diag-corner-label" }, "A"), /* @__PURE__ */ h("div", { class: "ef-diag-edge-label ef-diag-bot" }, "AB \xA0Y\u2212"), /* @__PURE__ */ h("div", { class: "ef-diag-corner-label" }, "B")))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Corner offset (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfOffset", value: String(cfg.offset), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Also probe Z"), /* @__PURE__ */ h("label", { class: "prob-toggle" }, /* @__PURE__ */ h("input", { type: "checkbox", id: "modEfProbeZ", checked: cfg.probeZ }), " Yes"))), /* @__PURE__ */ h("div", { class: "prob-section", id: "modEfZSection", style: cfg.probeZ ? "" : "display:none" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Z Probe"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Touch plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfPlateHeight", value: String(cfg.touchPlateHeight), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Workpiece height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modEfWpHeight", value: String(cfg.workpieceHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Write to WCS"), /* @__PURE__ */ h("select", { class: "prob-select", id: "modEfWcs" }, /* @__PURE__ */ h("option", { value: "" }, "\u2014 use active (", state.activeWcs || "G54", ") \u2014"), ["G54", "G55", "G56", "G57", "G58", "G59", "G59.1", "G59.2", "G59.3"].map(
+    (o) => /* @__PURE__ */ h("option", { value: o }, o)
+  ))), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Coordinate mode"), /* @__PURE__ */ h("select", { class: "prob-select", id: "modEfCoordMode" }, /* @__PURE__ */ h("option", { value: "G10" }, "G10 \u2014 Persistent WCS"), /* @__PURE__ */ h("option", { value: "G92" }, "G92 \u2014 Session offset"), /* @__PURE__ */ h("option", { value: "measure" }, "Measure only")))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "modEfStatus" }, "Select an edge or corner, then click PROBE"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "padding:8px;font-size:11px", id: "modEfPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "modEfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "modEfCancel", disabled: true }, "\u2715"))));
+  parent.appendChild(card);
+  let selectedEdge = null;
+  card.querySelectorAll(".prob-edge-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      card.querySelectorAll(".prob-edge-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedEdge = btn.dataset.edge;
+      setStatus3("modEfStatus", `Edge: ${selectedEdge} selected`);
+    });
+  });
+  card.querySelector("#modEfProbeZ")?.addEventListener("change", function() {
+    const sec = document.getElementById("modEfZSection");
+    if (sec) sec.style.display = this.checked ? "" : "none";
+  });
+  card.querySelector("#modEfPreview")?.addEventListener("click", () => {
+    if (!selectedEdge) {
+      setStatus3("modEfStatus", "Select an edge or corner first", "err");
+      return;
+    }
+    const mode = card.querySelector('input[name="modEfMode"]:checked')?.value || "external";
+    const cfg2 = {
+      edge: selectedEdge,
+      mode,
+      xyClr: numVal("modEfXYClr"),
+      depth: numVal("modEfDepth"),
+      offset: numVal("modEfOffset"),
+      probeDistance: numVal("modEfProbeDist"),
+      latchDistance: numVal("modEfLatchDist"),
+      probeDiameter: numVal("modEfDiameter")
+    };
+    const wps = selectedEdge === "Z" ? waypointsTouchplate({ probeDistance: cfg2.probeDistance, latchDistance: cfg2.latchDistance, touchPlateHeight: 0 }) : selectedEdge.length === 1 ? waypointsEdgeCorner(cfg2) : waypointsEdgeSingle(cfg2);
+    window.loadPreview3D?.(wps);
+  });
+  const probeBtn = card.querySelector("#modEfProbe");
+  const cancelBtn = card.querySelector("#modEfCancel");
+  probeBtn.addEventListener("click", async () => {
+    if (!state.connected) {
+      log("err", "Not connected");
+      return;
+    }
+    if (!selectedEdge) {
+      setStatus3("modEfStatus", "Select an edge or corner first", "err");
+      return;
+    }
+    const mode = card.querySelector('input[name="modEfMode"]:checked')?.value || "external";
+    const cfg2 = {
+      mode,
+      edge: selectedEdge,
+      probeFeedRate: numVal("modEfProbeFeed"),
+      latchFeedRate: numVal("modEfLatchFeed"),
+      probeDistance: numVal("modEfProbeDist"),
+      latchDistance: numVal("modEfLatchDist"),
+      xyClr: numVal("modEfXYClr"),
+      depth: numVal("modEfDepth"),
+      offset: numVal("modEfOffset"),
+      probeDiameter: numVal("modEfDiameter"),
+      probeZ: card.querySelector("#modEfProbeZ")?.checked ?? false,
+      touchPlateHeight: numVal("modEfPlateHeight"),
+      workpieceHeight: numVal("modEfWpHeight"),
+      coordMode: getCoordMode("modEfCoordMode"),
+      wcs: getWcs("modEfWcs")
+    };
+    saveCfg(cfg2);
+    probeBtn.disabled = true;
+    cancelBtn.disabled = false;
+    setStatus3("modEfStatus", `Probing ${selectedEdge}\u2026`, "running");
+    const ok = await runEdgeFinder(cfg2);
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+    setStatus3("modEfStatus", ok ? `\u2713 ${selectedEdge} complete` : "\u2717 Probe failed", ok ? "ok" : "err");
+  });
+  cancelBtn.addEventListener("click", () => {
+    cancelProbing();
+    setStatus3("modEfStatus", "Cancelled");
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+  });
+}
+var CFG_KEY, edgeButtons;
+var init_edge_finder_module = __esm({
+  "src/probing/edge-finder-module.tsx"() {
+    "use strict";
+    init_jsx();
+    init_state();
+    init_console();
+    init_ui();
+    init_edge_finder();
+    init_probe_program();
+    init_preview();
+    CFG_KEY = "fs-probing-tab-ef";
+    edgeButtons = [
+      { id: "D", label: "D \u2198", title: "Corner D (top-left)" },
+      { id: "CD", label: "\u2193 CD", title: "Edge CD (top, Y+)" },
+      { id: "C", label: "C \u2199", title: "Corner C (top-right)" },
+      { id: "AD", label: "\u2192 AD", title: "Edge AD (left, X-)" },
+      { id: "Z", label: "\u2193 Z", title: "Z surface" },
+      { id: "CB", label: "CB \u2190", title: "Edge CB (right, X+)" },
+      { id: "A", label: "A \u2197", title: "Corner A (bottom-left)" },
+      { id: "AB", label: "\u2191 AB", title: "Edge AB (bottom, Y-)" },
+      { id: "B", label: "B \u2196", title: "Corner B (bottom-right)" }
+    ];
+  }
+});
+
 // src/probing/center-finder.ts
 function startPos2() {
   return { x: state.machineX, y: state.machineY, z: state.machineZ };
@@ -7286,7 +8073,9 @@ async function probeCenter(cfg, sp) {
   const radius = cfg.probeDiameter / 2;
   let x1 = null, x2 = null;
   let y1 = null, y2 = null;
-  await rapidToMPos(null, null, sp.z - cfg.depth);
+  if (cfg.centerMode === "inside") {
+    await rapidToMPos(null, null, sp.z - cfg.depth);
+  }
   if (cfg.axes !== "Y") {
     const halfX = cfg.workpieceSizeX / 2;
     if (cfg.centerMode === "inside") {
@@ -7387,6 +8176,121 @@ var init_center_finder = __esm({
     init_state();
     init_console();
     init_probe_program();
+  }
+});
+
+// src/probing/center-finder-module.tsx
+function loadCfg2() {
+  return {
+    centerMode: "inside",
+    axes: "XY",
+    probeFeedRate: 100,
+    latchFeedRate: 25,
+    probeDistance: 10,
+    latchDistance: 1,
+    xyClr: 5,
+    depth: 3,
+    probeDiameter: 2,
+    workpieceSizeX: 50,
+    workpieceSizeY: 50,
+    passes: 1,
+    ...lsGet(CFG_KEY2, {})
+  };
+}
+function saveCfg2(cfg) {
+  lsSet(CFG_KEY2, cfg);
+}
+function numVal2(id) {
+  return parseFloat(document.getElementById(id)?.value || "0") || 0;
+}
+function getWcs2(id) {
+  return document.getElementById(id)?.value || getActiveWcs();
+}
+function getCoordMode2(id) {
+  return document.getElementById(id)?.value || "G10";
+}
+function setStatus4(id, msg, type = "idle") {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = msg;
+    el.className = `prob-status prob-status-${type}`;
+  }
+}
+function mount9(parent) {
+  const cfg = loadCfg2();
+  const card = /* @__PURE__ */ h("div", { class: "module-card mod-hidden", id: "mod-centerfinder", dataset: { modSize: "normal" }, style: "top:10px;left:302px" }, /* @__PURE__ */ h("div", { class: "module-drag-handle" }, /* @__PURE__ */ h("span", { class: "module-drag-dots" }, "\u283F\u283F"), /* @__PURE__ */ h("span", { class: "module-drag-title" }, "Center Finder"), /* @__PURE__ */ h("button", { class: "module-drag-close", onClick: () => card.classList.add("mod-hidden") }, "\u2715")), /* @__PURE__ */ h("div", { class: "module-body", style: "gap:8px;overflow-y:auto;max-height:80vh" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Center Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "modCfMode", id: "modCfModeInside", value: "inside", checked: cfg.centerMode === "inside" }), "Inside (bore)"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "modCfMode", id: "modCfModeOutside", value: "outside", checked: cfg.centerMode === "outside" }), "Outside (boss)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Axes"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "modCfAxes", id: "modCfAxesXY", value: "XY", checked: cfg.axes === "XY" }), "XY"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "modCfAxes", id: "modCfAxesX", value: "X", checked: cfg.axes === "X" }), "X only"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "modCfAxes", id: "modCfAxesY", value: "Y", checked: cfg.axes === "Y" }), "Y only"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Workpiece Size"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "X size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfSizeX", value: String(cfg.workpieceSizeX), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Y size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfSizeY", value: String(cfg.workpieceSizeY), min: "1", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Passes"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modCfPasses", value: String(cfg.passes), min: "1", max: "5", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Write to WCS"), /* @__PURE__ */ h("select", { class: "prob-select", id: "modCfWcs" }, /* @__PURE__ */ h("option", { value: "" }, "\u2014 use active (", state.activeWcs || "G54", ") \u2014"), ["G54", "G55", "G56", "G57", "G58", "G59", "G59.1", "G59.2", "G59.3"].map(
+    (o) => /* @__PURE__ */ h("option", { value: o }, o)
+  ))), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Coordinate mode"), /* @__PURE__ */ h("select", { class: "prob-select", id: "modCfCoordMode" }, /* @__PURE__ */ h("option", { value: "G10" }, "G10 \u2014 Persistent WCS"), /* @__PURE__ */ h("option", { value: "G92" }, "G92 \u2014 Session offset"), /* @__PURE__ */ h("option", { value: "measure" }, "Measure only")))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "modCfStatus" }, "Ready"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "padding:8px;font-size:11px", id: "modCfPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "modCfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "modCfCancel", disabled: true }, "\u2715"))));
+  parent.appendChild(card);
+  card.querySelector("#modCfPreview")?.addEventListener("click", () => {
+    const centerMode = card.querySelector('input[name="modCfMode"]:checked')?.value || "inside";
+    const axes = card.querySelector('input[name="modCfAxes"]:checked')?.value || "XY";
+    const wps = waypointsCenter({
+      centerMode,
+      axes,
+      sizeX: numVal2("modCfSizeX"),
+      sizeY: numVal2("modCfSizeY"),
+      xyClr: numVal2("modCfXYClr"),
+      depth: numVal2("modCfDepth"),
+      probeDistance: numVal2("modCfProbeDist"),
+      latchDistance: numVal2("modCfLatchDist"),
+      probeDiameter: numVal2("modCfDiameter")
+    });
+    window.loadPreview3D?.(wps);
+  });
+  const probeBtn = card.querySelector("#modCfProbe");
+  const cancelBtn = card.querySelector("#modCfCancel");
+  probeBtn.addEventListener("click", async () => {
+    if (!state.connected) {
+      log("err", "Not connected");
+      return;
+    }
+    const centerMode = card.querySelector('input[name="modCfMode"]:checked')?.value || "inside";
+    const axes = card.querySelector('input[name="modCfAxes"]:checked')?.value || "XY";
+    const cfg2 = {
+      centerMode,
+      axes,
+      probeFeedRate: numVal2("modCfProbeFeed"),
+      latchFeedRate: numVal2("modCfLatchFeed"),
+      probeDistance: numVal2("modCfProbeDist"),
+      latchDistance: numVal2("modCfLatchDist"),
+      xyClr: numVal2("modCfXYClr"),
+      depth: numVal2("modCfDepth"),
+      probeDiameter: numVal2("modCfDiameter"),
+      workpieceSizeX: numVal2("modCfSizeX"),
+      workpieceSizeY: numVal2("modCfSizeY"),
+      passes: numVal2("modCfPasses") || 1,
+      coordMode: getCoordMode2("modCfCoordMode"),
+      wcs: getWcs2("modCfWcs")
+    };
+    saveCfg2(cfg2);
+    probeBtn.disabled = true;
+    cancelBtn.disabled = false;
+    setStatus4("modCfStatus", "Finding center\u2026", "running");
+    const ok = await runCenterFinder(cfg2);
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+    setStatus4("modCfStatus", ok ? "\u2713 Center found" : "\u2717 Probe failed", ok ? "ok" : "err");
+  });
+  cancelBtn.addEventListener("click", () => {
+    cancelProbing();
+    setStatus4("modCfStatus", "Cancelled");
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+  });
+}
+var CFG_KEY2;
+var init_center_finder_module = __esm({
+  "src/probing/center-finder-module.tsx"() {
+    "use strict";
+    init_jsx();
+    init_state();
+    init_console();
+    init_ui();
+    init_center_finder();
+    init_probe_program();
+    init_preview();
+    CFG_KEY2 = "fs-probing-tab-cf";
   }
 });
 
@@ -7493,11 +8397,125 @@ var init_rotation = __esm({
   }
 });
 
+// src/probing/rotation-module.tsx
+function loadCfg3() {
+  return {
+    edge: "AB",
+    probeFeedRate: 100,
+    latchFeedRate: 25,
+    probeDistance: 10,
+    latchDistance: 1,
+    xyClr: 5,
+    depth: 3,
+    offset: 50,
+    probeDiameter: 2,
+    ...lsGet(CFG_KEY3, {})
+  };
+}
+function saveCfg3(cfg) {
+  lsSet(CFG_KEY3, cfg);
+}
+function numVal3(id) {
+  return parseFloat(document.getElementById(id)?.value || "0") || 0;
+}
+function setStatus5(id, msg, type = "idle") {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = msg;
+    el.className = `prob-status prob-status-${type}`;
+  }
+}
+function mount10(parent) {
+  const cfg = loadCfg3();
+  let lastAngle = null;
+  const card = /* @__PURE__ */ h("div", { class: "module-card mod-hidden", id: "mod-rotation", dataset: { modSize: "normal" }, style: "top:10px;left:302px" }, /* @__PURE__ */ h("div", { class: "module-drag-handle" }, /* @__PURE__ */ h("span", { class: "module-drag-dots" }, "\u283F\u283F"), /* @__PURE__ */ h("span", { class: "module-drag-title" }, "Rotation"), /* @__PURE__ */ h("button", { class: "module-drag-close", onClick: () => card.classList.add("mod-hidden") }, "\u2715")), /* @__PURE__ */ h("div", { class: "module-body", style: "gap:8px;overflow-y:auto;max-height:80vh" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Edge to Probe Along"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;flex-wrap:wrap;" }, ["AB", "AD", "CB", "CD"].map(
+    (e) => /* @__PURE__ */ h("label", { class: "prob-mode-btn", style: "flex:0 0 auto" }, /* @__PURE__ */ h("input", { type: "radio", name: "modRotEdge", value: e, checked: cfg.edge === e }), e)
+  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "AB=bottom \xB7 AD=left \xB7 CB=right \xB7 CD=top")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modRotProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modRotLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modRotProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modRotLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modRotXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modRotDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Point spacing (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modRotOffset", value: String(cfg.offset), min: "5", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "modRotDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "modRotStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "modRotResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "padding:8px;font-size:11px", id: "modRotPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "modRotProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:10px;font-size:11px", id: "modRotApply", disabled: true }, "\u21BB APPLY"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "modRotCancel", disabled: true }, "\u2715"))));
+  parent.appendChild(card);
+  const probeBtn = card.querySelector("#modRotProbe");
+  const applyBtn = card.querySelector("#modRotApply");
+  const cancelBtn = card.querySelector("#modRotCancel");
+  const resultEl = card.querySelector("#modRotResult");
+  card.querySelector("#modRotPreview")?.addEventListener("click", () => {
+    const edge = card.querySelector('input[name="modRotEdge"]:checked')?.value || "AB";
+    const wps = waypointsRotation({
+      edge,
+      xyClr: numVal3("modRotXYClr"),
+      depth: numVal3("modRotDepth"),
+      offset: numVal3("modRotOffset"),
+      probeDistance: numVal3("modRotProbeDist"),
+      latchDistance: numVal3("modRotLatchDist"),
+      probeDiameter: numVal3("modRotDiameter")
+    });
+    window.loadPreview3D?.(wps);
+  });
+  probeBtn.addEventListener("click", async () => {
+    if (!state.connected) {
+      log("err", "Not connected");
+      return;
+    }
+    const edge = card.querySelector('input[name="modRotEdge"]:checked')?.value || "AB";
+    const cfg2 = {
+      edge,
+      probeFeedRate: numVal3("modRotProbeFeed"),
+      latchFeedRate: numVal3("modRotLatchFeed"),
+      probeDistance: numVal3("modRotProbeDist"),
+      latchDistance: numVal3("modRotLatchDist"),
+      xyClr: numVal3("modRotXYClr"),
+      depth: numVal3("modRotDepth"),
+      offset: numVal3("modRotOffset"),
+      probeDiameter: numVal3("modRotDiameter")
+    };
+    saveCfg3(cfg2);
+    probeBtn.disabled = true;
+    cancelBtn.disabled = false;
+    applyBtn.disabled = true;
+    lastAngle = null;
+    setStatus5("modRotStatus", "Probing\u2026", "running");
+    const result = await runRotation(cfg2);
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+    if (result) {
+      lastAngle = result.angleDeg;
+      resultEl.textContent = `Angle: ${result.angleDeg.toFixed(3)}\xB0`;
+      applyBtn.disabled = !state.gcodeLines?.length;
+      setStatus5("modRotStatus", `\u2713 Measured: ${result.angleDeg.toFixed(3)}\xB0`, "ok");
+    } else {
+      setStatus5("modRotStatus", "\u2717 Probe failed", "err");
+    }
+  });
+  applyBtn.addEventListener("click", () => {
+    if (lastAngle === null) return;
+    applyRotationToGcode(lastAngle);
+    setStatus5("modRotStatus", `\u2713 G-code rotated by ${lastAngle.toFixed(3)}\xB0`, "ok");
+  });
+  cancelBtn.addEventListener("click", () => {
+    cancelProbing();
+    setStatus5("modRotStatus", "Cancelled");
+    probeBtn.disabled = false;
+    cancelBtn.disabled = true;
+  });
+}
+var CFG_KEY3;
+var init_rotation_module = __esm({
+  "src/probing/rotation-module.tsx"() {
+    "use strict";
+    init_jsx();
+    init_state();
+    init_console();
+    init_ui();
+    init_rotation();
+    init_probe_program();
+    init_preview();
+    CFG_KEY3 = "fs-probing-tab-rot";
+  }
+});
+
 // src/probing/probing-tab.tsx
-function loadCfg(sub, defaults) {
+function loadCfg4(sub, defaults) {
   return { ...defaults, ...lsGet(`${SAVE_KEY}-${sub}`, {}) };
 }
-function saveCfg(sub, cfg) {
+function saveCfg4(sub, cfg) {
   lsSet(`${SAVE_KEY}-${sub}`, cfg);
 }
 function WcsSelector({ id }) {
@@ -7507,18 +8525,18 @@ function WcsSelector({ id }) {
 function CoordModeSelector({ id }) {
   return /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Coordinate mode"), /* @__PURE__ */ h("select", { class: "prob-select", id }, /* @__PURE__ */ h("option", { value: "G10" }, "G10 \u2014 Persistent WCS"), /* @__PURE__ */ h("option", { value: "G92" }, "G92 \u2014 Session offset"), /* @__PURE__ */ h("option", { value: "measure" }, "Measure only")));
 }
-function getWcs(selectId) {
+function getWcs3(selectId) {
   const el = document.getElementById(selectId);
   return el?.value || getActiveWcs();
 }
-function getCoordMode(selectId) {
+function getCoordMode3(selectId) {
   const el = document.getElementById(selectId);
   return el?.value || "G10";
 }
-function numVal(id) {
+function numVal4(id) {
   return parseFloat(document.getElementById(id)?.value || "0") || 0;
 }
-function setStatus3(id, msg, type = "idle") {
+function setStatus6(id, msg, type = "idle") {
   const el = document.getElementById(id);
   if (!el) return;
   el.textContent = msg;
@@ -7537,7 +8555,7 @@ function initSubTabs(container) {
   });
 }
 function buildToolLengthTab() {
-  const tlCfg = loadCfg("tl", {
+  const tlCfg = loadCfg4("tl", {
     mode: "touchplate",
     probeFeedRate: 100,
     latchFeedRate: 25,
@@ -7547,10 +8565,10 @@ function buildToolLengthTab() {
     toolsetterDepth: 10,
     tloReference: null
   });
-  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-toollength", style: "display:flex;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeTouch", value: "touchplate", checked: tlCfg.mode === "touchplate" }), "Touch Plate"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeToolsetter", value: "toolsetter", checked: tlCfg.mode === "toolsetter" }), "Toolsetter (G59.3)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeFeed", value: String(tlCfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchFeed", value: String(tlCfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeDist", value: String(tlCfg.probeDistance), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchDist", value: String(tlCfg.latchDistance), min: "0.1", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlTouchSection", style: tlCfg.mode === "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Touch Plate"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlPlateHeight", value: String(tlCfg.touchPlateHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlToolsetterSection", style: tlCfg.mode !== "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Toolsetter"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Approach depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlTsDepth", value: String(tlCfg.toolsetterDepth), min: "1", step: "1" })), /* @__PURE__ */ h("div", { style: "font-family:var(--mono);font-size:10px;color:var(--text3);" }, "Position from G59.3 in Offsets tab")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Reference Tool"), /* @__PURE__ */ h("div", { class: "prob-ref-display", id: "probTlRefDisplay" }, tlCfg.tloReference !== null ? `Ref: ${tlCfg.tloReference.toFixed(4)} mm` : "No reference set"), /* @__PURE__ */ h("div", { style: "display:flex;gap:5px;margin-top:5px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;font-size:10px;padding:5px", id: "probTlSetRef" }, "SET REF TOOL"), /* @__PURE__ */ h("button", { class: "tb-btn danger", id: "probTlClearRef", style: `font-size:10px;padding:5px;display:${tlCfg.tloReference === null ? "none" : "inline-block"}` }, "CLEAR"))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probTlStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probTlResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probTlProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probTlCancel", disabled: true }, "\u2715")));
+  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-toollength", style: "display:flex;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeTouch", value: "touchplate", checked: tlCfg.mode === "touchplate" }), "Touch Plate"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probTlMode", id: "probTlModeToolsetter", value: "toolsetter", checked: tlCfg.mode === "toolsetter" }), "Toolsetter (G59.3)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeFeed", value: String(tlCfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchFeed", value: String(tlCfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlProbeDist", value: String(tlCfg.probeDistance), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlLatchDist", value: String(tlCfg.latchDistance), min: "0.1", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlTouchSection", style: tlCfg.mode === "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Touch Plate"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlPlateHeight", value: String(tlCfg.touchPlateHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probTlToolsetterSection", style: tlCfg.mode !== "toolsetter" ? "display:none" : "" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Toolsetter"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Approach depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probTlTsDepth", value: String(tlCfg.toolsetterDepth), min: "1", step: "1" })), /* @__PURE__ */ h("div", { style: "font-family:var(--mono);font-size:10px;color:var(--text3);" }, "Position from G59.3 in Offsets tab")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Reference Tool"), /* @__PURE__ */ h("div", { class: "prob-ref-display", id: "probTlRefDisplay" }, tlCfg.tloReference !== null ? `Ref: ${tlCfg.tloReference.toFixed(4)} mm` : "No reference set"), /* @__PURE__ */ h("div", { style: "display:flex;gap:5px;margin-top:5px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;font-size:10px;padding:5px", id: "probTlSetRef" }, "SET REF TOOL"), /* @__PURE__ */ h("button", { class: "tb-btn danger", id: "probTlClearRef", style: `font-size:10px;padding:5px;display:${tlCfg.tloReference === null ? "none" : "inline-block"}` }, "CLEAR"))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probTlStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probTlResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probTlPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probTlProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probTlCancel", disabled: true }, "\u2715")));
 }
 function buildEdgeFinderTab() {
-  const cfg = loadCfg("ef", {
+  const cfg = loadCfg4("ef", {
     mode: "external",
     probeFeedRate: 100,
     latchFeedRate: 25,
@@ -7564,23 +8582,23 @@ function buildEdgeFinderTab() {
     touchPlateHeight: 0,
     workpieceHeight: 0
   });
-  const edgeButtons = [
-    { id: "A", label: "A", title: "Corner A (bottom-left)" },
-    { id: "AB", label: "AB", title: "Edge AB (bottom)" },
-    { id: "B", label: "B", title: "Corner B (bottom-right)" },
-    { id: "AD", label: "AD", title: "Edge AD (left)" },
-    { id: "Z", label: "Z", title: "Z surface" },
-    { id: "CB", label: "CB", title: "Edge CB (right)" },
-    { id: "D", label: "D", title: "Corner D (top-left)" },
-    { id: "CD", label: "CD", title: "Edge CD (top)" },
-    { id: "C", label: "C", title: "Corner C (top-right)" }
+  const edgeButtons2 = [
+    { id: "D", label: "D \u2198", title: "Corner D (top-left)" },
+    { id: "CD", label: "\u2193 CD", title: "Edge CD (top, Y+)" },
+    { id: "C", label: "C \u2199", title: "Corner C (top-right)" },
+    { id: "AD", label: "\u2192 AD", title: "Edge AD (left, X-)" },
+    { id: "Z", label: "\u2193 Z", title: "Z surface" },
+    { id: "CB", label: "CB \u2190", title: "Edge CB (right, X+)" },
+    { id: "A", label: "A \u2197", title: "Corner A (bottom-left)" },
+    { id: "AB", label: "\u2191 AB", title: "Edge AB (bottom, Y-)" },
+    { id: "B", label: "B \u2196", title: "Corner B (bottom-right)" }
   ];
-  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-edgefinder", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probEfMode", id: "probEfModeExt", value: "external", checked: cfg.mode === "external" }), "External"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probEfMode", id: "probEfModeInt", value: "internal", checked: cfg.mode === "internal" }), "Internal"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Select Edge / Corner"), /* @__PURE__ */ h("div", { class: "prob-edge-grid" }, edgeButtons.map(
+  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-edgefinder", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probEfMode", id: "probEfModeExt", value: "external", checked: cfg.mode === "external" }), "External"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probEfMode", id: "probEfModeInt", value: "internal", checked: cfg.mode === "internal" }), "Internal"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Select Edge / Corner"), /* @__PURE__ */ h("div", { class: "prob-edge-grid" }, edgeButtons2.map(
     (e) => /* @__PURE__ */ h("button", { class: "prob-edge-btn", id: `probEfEdge-${e.id}`, "data-edge": e.id, title: e.title }, e.label)
-  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "D\u2014\u2014C", /* @__PURE__ */ h("br", null), "|  |", /* @__PURE__ */ h("br", null), "A\u2014\u2014B")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Corner offset (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfOffset", value: String(cfg.offset), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Also probe Z"), /* @__PURE__ */ h("label", { class: "prob-toggle" }, /* @__PURE__ */ h("input", { type: "checkbox", id: "probEfProbeZ", checked: cfg.probeZ }), " Yes"))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probEfZSection", style: cfg.probeZ ? "" : "display:none" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Z Probe"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Touch plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfPlateHeight", value: String(cfg.touchPlateHeight), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Workpiece height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfWpHeight", value: String(cfg.workpieceHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probEfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probEfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probEfStatus" }, "Select an edge or corner, then click PROBE"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probEfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probEfCancel", disabled: true }, "\u2715")));
+  )), /* @__PURE__ */ h("div", { class: "ef-diagram" }, /* @__PURE__ */ h("div", { class: "ef-diag-top-row" }, /* @__PURE__ */ h("div", { class: "ef-diag-corner-label" }, "D"), /* @__PURE__ */ h("div", { class: "ef-diag-edge-label ef-diag-top" }, "CD \xA0Y+"), /* @__PURE__ */ h("div", { class: "ef-diag-corner-label" }, "C")), /* @__PURE__ */ h("div", { class: "ef-diag-mid-row" }, /* @__PURE__ */ h("div", { class: "ef-diag-edge-label ef-diag-left" }, "AD", /* @__PURE__ */ h("br", null), "X\u2212"), /* @__PURE__ */ h("div", { class: "ef-diag-box" }, /* @__PURE__ */ h("span", { class: "ef-diag-z-label" }, "Z")), /* @__PURE__ */ h("div", { class: "ef-diag-edge-label ef-diag-right" }, "CB", /* @__PURE__ */ h("br", null), "X+")), /* @__PURE__ */ h("div", { class: "ef-diag-bot-row" }, /* @__PURE__ */ h("div", { class: "ef-diag-corner-label" }, "A"), /* @__PURE__ */ h("div", { class: "ef-diag-edge-label ef-diag-bot" }, "AB \xA0Y\u2212"), /* @__PURE__ */ h("div", { class: "ef-diag-corner-label" }, "B")))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Corner offset (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfOffset", value: String(cfg.offset), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Also probe Z"), /* @__PURE__ */ h("label", { class: "prob-toggle" }, /* @__PURE__ */ h("input", { type: "checkbox", id: "probEfProbeZ", checked: cfg.probeZ }), " Yes"))), /* @__PURE__ */ h("div", { class: "prob-section", id: "probEfZSection", style: cfg.probeZ ? "" : "display:none" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Z Probe"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Touch plate height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfPlateHeight", value: String(cfg.touchPlateHeight), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Workpiece height (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probEfWpHeight", value: String(cfg.workpieceHeight), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probEfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probEfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probEfStatus" }, "Select an edge or corner, then click PROBE"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probEfPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probEfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probEfCancel", disabled: true }, "\u2715")));
 }
 function buildCenterFinderTab() {
-  const cfg = loadCfg("cf", {
+  const cfg = loadCfg4("cf", {
     centerMode: "inside",
     axes: "XY",
     probeFeedRate: 100,
@@ -7594,10 +8612,10 @@ function buildCenterFinderTab() {
     workpieceSizeY: 50,
     passes: 1
   });
-  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-centerfinder", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Center Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeInside", value: "inside", checked: cfg.centerMode === "inside" }), "Inside (bore)"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeOutside", value: "outside", checked: cfg.centerMode === "outside" }), "Outside (boss)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Axes"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesXY", value: "XY", checked: cfg.axes === "XY" }), "XY"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesX", value: "X", checked: cfg.axes === "X" }), "X only"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesY", value: "Y", checked: cfg.axes === "Y" }), "Y only"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Workpiece Size"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "X size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeX", value: String(cfg.workpieceSizeX), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Y size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeY", value: String(cfg.workpieceSizeY), min: "1", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Passes"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfPasses", value: String(cfg.passes), min: "1", max: "5", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probCfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probCfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probCfStatus" }, "Ready"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probCfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probCfCancel", disabled: true }, "\u2715")));
+  return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-centerfinder", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Center Mode"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeInside", value: "inside", checked: cfg.centerMode === "inside" }), "Inside (bore)"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfMode", id: "probCfModeOutside", value: "outside", checked: cfg.centerMode === "outside" }), "Outside (boss)"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Axes"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesXY", value: "XY", checked: cfg.axes === "XY" }), "XY"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesX", value: "X", checked: cfg.axes === "X" }), "X only"), /* @__PURE__ */ h("label", { class: "prob-mode-btn" }, /* @__PURE__ */ h("input", { type: "radio", name: "probCfAxes", id: "probCfAxesY", value: "Y", checked: cfg.axes === "Y" }), "Y only"))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Workpiece Size"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "X size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeX", value: String(cfg.workpieceSizeX), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Y size (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfSizeY", value: String(cfg.workpieceSizeY), min: "1", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Passes"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probCfPasses", value: String(cfg.passes), min: "1", max: "5", step: "1" }))), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h(WcsSelector, { id: "probCfWcs" }), /* @__PURE__ */ h(CoordModeSelector, { id: "probCfCoordMode" })), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probCfStatus" }, "Ready"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probCfPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probCfProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probCfCancel", disabled: true }, "\u2715")));
 }
 function buildRotationTab() {
-  const cfg = loadCfg("rot", {
+  const cfg = loadCfg4("rot", {
     edge: "AB",
     probeFeedRate: 100,
     latchFeedRate: 25,
@@ -7610,7 +8628,7 @@ function buildRotationTab() {
   });
   return /* @__PURE__ */ h("div", { class: "prob-subtab-panel", id: "probpanel-rotation", style: "display:none;flex-direction:column;gap:8px;padding:12px;overflow-y:auto;" }, /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Edge to Probe Along"), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;flex-wrap:wrap;" }, ["AB", "AD", "CB", "CD"].map(
     (e) => /* @__PURE__ */ h("label", { class: "prob-mode-btn", style: "flex:0 0 auto" }, /* @__PURE__ */ h("input", { type: "radio", name: "probRotEdge", value: e, checked: cfg.edge === e }), e)
-  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "AB=bottom edge \xB7 AD=left edge \xB7 CB=right edge \xB7 CD=top edge")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Point spacing (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotOffset", value: String(cfg.offset), min: "5", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probRotStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probRotResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probRotProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:10px;font-size:13px", id: "probRotApply", disabled: true }, "\u21BB APPLY ROTATION"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probRotCancel", disabled: true }, "\u2715")));
+  )), /* @__PURE__ */ h("div", { style: "font-family:var(--cond);font-size:10px;color:var(--text3);margin-top:4px;" }, "AB=bottom edge \xB7 AD=left edge \xB7 CB=right edge \xB7 CD=top edge")), /* @__PURE__ */ h("div", { class: "prob-section" }, /* @__PURE__ */ h("div", { class: "prob-section-label" }, "Probe Settings"), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeFeed", value: String(cfg.probeFeedRate), min: "1", step: "10" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch feed (mm/min)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchFeed", value: String(cfg.latchFeedRate), min: "1", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotProbeDist", value: String(cfg.probeDistance), min: "1", step: "1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Latch distance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotLatchDist", value: String(cfg.latchDistance), min: "0.1", step: "0.1" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "XY clearance (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotXYClr", value: String(cfg.xyClr), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe depth (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDepth", value: String(cfg.depth), min: "0.5", step: "0.5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Point spacing (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotOffset", value: String(cfg.offset), min: "5", step: "5" })), /* @__PURE__ */ h("div", { class: "prob-row" }, /* @__PURE__ */ h("span", { class: "prob-label" }, "Probe diameter (mm)"), /* @__PURE__ */ h("input", { type: "number", class: "prob-input", id: "probRotDiameter", value: String(cfg.probeDiameter), min: "0", step: "0.1" }))), /* @__PURE__ */ h("div", { class: "prob-status prob-status-idle", id: "probRotStatus" }, "Ready"), /* @__PURE__ */ h("div", { class: "prob-result", id: "probRotResult" }), /* @__PURE__ */ h("div", { style: "display:flex;gap:6px;" }, /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:8px;font-size:11px", id: "probRotPreview" }, "\u25C8 PREVIEW"), /* @__PURE__ */ h("button", { class: "tb-btn success", style: "flex:1;padding:10px;font-size:13px", id: "probRotProbe" }, "\u2295 PROBE"), /* @__PURE__ */ h("button", { class: "tb-btn", style: "flex:1;padding:10px;font-size:13px", id: "probRotApply", disabled: true }, "\u21BB APPLY ROTATION"), /* @__PURE__ */ h("button", { class: "tb-btn danger", style: "padding:10px;font-size:13px", id: "probRotCancel", disabled: true }, "\u2715")));
 }
 function wireTlEvents(container) {
   const statusId = "probTlStatus";
@@ -7622,7 +8640,7 @@ function wireTlEvents(container) {
     document.getElementById("probTlTouchSection").style.display = "none";
     document.getElementById("probTlToolsetterSection").style.display = "";
   });
-  let tloRef = loadCfg("tl", { tloReference: null }).tloReference;
+  let tloRef = loadCfg4("tl", { tloReference: null }).tloReference;
   const updateRefDisplay2 = () => {
     const el = document.getElementById("probTlRefDisplay");
     const clearBtn = document.getElementById("probTlClearRef");
@@ -7631,10 +8649,10 @@ function wireTlEvents(container) {
   };
   container.querySelector("#probTlClearRef")?.addEventListener("click", () => {
     tloRef = null;
-    saveCfg("tl", { ...loadCfg("tl", {}), tloReference: null });
+    saveCfg4("tl", { ...loadCfg4("tl", {}), tloReference: null });
     updateRefDisplay2();
     sendCmd("G49");
-    setStatus3(statusId, "Reference cleared", "idle");
+    setStatus6(statusId, "Reference cleared", "idle");
   });
   const probeBtn = container.querySelector("#probTlProbe");
   const cancelBtn = container.querySelector("#probTlCancel");
@@ -7646,23 +8664,23 @@ function wireTlEvents(container) {
     const mode = document.querySelector('input[name="probTlMode"]:checked')?.value || "touchplate";
     const ts = state.wcsOffsets["G59.3"];
     if (mode === "toolsetter" && !ts) {
-      setStatus3(statusId, "G59.3 not set \u2014 configure in Offsets tab", "err");
+      setStatus6(statusId, "G59.3 not set \u2014 configure in Offsets tab", "err");
       return;
     }
     const cfg = {
       mode,
-      probeFeedRate: numVal("probTlProbeFeed"),
-      latchFeedRate: numVal("probTlLatchFeed"),
-      probeDistance: numVal("probTlProbeDist"),
-      latchDistance: numVal("probTlLatchDist"),
-      touchPlateHeight: numVal("probTlPlateHeight"),
-      toolsetterDepth: numVal("probTlTsDepth"),
+      probeFeedRate: numVal4("probTlProbeFeed"),
+      latchFeedRate: numVal4("probTlLatchFeed"),
+      probeDistance: numVal4("probTlProbeDist"),
+      latchDistance: numVal4("probTlLatchDist"),
+      touchPlateHeight: numVal4("probTlPlateHeight"),
+      toolsetterDepth: numVal4("probTlTsDepth"),
       tloReference: tloRef
     };
-    saveCfg("tl", { ...cfg, tloReference: tloRef });
+    saveCfg4("tl", { ...cfg, tloReference: tloRef });
     probeBtn.disabled = true;
     cancelBtn.disabled = false;
-    setStatus3(statusId, asReference ? "Measuring reference\u2026" : "Probing\u2026", "running");
+    setStatus6(statusId, asReference ? "Measuring reference\u2026" : "Probing\u2026", "running");
     const result = await runToolLengthProbe({
       mode: cfg.mode,
       probeFeedRate: cfg.probeFeedRate,
@@ -7678,15 +8696,15 @@ function wireTlEvents(container) {
     probeBtn.disabled = false;
     cancelBtn.disabled = true;
     if (!result || !result.success) {
-      setStatus3(statusId, "Probe failed", "err");
+      setStatus6(statusId, "Probe failed", "err");
       return;
     }
     if (asReference) {
       tloRef = result.z;
-      saveCfg("tl", { ...cfg, tloReference: tloRef });
+      saveCfg4("tl", { ...cfg, tloReference: tloRef });
       updateRefDisplay2();
       sendCmd("G49");
-      setStatus3(statusId, "\u2713 Reference set", "ok");
+      setStatus6(statusId, "\u2713 Reference set", "ok");
     } else {
       let tlo = result.z;
       if (tloRef !== null) tlo -= tloRef + cfg.touchPlateHeight;
@@ -7694,7 +8712,7 @@ function wireTlEvents(container) {
       sendCmd(`G43.1Z${tlo.toFixed(4)}`);
       const resEl = document.getElementById("probTlResult");
       if (resEl) resEl.textContent = `Z=${result.z.toFixed(4)}  TLO=${tlo.toFixed(4)} mm`;
-      setStatus3(statusId, "\u2713 Complete \u2014 TLO applied", "ok");
+      setStatus6(statusId, "\u2713 Complete \u2014 TLO applied", "ok");
       setTimeout(() => Promise.resolve().then(() => (init_offsets(), offsets_exports)).then((o) => o.loadOffsets()), 300);
     }
   };
@@ -7702,7 +8720,7 @@ function wireTlEvents(container) {
   probeBtn.addEventListener("click", () => runProbe(false));
   cancelBtn.addEventListener("click", () => {
     cancelProbing();
-    setStatus3(statusId, "Cancelled", "idle");
+    setStatus6(statusId, "Cancelled", "idle");
   });
 }
 function wireEfEvents(container) {
@@ -7713,7 +8731,7 @@ function wireEfEvents(container) {
       container.querySelectorAll(".prob-edge-btn").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       selectedEdge = btn.dataset.edge;
-      setStatus3(statusId, `Edge: ${selectedEdge} selected`, "idle");
+      setStatus6(statusId, `Edge: ${selectedEdge} selected`, "idle");
     });
   });
   container.querySelector("#probEfProbeZ")?.addEventListener("change", function() {
@@ -7728,39 +8746,39 @@ function wireEfEvents(container) {
       return;
     }
     if (!selectedEdge) {
-      setStatus3(statusId, "Select an edge or corner first", "err");
+      setStatus6(statusId, "Select an edge or corner first", "err");
       return;
     }
     const mode = document.querySelector('input[name="probEfMode"]:checked')?.value || "external";
     const cfg = {
       mode,
       edge: selectedEdge,
-      probeFeedRate: numVal("probEfProbeFeed"),
-      latchFeedRate: numVal("probEfLatchFeed"),
-      probeDistance: numVal("probEfProbeDist"),
-      latchDistance: numVal("probEfLatchDist"),
-      xyClr: numVal("probEfXYClr"),
-      depth: numVal("probEfDepth"),
-      offset: numVal("probEfOffset"),
-      probeDiameter: numVal("probEfDiameter"),
+      probeFeedRate: numVal4("probEfProbeFeed"),
+      latchFeedRate: numVal4("probEfLatchFeed"),
+      probeDistance: numVal4("probEfProbeDist"),
+      latchDistance: numVal4("probEfLatchDist"),
+      xyClr: numVal4("probEfXYClr"),
+      depth: numVal4("probEfDepth"),
+      offset: numVal4("probEfOffset"),
+      probeDiameter: numVal4("probEfDiameter"),
       probeZ: document.getElementById("probEfProbeZ")?.checked ?? false,
-      touchPlateHeight: numVal("probEfPlateHeight"),
-      workpieceHeight: numVal("probEfWpHeight"),
-      coordMode: getCoordMode("probEfCoordMode"),
-      wcs: getWcs("probEfWcs")
+      touchPlateHeight: numVal4("probEfPlateHeight"),
+      workpieceHeight: numVal4("probEfWpHeight"),
+      coordMode: getCoordMode3("probEfCoordMode"),
+      wcs: getWcs3("probEfWcs")
     };
-    saveCfg("ef", cfg);
+    saveCfg4("ef", cfg);
     probeBtn.disabled = true;
     cancelBtn.disabled = false;
-    setStatus3(statusId, `Probing ${selectedEdge}\u2026`, "running");
+    setStatus6(statusId, `Probing ${selectedEdge}\u2026`, "running");
     const ok = await runEdgeFinder(cfg);
     probeBtn.disabled = false;
     cancelBtn.disabled = true;
-    setStatus3(statusId, ok ? `\u2713 ${selectedEdge} complete` : "\u2717 Probe failed", ok ? "ok" : "err");
+    setStatus6(statusId, ok ? `\u2713 ${selectedEdge} complete` : "\u2717 Probe failed", ok ? "ok" : "err");
   });
   cancelBtn.addEventListener("click", () => {
     cancelProbing();
-    setStatus3(statusId, "Cancelled", "idle");
+    setStatus6(statusId, "Cancelled", "idle");
   });
 }
 function wireCfEvents(container) {
@@ -7777,31 +8795,31 @@ function wireCfEvents(container) {
     const cfg = {
       centerMode,
       axes,
-      probeFeedRate: numVal("probCfProbeFeed"),
-      latchFeedRate: numVal("probCfLatchFeed"),
-      probeDistance: numVal("probCfProbeDist"),
-      latchDistance: numVal("probCfLatchDist"),
-      xyClr: numVal("probCfXYClr"),
-      depth: numVal("probCfDepth"),
-      probeDiameter: numVal("probCfDiameter"),
-      workpieceSizeX: numVal("probCfSizeX"),
-      workpieceSizeY: numVal("probCfSizeY"),
-      passes: numVal("probCfPasses") || 1,
-      coordMode: getCoordMode("probCfCoordMode"),
-      wcs: getWcs("probCfWcs")
+      probeFeedRate: numVal4("probCfProbeFeed"),
+      latchFeedRate: numVal4("probCfLatchFeed"),
+      probeDistance: numVal4("probCfProbeDist"),
+      latchDistance: numVal4("probCfLatchDist"),
+      xyClr: numVal4("probCfXYClr"),
+      depth: numVal4("probCfDepth"),
+      probeDiameter: numVal4("probCfDiameter"),
+      workpieceSizeX: numVal4("probCfSizeX"),
+      workpieceSizeY: numVal4("probCfSizeY"),
+      passes: numVal4("probCfPasses") || 1,
+      coordMode: getCoordMode3("probCfCoordMode"),
+      wcs: getWcs3("probCfWcs")
     };
-    saveCfg("cf", cfg);
+    saveCfg4("cf", cfg);
     probeBtn.disabled = true;
     cancelBtn.disabled = false;
-    setStatus3(statusId, "Finding center\u2026", "running");
+    setStatus6(statusId, "Finding center\u2026", "running");
     const ok = await runCenterFinder(cfg);
     probeBtn.disabled = false;
     cancelBtn.disabled = true;
-    setStatus3(statusId, ok ? "\u2713 Center found" : "\u2717 Probe failed", ok ? "ok" : "err");
+    setStatus6(statusId, ok ? "\u2713 Center found" : "\u2717 Probe failed", ok ? "ok" : "err");
   });
   cancelBtn.addEventListener("click", () => {
     cancelProbing();
-    setStatus3(statusId, "Cancelled", "idle");
+    setStatus6(statusId, "Cancelled", "idle");
   });
 }
 function wireRotEvents(container) {
@@ -7818,21 +8836,21 @@ function wireRotEvents(container) {
     const edge = document.querySelector('input[name="probRotEdge"]:checked')?.value || "AB";
     const cfg = {
       edge,
-      probeFeedRate: numVal("probRotProbeFeed"),
-      latchFeedRate: numVal("probRotLatchFeed"),
-      probeDistance: numVal("probRotProbeDist"),
-      latchDistance: numVal("probRotLatchDist"),
-      xyClr: numVal("probRotXYClr"),
-      depth: numVal("probRotDepth"),
-      offset: numVal("probRotOffset"),
-      probeDiameter: numVal("probRotDiameter")
+      probeFeedRate: numVal4("probRotProbeFeed"),
+      latchFeedRate: numVal4("probRotLatchFeed"),
+      probeDistance: numVal4("probRotProbeDist"),
+      latchDistance: numVal4("probRotLatchDist"),
+      xyClr: numVal4("probRotXYClr"),
+      depth: numVal4("probRotDepth"),
+      offset: numVal4("probRotOffset"),
+      probeDiameter: numVal4("probRotDiameter")
     };
-    saveCfg("rot", cfg);
+    saveCfg4("rot", cfg);
     probeBtn.disabled = true;
     cancelBtn.disabled = false;
     applyBtn.disabled = true;
     lastAngle = null;
-    setStatus3(statusId, "Probing\u2026", "running");
+    setStatus6(statusId, "Probing\u2026", "running");
     const result = await runRotation(cfg);
     probeBtn.disabled = false;
     cancelBtn.disabled = true;
@@ -7841,20 +8859,23 @@ function wireRotEvents(container) {
       const resEl = document.getElementById("probRotResult");
       if (resEl) resEl.textContent = `Angle: ${result.angleDeg.toFixed(3)}\xB0`;
       applyBtn.disabled = !state.gcodeLines?.length;
-      setStatus3(statusId, `\u2713 Measured: ${result.angleDeg.toFixed(3)}\xB0`, "ok");
+      setStatus6(statusId, `\u2713 Measured: ${result.angleDeg.toFixed(3)}\xB0`, "ok");
     } else {
-      setStatus3(statusId, "\u2717 Probe failed", "err");
+      setStatus6(statusId, "\u2717 Probe failed", "err");
     }
   });
   applyBtn.addEventListener("click", () => {
     if (lastAngle === null) return;
     applyRotationToGcode(lastAngle);
-    setStatus3(statusId, `\u2713 G-code rotated by ${lastAngle.toFixed(3)}\xB0`, "ok");
+    setStatus6(statusId, `\u2713 G-code rotated by ${lastAngle.toFixed(3)}\xB0`, "ok");
   });
   cancelBtn.addEventListener("click", () => {
     cancelProbing();
-    setStatus3(statusId, "Cancelled", "idle");
+    setStatus6(statusId, "Cancelled", "idle");
   });
+}
+function buildPreviewPanel() {
+  return /* @__PURE__ */ h("div", { class: "prob-preview-panel", id: "probPreviewPanel" }, /* @__PURE__ */ h("div", { class: "prob-preview-canvases" }, /* @__PURE__ */ h("canvas", { id: "previewXY", class: "prob-preview-canvas", width: "220", height: "160" }), /* @__PURE__ */ h("canvas", { id: "previewXZ", class: "prob-preview-canvas", width: "220", height: "160" })), /* @__PURE__ */ h("div", { class: "prob-preview-controls" }, /* @__PURE__ */ h("div", { class: "prob-preview-dro" }, /* @__PURE__ */ h("div", { class: "prob-dro-cell" }, /* @__PURE__ */ h("span", { class: "prob-dro-axis" }, "X"), /* @__PURE__ */ h("span", { class: "prob-dro-val", id: "previewDroX" }, "\u2014")), /* @__PURE__ */ h("div", { class: "prob-dro-cell" }, /* @__PURE__ */ h("span", { class: "prob-dro-axis" }, "Y"), /* @__PURE__ */ h("span", { class: "prob-dro-val", id: "previewDroY" }, "\u2014")), /* @__PURE__ */ h("div", { class: "prob-dro-cell" }, /* @__PURE__ */ h("span", { class: "prob-dro-axis" }, "Z"), /* @__PURE__ */ h("span", { class: "prob-dro-val", id: "previewDroZ" }, "\u2014"))), /* @__PURE__ */ h("div", { class: "prob-preview-label", id: "previewDroLabel" }, "Load a preview"), /* @__PURE__ */ h("div", { class: "prob-preview-btns" }, /* @__PURE__ */ h("button", { class: "prob-prev-btn", id: "previewStepBck", onClick: () => stepPreview(-1), disabled: true }, "\u25C0"), /* @__PURE__ */ h("button", { class: "prob-prev-btn", id: "previewPlayBtn", onClick: () => playPreview() }, "\u25B6"), /* @__PURE__ */ h("button", { class: "prob-prev-btn", id: "previewStepFwd", onClick: () => stepPreview(1), disabled: true }, "\u25B6|"), /* @__PURE__ */ h("span", { class: "prob-prev-counter", id: "previewCounter" }, "\u2014"))));
 }
 function initProbingTab() {
   const container = document.getElementById("tabpanel-probing");
@@ -7863,6 +8884,7 @@ function initProbingTab() {
   const efPanel = buildEdgeFinderTab();
   const cfPanel = buildCenterFinderTab();
   const rotPanel = buildRotationTab();
+  const previewPanel = buildPreviewPanel();
   const panelWrap = container.querySelector(".prob-panels");
   if (panelWrap) {
     panelWrap.appendChild(tlPanel);
@@ -7870,11 +8892,84 @@ function initProbingTab() {
     panelWrap.appendChild(cfPanel);
     panelWrap.appendChild(rotPanel);
   }
+  container.appendChild(previewPanel);
   initSubTabs(container);
   wireTlEvents(container);
   wireEfEvents(container);
   wireCfEvents(container);
   wireRotEvents(container);
+  wirePreviewBtns(container);
+}
+function wirePreviewBtns(container) {
+  const load = (wps) => window.loadPreview3D?.(wps);
+  container.querySelector("#probTlPreview")?.addEventListener("click", () => {
+    const mode = document.querySelector('input[name="probTlMode"]:checked')?.value || "touchplate";
+    if (mode === "toolsetter") {
+      const ts = state.wcsOffsets["G59.3"] || { x: 50, y: 50, z: -20 };
+      load(waypointsToolsetter({
+        probeDistance: numVal4("probTlProbeDist"),
+        latchDistance: numVal4("probTlLatchDist"),
+        toolsetterDepth: numVal4("probTlTsDepth"),
+        tsOffX: ts.x - state.machineX,
+        tsOffY: ts.y - state.machineY,
+        tsOffZ: ts.z - state.machineZ
+      }));
+    } else {
+      load(waypointsTouchplate({
+        probeDistance: numVal4("probTlProbeDist"),
+        latchDistance: numVal4("probTlLatchDist"),
+        touchPlateHeight: numVal4("probTlPlateHeight")
+      }));
+    }
+  });
+  container.querySelector("#probEfPreview")?.addEventListener("click", () => {
+    const edge = container.querySelector(".prob-edge-btn.active")?.dataset.edge || "AB";
+    const mode = document.querySelector('input[name="probEfMode"]:checked')?.value || "external";
+    const cfg = {
+      edge,
+      mode,
+      xyClr: numVal4("probEfXYClr"),
+      depth: numVal4("probEfDepth"),
+      offset: numVal4("probEfOffset"),
+      probeDistance: numVal4("probEfProbeDist"),
+      latchDistance: numVal4("probEfLatchDist"),
+      probeDiameter: numVal4("probEfDiameter")
+    };
+    if (edge === "Z") {
+      load(waypointsTouchplate({ probeDistance: cfg.probeDistance, latchDistance: cfg.latchDistance, touchPlateHeight: 0 }));
+    } else if (edge.length === 1) {
+      load(waypointsEdgeCorner(cfg));
+    } else {
+      load(waypointsEdgeSingle(cfg));
+    }
+  });
+  container.querySelector("#probCfPreview")?.addEventListener("click", () => {
+    const centerMode = document.querySelector('input[name="probCfMode"]:checked')?.value || "inside";
+    const axes = document.querySelector('input[name="probCfAxes"]:checked')?.value || "XY";
+    load(waypointsCenter({
+      centerMode,
+      axes,
+      sizeX: numVal4("probCfSizeX"),
+      sizeY: numVal4("probCfSizeY"),
+      xyClr: numVal4("probCfXYClr"),
+      depth: numVal4("probCfDepth"),
+      probeDistance: numVal4("probCfProbeDist"),
+      latchDistance: numVal4("probCfLatchDist"),
+      probeDiameter: numVal4("probCfDiameter")
+    }));
+  });
+  container.querySelector("#probRotPreview")?.addEventListener("click", () => {
+    const edge = document.querySelector('input[name="probRotEdge"]:checked')?.value || "AB";
+    load(waypointsRotation({
+      edge,
+      xyClr: numVal4("probRotXYClr"),
+      depth: numVal4("probRotDepth"),
+      offset: numVal4("probRotOffset"),
+      probeDistance: numVal4("probRotProbeDist"),
+      latchDistance: numVal4("probRotLatchDist"),
+      probeDiameter: numVal4("probRotDiameter")
+    }));
+  });
 }
 var SAVE_KEY;
 var init_probing_tab = __esm({
@@ -7890,7 +8985,242 @@ var init_probing_tab = __esm({
     init_edge_finder();
     init_center_finder();
     init_rotation();
+    init_preview();
     SAVE_KEY = "fs-probing-tab";
+  }
+});
+
+// src/probing/probe-preview-3d.ts
+function toThree(mx, my, mz) {
+  return new THREE.Vector3(mx, mz, -my);
+}
+function buildPathLines(wps, upTo) {
+  if (_pathGroup) {
+    scene.remove(_pathGroup);
+    _pathGroup.traverse((c) => {
+      c.geometry?.dispose();
+      c.material?.dispose();
+    });
+  }
+  _pathGroup = new THREE.Group();
+  const ox = state.machineX;
+  const oy = state.machineY;
+  const oz = state.machineZ;
+  for (let i = 1; i < wps.length; i++) {
+    const a = wps[i - 1];
+    const b = wps[i];
+    const pa = toThree(ox + a.x, oy + a.y, oz + a.z);
+    const pb = toThree(ox + b.x, oy + b.y, oz + b.z);
+    const geo = new THREE.BufferGeometry().setFromPoints([pa, pb]);
+    const isPast = i <= upTo;
+    const color = SEG_COLOR[b.type] ?? 8947848;
+    const mat = new THREE.LineDashedMaterial({
+      color,
+      dashSize: b.type === "probe" ? 0 : 3,
+      gapSize: b.type === "probe" ? 0 : 2,
+      transparent: true,
+      opacity: isPast ? 0.85 : 0.2
+    });
+    const line = new THREE.Line(geo, mat);
+    line.computeLineDistances();
+    _pathGroup.add(line);
+  }
+  for (let i = 0; i <= upTo && i < wps.length; i++) {
+    const wp = wps[i];
+    if (wp.type !== "contact") continue;
+    const pos = toThree(ox + wp.x, oy + wp.y, oz + wp.z);
+    const geo = new THREE.SphereGeometry(1.2, 8, 8);
+    const mat = new THREE.MeshBasicMaterial({ color: 2278750, transparent: true, opacity: 0.9 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.copy(pos);
+    _pathGroup.add(mesh);
+  }
+  scene.add(_pathGroup);
+}
+function updateGhost(wp) {
+  if (!_probeGhost) {
+    const mat = new THREE.MeshBasicMaterial({ color: 16347926, transparent: true, opacity: 0.5, depthWrite: false });
+    _probeGhost = new THREE.Group();
+    const cone = new THREE.Mesh(new THREE.CylinderGeometry(0, 1.5, 4, 8), mat);
+    cone.rotation.x = Math.PI;
+    cone.position.y = 2;
+    _probeGhost.add(cone);
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 6, 8), mat);
+    body.position.y = 7;
+    _probeGhost.add(body);
+    scene.add(_probeGhost);
+  }
+  const ox = state.machineX, oy = state.machineY, oz = state.machineZ;
+  _probeGhost.position.copy(toThree(ox + wp.x, oy + wp.y, oz + wp.z));
+}
+function dimToolpath(dim) {
+  const opacity = dim ? 0.12 : void 0;
+  [cutLines, rapidLines, executedLine].forEach((obj) => {
+    if (!obj) return;
+    if (dim) {
+      obj.material.opacity = 0.12;
+      obj.material.transparent = true;
+    } else {
+      if (obj === cutLines) {
+        obj.material.opacity = 0.85;
+        obj.material.transparent = true;
+      }
+      if (obj === rapidLines) {
+        obj.material.opacity = 0.5;
+        obj.material.transparent = true;
+      }
+      if (obj === executedLine) {
+        obj.material.opacity = 1;
+        obj.material.transparent = false;
+      }
+    }
+    obj.material.needsUpdate = true;
+  });
+}
+function loadPreview3D(wps) {
+  clearPreview3D();
+  if (!wps.length) return;
+  _waypoints2 = wps;
+  _step = 0;
+  dimToolpath(true);
+  buildPathLines(_waypoints2, _step);
+  updateGhost(_waypoints2[0]);
+  showOverlay(true);
+  updateOverlayDRO();
+  updateOverlayControls();
+  playPreview3D();
+}
+function clearPreview3D() {
+  stopPlay();
+  if (_autoTimer) {
+    clearTimeout(_autoTimer);
+    _autoTimer = null;
+  }
+  if (_pathGroup) {
+    scene.remove(_pathGroup);
+    _pathGroup.traverse((c) => {
+      c.geometry?.dispose();
+      c.material?.dispose();
+    });
+    _pathGroup = null;
+  }
+  if (_probeGhost) {
+    scene.remove(_probeGhost);
+    _probeGhost.traverse((c) => {
+      c.geometry?.dispose();
+      c.material?.dispose();
+    });
+    _probeGhost = null;
+  }
+  dimToolpath(false);
+  _waypoints2 = [];
+  _step = 0;
+  showOverlay(false);
+}
+function stepPreview3D(dir) {
+  if (!_waypoints2.length) return;
+  _step = Math.max(0, Math.min(_waypoints2.length - 1, _step + dir));
+  buildPathLines(_waypoints2, _step);
+  updateGhost(_waypoints2[_step]);
+  updateOverlayDRO();
+  updateOverlayControls();
+}
+function playPreview3D() {
+  if (!_waypoints2.length) return;
+  if (_playing) {
+    stopPlay();
+    return;
+  }
+  if (_step >= _waypoints2.length - 1) _step = 0;
+  _playing = true;
+  updateOverlayControls();
+  _playTimer = setInterval(() => {
+    _step++;
+    buildPathLines(_waypoints2, _step);
+    updateGhost(_waypoints2[_step]);
+    updateOverlayDRO();
+    if (_step >= _waypoints2.length - 1) {
+      stopPlay();
+    } else {
+      updateOverlayControls();
+    }
+  }, STEP_INTERVAL);
+}
+function stopPlay() {
+  if (_playTimer) {
+    clearInterval(_playTimer);
+    _playTimer = null;
+  }
+  _playing = false;
+  updateOverlayControls();
+}
+function showOverlay(visible) {
+  const overlay = document.getElementById("probePreviewOverlay");
+  if (overlay) overlay.style.display = visible ? "flex" : "none";
+}
+function updateOverlayDRO() {
+  const wp = _waypoints2[_step];
+  if (!wp) return;
+  const ox = state.machineX, oy = state.machineY, oz = state.machineZ;
+  const el = (id) => document.getElementById(id);
+  const droX = el("ppDroX"), droY = el("ppDroY"), droZ = el("ppDroZ"), droL = el("ppDroLabel");
+  if (droX) droX.textContent = (ox + wp.x).toFixed(3);
+  if (droY) droY.textContent = (oy + wp.y).toFixed(3);
+  if (droZ) droZ.textContent = (oz + wp.z).toFixed(3);
+  if (droL) droL.textContent = wp.label || typeLabel(wp.type);
+}
+function updateOverlayControls() {
+  const bck = document.getElementById("ppStepBck");
+  const fwd = document.getElementById("ppStepFwd");
+  const play = document.getElementById("ppPlay");
+  const ctr = document.getElementById("ppCounter");
+  if (bck) bck.disabled = _step <= 0;
+  if (fwd) fwd.disabled = _step >= _waypoints2.length - 1;
+  if (play) play.textContent = _playing ? "\u23F8" : "\u25B6";
+  if (ctr) ctr.textContent = _waypoints2.length ? `${_step + 1} / ${_waypoints2.length}` : "\u2014";
+}
+function typeLabel(type) {
+  switch (type) {
+    case "start":
+      return "Start position";
+    case "rapid":
+      return "Rapid move";
+    case "probe":
+      return "Probing\u2026";
+    case "retract":
+      return "Retract";
+    case "contact":
+      return "\u2295 Contact";
+    default:
+      return "";
+  }
+}
+var _waypoints2, _step, _playing, _playTimer, _autoTimer, _pathGroup, _probeGhost, STEP_INTERVAL, SEG_COLOR;
+var init_probe_preview_3d = __esm({
+  "src/probing/probe-preview-3d.ts"() {
+    "use strict";
+    init_state();
+    init_viewport();
+    _waypoints2 = [];
+    _step = 0;
+    _playing = false;
+    _playTimer = null;
+    _autoTimer = null;
+    _pathGroup = null;
+    _probeGhost = null;
+    STEP_INTERVAL = 400;
+    SEG_COLOR = {
+      rapid: 3900150,
+      // blue
+      probe: 16347926,
+      // orange
+      retract: 6514417,
+      // indigo
+      contact: 2278750,
+      // green
+      start: 9741240
+      // slate
+    };
   }
 });
 
@@ -8704,8 +10034,10 @@ function modSaveState() {
   MODULE_DEFS.forEach((m) => {
     const card = document.getElementById("mod-" + m.id);
     if (!card) return;
+    const groupsAllow = isModuleVisibleByGroups(m.id);
+    const isVisible = !card.classList.contains("mod-hidden");
     s[m.id] = {
-      enabled: !card.classList.contains("mod-hidden"),
+      enabled: groupsAllow ? isVisible : modLoadState()[m.id]?.enabled ?? false,
       x: parseInt(card.style.left) || 0,
       y: parseInt(card.style.top) || 0,
       size: card.dataset.modSize || "normal"
@@ -8716,29 +10048,111 @@ function modSaveState() {
   } catch (_) {
   }
 }
+function loadGroupStates() {
+  return lsGet("fs-module-groups", {});
+}
+function saveGroupStates(s) {
+  lsSet("fs-module-groups", s);
+}
+function isModuleVisibleByGroups(moduleId) {
+  const groupStates = loadGroupStates();
+  for (const group of MODULE_GROUPS) {
+    if (group.modules.includes(moduleId) && groupStates[group.id] === false) return false;
+  }
+  return true;
+}
+function allCfgCards(moduleId) {
+  return Array.from(document.querySelectorAll(`[data-module-id="${moduleId}"]`));
+}
+function updateCfgCards(moduleId, individualEnabled, groupsAllow, size) {
+  allCfgCards(moduleId).forEach((cfgCard) => {
+    cfgCard.classList.toggle("enabled", individualEnabled);
+    cfgCard.classList.toggle("group-disabled", !groupsAllow);
+    if (size) {
+      cfgCard.querySelectorAll(".mod-size-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.textContent.toLowerCase() === size);
+      });
+    }
+  });
+}
+function loadCollapseStates() {
+  return lsGet("fs-module-groups-collapsed", {});
+}
+function toggleGroupCollapse(groupId) {
+  const states = loadCollapseStates();
+  const collapsed = states[groupId] === true;
+  states[groupId] = !collapsed;
+  lsSet("fs-module-groups-collapsed", states);
+  const group = document.querySelector(`.mod-group:has([data-group-id="${groupId}"])`);
+  if (group) group.classList.toggle("collapsed", !collapsed);
+}
+function updateGroupBadge(groupId) {
+  const badge = document.getElementById("modgrp-badge-" + groupId);
+  if (!badge) return;
+  const group = MODULE_GROUPS.find((g) => g.id === groupId);
+  if (!group) return;
+  const saved = modLoadState();
+  const uniqueIds = [...new Set(group.modules)];
+  const total = uniqueIds.length;
+  const active = uniqueIds.filter((id) => {
+    const s = saved[id];
+    const def = MOD_DEFAULTS[id] || { enabled: false };
+    return s ? s.enabled : def.enabled;
+  }).length;
+  badge.textContent = `${active} / ${total}`;
+  badge.classList.toggle("has-active", active > 0);
+}
+function updateAllBadges() {
+  MODULE_GROUPS.forEach((g) => updateGroupBadge(g.id));
+}
+function toggleGroup(groupId, forceState) {
+  const groupStates = loadGroupStates();
+  const currentEnabled = groupStates[groupId] !== false;
+  const enable = forceState !== void 0 ? forceState : !currentEnabled;
+  groupStates[groupId] = enable;
+  saveGroupStates(groupStates);
+  document.querySelectorAll(`[data-group-id="${groupId}"]`).forEach((el) => {
+    el.classList.toggle("enabled", enable);
+  });
+  const group = MODULE_GROUPS.find((g) => g.id === groupId);
+  if (!group) return;
+  const saved = modLoadState();
+  group.modules.forEach((moduleId) => {
+    const card = document.getElementById("mod-" + moduleId);
+    if (!card) return;
+    const s = saved[moduleId] || {};
+    const def = MOD_DEFAULTS[moduleId] || { enabled: false };
+    const individualEnabled = s.enabled !== void 0 ? s.enabled : def.enabled;
+    const groupsAllow = isModuleVisibleByGroups(moduleId);
+    card.classList.toggle("mod-hidden", !(individualEnabled && groupsAllow));
+    updateCfgCards(moduleId, individualEnabled, groupsAllow);
+  });
+  updateAllBadges();
+}
 function toggleModule(id, forceState) {
   const card = document.getElementById("mod-" + id);
-  const cfgCard = document.getElementById("modcfg-" + id);
   if (!card) return;
-  const isHidden = card.classList.contains("mod-hidden");
-  const enable = forceState !== void 0 ? forceState : isHidden;
-  card.classList.toggle("mod-hidden", !enable);
-  if (cfgCard) cfgCard.classList.toggle("enabled", enable);
+  const groupsAllow = isModuleVisibleByGroups(id);
+  const saved = modLoadState();
+  const currentIndividual = saved[id]?.enabled ?? !card.classList.contains("mod-hidden");
+  const enable = forceState !== void 0 ? forceState : !currentIndividual;
+  card.classList.toggle("mod-hidden", !(enable && groupsAllow));
+  updateCfgCards(id, enable, groupsAllow);
   modSaveState();
+  updateAllBadges();
 }
 function setModSize(id, size, evt) {
   if (evt) evt.stopPropagation();
   const card = document.getElementById("mod-" + id);
-  const cfgCard = document.getElementById("modcfg-" + id);
   if (!card) return;
   const w2 = MOD_SIZES[size] || MOD_SIZES.normal;
   card.style.width = w2 + "px";
   card.dataset.modSize = size;
-  if (cfgCard) {
+  allCfgCards(id).forEach((cfgCard) => {
     cfgCard.querySelectorAll(".mod-size-btn").forEach((btn) => {
       btn.classList.toggle("active", btn.textContent.toLowerCase() === size);
     });
-  }
+  });
   modSaveState();
 }
 function setConsoleLines(n, evt) {
@@ -8757,28 +10171,37 @@ function setConsoleLines(n, evt) {
 function modInitPositions() {
   const saved = modLoadState();
   if (saved._consoleLines) setConsoleLines(saved._consoleLines);
+  const groupStates = loadGroupStates();
+  MODULE_GROUPS.forEach((group) => {
+    const enabled = groupStates[group.id] !== false;
+    document.querySelectorAll(`[data-group-id="${group.id}"]`).forEach((el) => {
+      el.classList.toggle("enabled", enabled);
+    });
+  });
   MODULE_DEFS.forEach((m) => {
     const card = document.getElementById("mod-" + m.id);
-    const cfgCard = document.getElementById("modcfg-" + m.id);
     if (!card) return;
     const def = MOD_DEFAULTS[m.id] || { x: 10, y: 10, enabled: false, size: "normal" };
     const s = saved[m.id] || {};
     const x = s.x !== void 0 ? s.x : def.x;
     const y = s.y !== void 0 ? s.y : def.y;
-    const enabled = s.enabled !== void 0 ? s.enabled : def.enabled;
+    const individualEnabled = s.enabled !== void 0 ? s.enabled : def.enabled;
+    const groupsAllow = isModuleVisibleByGroups(m.id);
     const size = s.size || def.size;
     card.style.left = x + "px";
     card.style.top = y + "px";
     card.style.width = (MOD_SIZES[size] || MOD_SIZES.normal) + "px";
     card.dataset.modSize = size;
-    card.classList.toggle("mod-hidden", !enabled);
-    if (cfgCard) {
-      cfgCard.classList.toggle("enabled", enabled);
-      cfgCard.querySelectorAll(".mod-size-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.textContent.toLowerCase() === size);
-      });
-    }
+    card.classList.toggle("mod-hidden", !(individualEnabled && groupsAllow));
+    updateCfgCards(m.id, individualEnabled, groupsAllow, size);
   });
+  const collapseStates = loadCollapseStates();
+  MODULE_GROUPS.forEach((group) => {
+    const collapsed = collapseStates[group.id] === true;
+    const groupEl = document.querySelector(`.mod-group:has([data-group-id="${group.id}"])`);
+    if (groupEl) groupEl.classList.toggle("collapsed", collapsed);
+  });
+  updateAllBadges();
   _initDone = true;
 }
 function toggleModLock() {
@@ -9015,12 +10438,26 @@ function initChunk3Events() {
   });
 }
 function initChunk2Events() {
-  document.querySelectorAll(".mod-toggle-card").forEach((cfgCard) => {
-    const moduleId = cfgCard.id.replace("modcfg-", "");
+  document.querySelectorAll("[data-module-id]").forEach((cfgCard) => {
+    const moduleId = cfgCard.dataset.moduleId;
+    if (!moduleId) return;
     const sw = cfgCard.querySelector(".mod-switch");
     if (sw) sw.addEventListener("click", () => toggleModule(moduleId));
     cfgCard.querySelectorAll(".mod-size-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => setModSize(moduleId, btn.textContent.toLowerCase(), e));
+    });
+  });
+  document.querySelectorAll(".mod-group-toggle").forEach((toggle) => {
+    const groupId = toggle.dataset.groupId;
+    if (groupId) toggle.addEventListener("click", () => toggleGroup(groupId));
+  });
+  document.querySelectorAll("[data-collapse-group]").forEach((el) => {
+    el.addEventListener("click", () => toggleGroupCollapse(el.dataset.collapseGroup));
+  });
+  document.querySelectorAll(".mod-toggle-card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".mod-switch, .mod-size-btn, .mod-lines-btn")) return;
+      card.classList.toggle("expanded");
     });
   });
   document.querySelectorAll(".mod-lines-btn").forEach((btn) => {
@@ -9101,6 +10538,10 @@ function initChunk1Events() {
   on2("btnFitView", "click", () => fitView());
   on2("btnToolhead", "click", () => toggleToolhead());
   on2("vpCopyBtn", "click", () => copyDebugStats());
+  on2("ppStepBck", "click", () => stepPreview3D(-1));
+  on2("ppStepFwd", "click", () => stepPreview3D(1));
+  on2("ppPlay", "click", () => playPreview3D());
+  on2("ppClose", "click", () => clearPreview3D());
 }
 function copyDebugStats() {
   const snap = {
@@ -9129,7 +10570,7 @@ function copyDebugStats() {
     }
   });
 }
-var w, mainEl;
+var w, mainEl, runPanelEl;
 var init_main = __esm({
   "src/main.ts"() {
     init_state();
@@ -9146,10 +10587,14 @@ var init_main = __esm({
     init_macros();
     init_signals();
     init_tool_length();
+    init_edge_finder_module();
+    init_center_finder_module();
+    init_rotation_module();
     init_settings();
     init_tooltable();
     init_offsets();
     init_probing_tab();
+    init_probe_preview_3d();
     init_sd();
     init_camera();
     init_keyboard();
@@ -9161,6 +10606,8 @@ var init_main = __esm({
     w.vpApply = vpApply;
     w.setProjection = setProjection;
     w.sendCmd = sendCmd;
+    w.loadPreview3D = loadPreview3D;
+    w.clearPreview3D = clearPreview3D;
     w.bearShowAddForm = bearShowAddForm;
     w.bearEditZone = bearEditZone;
     w.bearSaveZone = bearSaveZone;
@@ -9171,6 +10618,7 @@ var init_main = __esm({
     initChunk3Events();
     initViewport();
     mainEl = document.querySelector(".main");
+    runPanelEl = document.getElementById("tabpanel-run");
     mount2(mainEl);
     mount3(mainEl);
     mount4(mainEl);
@@ -9178,7 +10626,9 @@ var init_main = __esm({
     mount(mainEl);
     mount6(mainEl);
     mount7(mainEl);
-    mount7(mainEl);
+    mount8(mainEl);
+    mount9(mainEl);
+    mount10(mainEl);
     initKeyboardJog();
     document.querySelectorAll(".module-drag-handle").forEach((handle) => {
       const card = handle.closest(".module-card");
@@ -9191,6 +10641,9 @@ var init_main = __esm({
       const card = btn.closest(".module-card");
       if (!card) return;
       btn.addEventListener("click", () => toggleModule(card.id.replace("mod-", ""), false));
+    });
+    ["mod-toollength", "mod-edgefinder", "mod-centerfinder", "mod-rotation"].forEach((id) => {
+      document.getElementById(id)?.querySelector(".module-drag-close")?.addEventListener("click", () => clearPreview3D());
     });
     initModDragListeners();
     initSdClickOutside();
