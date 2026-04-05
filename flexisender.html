@@ -559,8 +559,10 @@
   .progress-bar-fill { height: 100%; background: var(--accent2); transition: width 0.3s; border-radius: 3px; }
   .progress-text { font-family: var(--mono); font-size: 10px; color: var(--text2); white-space: nowrap; }
 
-  #threeCanvas { flex: 1; display: block; cursor: grab; }
+  #threeCanvas { flex: 1; display: block; cursor: grab; min-height: 0; user-select: none; -webkit-user-select: none; touch-action: none; }
   #threeCanvas:active { cursor: grabbing; }
+  /* ── Viewport rulers — sized and positioned entirely by JS ───────────────── */
+  .ruler { position: absolute; z-index: 10; pointer-events: none; display: block; }
 
   .viewport-legend { display: flex; gap: 14px; padding: 6px 12px; background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; }
   .legend-item { display: flex; align-items: center; gap: 5px; font-family: var(--cond); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); }
@@ -1521,6 +1523,8 @@
 
     <div class="viewport-wrap">
       <canvas id="threeCanvas"></canvas>
+      <canvas id="rulerX" class="ruler ruler-x"></canvas>
+      <canvas id="rulerY" class="ruler ruler-y"></canvas>
       <div class="viewport-stats" id="vpStats">
         X: 0.000&nbsp;&nbsp;Y: 0.000&nbsp;&nbsp;Z: 0.000<br>
         MOVES: 0&nbsp;&nbsp;RAPIDS: 0
@@ -2374,6 +2378,13 @@
 
             <div style="height:1px;background:var(--border);margin:4px 0;"></div>
             <div style="font-family:var(--cond);font-size:10px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">3D Viewport</div>
+            <div class="opt-color-row" style="margin-bottom:8px;">
+              <span class="opt-color-label" style="flex:1">Ruler Coordinates</span>
+              <select class="prob-select" id="optRulerCoords" style="width:140px;">
+                <option value="machine">Machine</option>
+                <option value="work">Work (WCS)</option>
+              </select>
+            </div>
 
             <div class="opt-color-row">
               <span class="opt-color-label">Cut Moves</span>
@@ -2723,6 +2734,7 @@ var init_state = __esm({
       tloActive: false,
       wcsPhase: "idle",
       activeWcs: "G54",
+      rulerCoords: "machine",
       currentToolNumber: 0,
       ttPhase: "idle",
       _ttLines: [],
@@ -4138,12 +4150,16 @@ function initViewport() {
   resizeRenderer();
   animate();
 }
+function setRenderCallback(fn) {
+  _onRender = fn;
+}
 function animate() {
   requestAnimationFrame(animate);
   const t = Date.now() * 2e-3;
   if (ringMat) ringMat.opacity = 0.2 + 0.2 * Math.sin(t);
   bearUpdateSpriteScales(spherical.radius);
   renderer.render(scene, camera);
+  _onRender?.();
 }
 function updateCamera() {
   const sp = Math.sin(spherical.phi), cp = Math.cos(spherical.phi);
@@ -4200,17 +4216,20 @@ function screenToWorld(clientX, clientY) {
 }
 function setupOrbitControls(canvas) {
   canvas.addEventListener("mousedown", (e) => {
+    e.preventDefault();
     if (e.button === 0) isOrbiting = true;
     if (e.button === 2) isPanning = true;
     lastMouse = { x: e.clientX, y: e.clientY };
   });
   canvas.addEventListener("contextmenu", (e) => e.preventDefault());
-  window.addEventListener("mouseup", () => {
+  canvas.addEventListener("selectstart", (e) => e.preventDefault());
+  window.addEventListener("mouseup", (e) => {
     isOrbiting = false;
     isPanning = false;
   });
   window.addEventListener("mousemove", (e) => {
     if (!isOrbiting && !isPanning) return;
+    e.preventDefault();
     const dx = e.clientX - lastMouse.x;
     const dy = e.clientY - lastMouse.y;
     lastMouse = { x: e.clientX, y: e.clientY };
@@ -4467,7 +4486,7 @@ function vpApply() {
   vpSaveExtents();
   rebuildViewportGrid();
 }
-var renderer, scene, camera, perspCamera, orthoCamera, gridHelper, _vpBoundary, _vpOriginAxes, toolGroup, toolMesh, ringMat, rapidLines, cutLines, executedLine, isOrbiting, isPanning, lastMouse, spherical, target, _lastTouches, _canvas;
+var renderer, scene, camera, perspCamera, orthoCamera, gridHelper, _vpBoundary, _vpOriginAxes, toolGroup, toolMesh, ringMat, rapidLines, cutLines, executedLine, isOrbiting, isPanning, lastMouse, spherical, target, _lastTouches, _canvas, _onRender;
 var init_viewport = __esm({
   "src/viewport.ts"() {
     "use strict";
@@ -4485,6 +4504,7 @@ var init_viewport = __esm({
     lastMouse = { x: 0, y: 0 };
     spherical = { theta: -0.8, phi: 0.7, radius: 180 };
     _lastTouches = null;
+    _onRender = null;
   }
 });
 
@@ -6693,6 +6713,248 @@ var init_console = __esm({
     _acVisible = false;
     _acIdx = -1;
     _acItems = [];
+  }
+});
+
+// src/ruler.ts
+function initRulers() {
+  _xCanvas = document.getElementById("rulerX");
+  _yCanvas = document.getElementById("rulerY");
+  if (!_xCanvas || !_yCanvas) return;
+  document.body.appendChild(_xCanvas);
+  document.body.appendChild(_yCanvas);
+  _xCtx = _xCanvas.getContext("2d") ?? null;
+  _yCtx = _yCanvas.getContext("2d") ?? null;
+  _wrap = document.querySelector(".viewport-wrap");
+  [_xCanvas, _yCanvas].forEach((c) => {
+    c.style.position = "fixed";
+    c.style.zIndex = "10";
+    c.style.pointerEvents = "none";
+  });
+  sizeRulers();
+  if (_wrap) new ResizeObserver(sizeRulers).observe(_wrap);
+  window.addEventListener("resize", sizeRulers);
+}
+function sizeRulers() {
+  if (!_xCanvas || !_yCanvas) return;
+  const el = renderer?.domElement;
+  const ref = el ? el.getBoundingClientRect() : _wrap ? _wrap.getBoundingClientRect() : null;
+  if (!ref || ref.width === 0 || ref.height === 0) return;
+  const L = ref.left, T = ref.top, W = ref.width, H = ref.height;
+  _xCanvas.style.left = L + RULER_SIZE + "px";
+  _xCanvas.style.top = T + H - RULER_SIZE + "px";
+  _xCanvas.style.width = W - RULER_SIZE + "px";
+  _xCanvas.style.height = RULER_SIZE + "px";
+  _xCanvas.width = Math.round(W - RULER_SIZE);
+  _xCanvas.height = RULER_SIZE;
+  _yCanvas.style.left = L + "px";
+  _yCanvas.style.top = T + "px";
+  _yCanvas.style.width = RULER_SIZE + "px";
+  _yCanvas.style.height = H - RULER_SIZE + "px";
+  _yCanvas.width = RULER_SIZE;
+  _yCanvas.height = Math.round(H - RULER_SIZE);
+}
+function getOffset() {
+  if (state.rulerCoords === "work") {
+    const wcs = state.wcsOffsets[state.activeWcs];
+    if (wcs) return { x: wcs.x, y: wcs.y };
+  }
+  return { x: 0, y: 0 };
+}
+function vpSize() {
+  const el = renderer?.domElement;
+  if (!el) return { w: 1, h: 1 };
+  return { w: el.clientWidth || 1, h: el.clientHeight || 1 };
+}
+function sampleWorldX(rulerPixelX) {
+  if (!camera || !target) return null;
+  const { w: w2 } = vpSize();
+  const ndcX = (rulerPixelX + RULER_SIZE) / w2 * 2 - 1;
+  const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -target.y);
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(new THREE.Vector2(ndcX, -1), camera);
+  const hit = new THREE.Vector3();
+  if (!raycaster.ray.intersectPlane(plane, hit)) return null;
+  return hit.x;
+}
+function sampleWorldY(rulerPixelY) {
+  if (!camera || !target) return null;
+  const { h: h2 } = vpSize();
+  const ndcY = -(rulerPixelY / h2) * 2 + 1;
+  const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -target.y);
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(new THREE.Vector2(-1, ndcY), camera);
+  const hit = new THREE.Vector3();
+  if (!raycaster.ray.intersectPlane(plane, hit)) return null;
+  return -hit.z;
+}
+function niceInterval(range, pixels, minSpacing) {
+  const rawInterval = range / pixels * minSpacing;
+  if (!isFinite(rawInterval) || rawInterval <= 0) return 10;
+  const mag = Math.pow(10, Math.floor(Math.log10(rawInterval)));
+  const n = rawInterval / mag;
+  if (n < 1.5) return mag;
+  if (n < 3.5) return 2 * mag;
+  if (n < 7.5) return 5 * mag;
+  return 10 * mag;
+}
+function fmtLabel(v, interval) {
+  const decimals = interval < 1 ? Math.max(0, -Math.floor(Math.log10(interval))) : 0;
+  return v.toFixed(decimals);
+}
+function renderXRuler() {
+  const canvas = _xCanvas, ctx = _xCtx;
+  if (!canvas || !ctx) return;
+  const W = canvas.width, H = canvas.height;
+  if (W === 0 || H === 0) return;
+  const wxLeft = sampleWorldX(0);
+  const wxRight = sampleWorldX(W);
+  if (wxLeft === null || wxRight === null) return;
+  const off = getOffset();
+  const wMin = wxLeft - off.x;
+  const wMax = wxRight - off.x;
+  const range = wMax - wMin;
+  if (Math.abs(range) < 1e-4 || !isFinite(range)) return;
+  const toScreen = (w2) => (w2 + off.x - wxLeft) / (wxRight - wxLeft) * W;
+  const interval = niceInterval(Math.abs(range), W, 70);
+  const labelColor = state.rulerCoords === "work" ? LABEL_WK : LABEL;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#1e293b";
+  ctx.fillRect(0, 0, W, 1);
+  ctx.strokeStyle = TICK_MIN;
+  ctx.lineWidth = 1;
+  const mi = interval / 5;
+  for (let w2 = Math.floor(wMin / mi) * mi; w2 <= wMax + mi; w2 += mi) {
+    const sx = toScreen(w2);
+    if (sx < 0 || sx > W) continue;
+    ctx.beginPath();
+    ctx.moveTo(sx, H);
+    ctx.lineTo(sx, H - 4);
+    ctx.stroke();
+  }
+  ctx.strokeStyle = TICK_MAJ;
+  ctx.fillStyle = labelColor;
+  ctx.font = "9px monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (let w2 = Math.floor(wMin / interval) * interval; w2 <= wMax + interval; w2 += interval) {
+    const sx = toScreen(w2);
+    if (sx < 0 || sx > W) continue;
+    ctx.beginPath();
+    ctx.moveTo(sx, H);
+    ctx.lineTo(sx, H - 9);
+    ctx.stroke();
+    ctx.fillText(fmtLabel(w2, interval), sx, 2);
+  }
+  const sx0 = toScreen(0);
+  if (sx0 >= 0 && sx0 <= W) {
+    ctx.strokeStyle = ZERO_LN;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(sx0, 0);
+    ctx.lineTo(sx0, H);
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#475569";
+  ctx.font = "bold 8px monospace";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  ctx.fillText(state.rulerCoords === "work" ? "X(w)" : "X", 3, 2);
+}
+function renderYRuler() {
+  const canvas = _yCanvas, ctx = _yCtx;
+  if (!canvas || !ctx) return;
+  const W = canvas.width, H = canvas.height;
+  if (W === 0 || H === 0) return;
+  const wyTop = sampleWorldY(0);
+  const wyBottom = sampleWorldY(H);
+  if (wyTop === null || wyBottom === null) return;
+  const off = getOffset();
+  const wMin = wyBottom - off.y;
+  const wMax = wyTop - off.y;
+  const range = wMax - wMin;
+  if (Math.abs(range) < 1e-4 || !isFinite(range)) return;
+  const toScreen = (w2) => H - (w2 + off.y - wyBottom) / (wyTop - wyBottom) * H;
+  const interval = niceInterval(Math.abs(range), H, 55);
+  const labelColor = state.rulerCoords === "work" ? LABEL_WK : LABEL;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#1e293b";
+  ctx.fillRect(W - 1, 0, 1, H);
+  ctx.strokeStyle = TICK_MIN;
+  ctx.lineWidth = 1;
+  const mi = interval / 5;
+  for (let w2 = Math.floor(wMin / mi) * mi; w2 <= wMax + mi; w2 += mi) {
+    const sy = toScreen(w2);
+    if (sy < 0 || sy > H) continue;
+    ctx.beginPath();
+    ctx.moveTo(0, sy);
+    ctx.lineTo(4, sy);
+    ctx.stroke();
+  }
+  ctx.strokeStyle = TICK_MAJ;
+  for (let w2 = Math.floor(wMin / interval) * interval; w2 <= wMax + interval; w2 += interval) {
+    const sy = toScreen(w2);
+    if (sy < 0 || sy > H) continue;
+    ctx.beginPath();
+    ctx.moveTo(0, sy);
+    ctx.lineTo(9, sy);
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(W - 2, sy);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = labelColor;
+    ctx.font = "9px monospace";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(fmtLabel(w2, interval), 0, 0);
+    ctx.restore();
+  }
+  const sy0 = toScreen(0);
+  if (sy0 >= 0 && sy0 <= H) {
+    ctx.strokeStyle = ZERO_LN;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, sy0);
+    ctx.lineTo(W, sy0);
+    ctx.stroke();
+  }
+  ctx.save();
+  ctx.translate(W / 2, H - 4);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = "#475569";
+  ctx.font = "bold 8px monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(state.rulerCoords === "work" ? "Y(w)" : "Y", 0, 0);
+  ctx.restore();
+}
+function renderRulers() {
+  sizeRulers();
+  renderXRuler();
+  renderYRuler();
+}
+var RULER_SIZE, _xCanvas, _yCanvas, _xCtx, _yCtx, _wrap, BG, TICK_MAJ, TICK_MIN, LABEL, LABEL_WK, ZERO_LN;
+var init_ruler = __esm({
+  "src/ruler.ts"() {
+    "use strict";
+    init_state();
+    init_viewport();
+    RULER_SIZE = 22;
+    _xCanvas = null;
+    _yCanvas = null;
+    _xCtx = null;
+    _yCtx = null;
+    _wrap = null;
+    BG = "rgba(15,14,12,0.92)";
+    TICK_MAJ = "#64748b";
+    TICK_MIN = "#2d3748";
+    LABEL = "#94a3b8";
+    LABEL_WK = "#f97316";
+    ZERO_LN = "rgba(229,92,0,0.5)";
   }
 });
 
@@ -10578,6 +10840,7 @@ var init_main = __esm({
     init_console();
     init_connection();
     init_viewport();
+    init_ruler();
     init_gcode();
     init_streaming();
     init_jog();
@@ -10617,6 +10880,8 @@ var init_main = __esm({
     initChunk2Events();
     initChunk3Events();
     initViewport();
+    initRulers();
+    setRenderCallback(renderRulers);
     mainEl = document.querySelector(".main");
     runPanelEl = document.getElementById("tabpanel-run");
     mount2(mainEl);
@@ -10676,6 +10941,19 @@ var init_main = __esm({
       optApplyJogSteps();
       optLoadJogShowUnits();
       optLoadBearColors();
+      try {
+        const rulerSel = document.getElementById("optRulerCoords");
+        if (rulerSel) {
+          const saved = lsGet("fs-opt-ruler-coords", "machine");
+          state.rulerCoords = saved;
+          rulerSel.value = saved;
+          rulerSel.addEventListener("change", () => {
+            state.rulerCoords = rulerSel.value;
+            lsSet("fs-opt-ruler-coords", rulerSel.value);
+          });
+        }
+      } catch (_) {
+      }
       try {
         const al = document.getElementById("optAutoLoadSettings");
         if (al) al.checked = lsGet("fs-opt-autoload-settings", false);
