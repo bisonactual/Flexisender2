@@ -23,6 +23,9 @@ export let ringMat: any;
 export let rapidLines: any = null;
 export let cutLines: any = null;
 export let executedLine: any = null;
+let _gridLabels: any[] = [];
+let _wcsMarkers: any[] = [];
+let _wcsMarkersVisible = false;
 
 // Orbit state
 let isOrbiting = false;
@@ -33,6 +36,16 @@ export let target: any;
 
 let _lastTouches: Touch[] | null = null;
 let _canvas: HTMLCanvasElement;
+
+// ── Read a CSS colour variable as a THREE.js hex number ──────────────────────
+function cssColorToHex(varName: string, fallback: number): number {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  if (raw && raw.startsWith('#') && raw.length === 7) {
+    const n = parseInt(raw.slice(1), 16);
+    return isNaN(n) ? fallback : n;
+  }
+  return fallback;
+}
 
 export function initViewport(): void {
   _canvas = document.getElementById('threeCanvas') as HTMLCanvasElement;
@@ -57,16 +70,6 @@ export function initViewport(): void {
   scene.add(dlight);
 
   target = new THREE.Vector3(0, 0, 0);
-
-// ── Read a CSS colour variable as a THREE.js hex number ──────────────────────
-function cssColorToHex(varName: string, fallback: number): number {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-  if (raw && raw.startsWith('#') && raw.length === 7) {
-    const n = parseInt(raw.slice(1), 16);
-    return isNaN(n) ? fallback : n;
-  }
-  return fallback;
-}
 
   // Toolhead marker
   const toolGeo = new THREE.CylinderGeometry(0, 1.5, 4, 8);
@@ -293,11 +296,35 @@ export function vpSaveExtents(): void {
   lsSet(VP_STORAGE_KEY, { xMin: state.vpXMin, xMax: state.vpXMax, yMin: state.vpYMin, yMax: state.vpYMax, ortho: state.vpOrtho });
 }
 
+// ── Grid label sprite ─────────────────────────────────────────────────────────
+function makeTextSprite(text: string, gridStep: number): any {
+  const canvas = document.createElement('canvas');
+  const sz = 128;
+  canvas.width = sz;
+  canvas.height = sz;
+  const ctx = canvas.getContext('2d')!;
+  ctx.clearRect(0, 0, sz, sz);
+  ctx.fillStyle = '#64748b';
+  ctx.font = 'bold 48px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, sz / 2, sz / 2);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  const scale = gridStep * 0.45;
+  sprite.scale.set(scale, scale, 1);
+  return sprite;
+}
+
 export function rebuildViewportGrid(): void {
   if (gridHelper) { scene.remove(gridHelper); gridHelper.geometry.dispose(); gridHelper.material.dispose(); gridHelper = null; }
   if (_vpBoundary) { scene.remove(_vpBoundary); _vpBoundary.geometry.dispose(); _vpBoundary.material.dispose(); _vpBoundary = null; }
   _vpOriginAxes.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
   _vpOriginAxes = [];
+  _gridLabels.forEach(s => { scene.remove(s); s.material.map?.dispose(); s.material.dispose(); });
+  _gridLabels = [];
 
   const threeXMin = state.vpXMin, threeXMax = state.vpXMax;
   const threeZMin = -state.vpYMax, threeZMax = -state.vpYMin;
@@ -311,6 +338,36 @@ export function rebuildViewportGrid(): void {
   gridHelper = new THREE.GridHelper(gridSize, divisions, 0x2a2720, 0x1a1814);
   gridHelper.position.set(cx, 0, cz);
   scene.add(gridHelper);
+
+  // ── Grid labels along edges ─────────────────────────────────────────────────
+  const step = gridSize / divisions;
+  const halfGrid = gridSize / 2;
+  const gridXMin = cx - halfGrid;
+  const gridZMin = cz - halfGrid;
+  const labelY = 0.15;
+  const pad = step * 0.35;
+
+  // X labels along the bottom edge (max Z = front)
+  for (let i = 0; i <= divisions; i++) {
+    const wx = gridXMin + i * step;
+    const machineX = wx;
+    const label = Math.round(machineX).toString();
+    const sprite = makeTextSprite(label, step);
+    sprite.position.set(wx, labelY, cz + halfGrid + pad);
+    scene.add(sprite);
+    _gridLabels.push(sprite);
+  }
+
+  // Y labels along the left edge (min X)
+  for (let i = 0; i <= divisions; i++) {
+    const wz = gridZMin + i * step;
+    const machineY = -wz; // THREE Z is -machineY
+    const label = Math.round(machineY).toString();
+    const sprite = makeTextSprite(label, step);
+    sprite.position.set(cx - halfGrid - pad, labelY, wz);
+    scene.add(sprite);
+    _gridLabels.push(sprite);
+  }
 
   const pts = [
     new THREE.Vector3(threeXMin, 0.1, threeZMin),
@@ -339,6 +396,82 @@ export function rebuildViewportGrid(): void {
   target.set(cx, 0, cz);
   spherical.radius = Math.max(sizeX, sizeZ) * 1.4;
   updateCamera();
+}
+
+// ── WCS origin markers ────────────────────────────────────────────────────────
+
+const WCS_COLORS: Record<string, number> = {
+  G54: 0xff8c42, G55: 0x3b82f6, G56: 0x22c55e,
+  G57: 0xf59e0b, G58: 0x14b8a6, G59: 0xef4444,
+};
+
+function clearWcsMarkers(): void {
+  _wcsMarkers.forEach(g => { scene.remove(g); g.traverse((c: any) => { c.geometry?.dispose(); c.material?.dispose(); }); });
+  _wcsMarkers = [];
+}
+
+function buildWcsMarkers(): void {
+  clearWcsMarkers();
+  if (!_wcsMarkersVisible) return;
+  const axLen = 12;
+  const wcsKeys = ['G54', 'G55', 'G56', 'G57', 'G58', 'G59'];
+  for (const wcs of wcsKeys) {
+    const off = state.wcsOffsets[wcs];
+    if (!off) continue;
+    // THREE coords: X = machineX, Y = machineZ, Z = -machineY
+    const ox = off.x, oy = off.z, oz = -off.y;
+    const color = WCS_COLORS[wcs] || 0xffffff;
+    const group = new THREE.Group();
+
+    // Small axes
+    const makeAx = (dir: any, c: number) => {
+      const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), dir.clone().multiplyScalar(axLen)]);
+      const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color: c, transparent: true, opacity: 0.7 }));
+      group.add(l);
+    };
+    makeAx(new THREE.Vector3(1, 0, 0), 0xff3333);
+    makeAx(new THREE.Vector3(0, 1, 0), 0x3399ff);
+    makeAx(new THREE.Vector3(0, 0, -1), 0x33ff66);
+
+    // Label sprite
+    const canvas = document.createElement('canvas');
+    canvas.width = 128; canvas.height = 64;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#' + color.toString(16).padStart(6, '0');
+    ctx.font = 'bold 36px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(wcs, 64, 32);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.minFilter = THREE.LinearFilter;
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(16, 8, 1);
+    sprite.position.set(0, 14, 0);
+    group.add(sprite);
+
+    // Ring on ground plane
+    const ringGeo = new THREE.RingGeometry(2, 3, 16);
+    const ringMat2 = new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+    const ring = new THREE.Mesh(ringGeo, ringMat2);
+    ring.rotation.x = -Math.PI / 2;
+    group.add(ring);
+
+    group.position.set(ox, oy, oz);
+    scene.add(group);
+    _wcsMarkers.push(group);
+  }
+}
+
+export function toggleWcsMarkers(): void {
+  _wcsMarkersVisible = !_wcsMarkersVisible;
+  buildWcsMarkers();
+  const btn = document.getElementById('btnWcsVis');
+  if (btn) btn.textContent = _wcsMarkersVisible ? 'WCS ●' : 'WCS ○';
+}
+
+export function refreshWcsMarkers(): void {
+  if (_wcsMarkersVisible) buildWcsMarkers();
 }
 
 // ── View presets ──────────────────────────────────────────────────────────────

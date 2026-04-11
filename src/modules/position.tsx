@@ -6,6 +6,7 @@ import { h } from '../jsx';
 import { fmtPos } from '../ui';
 import { sendCmd } from '../connection';
 import { setWCS } from '../streaming';
+import { state } from '../state';
 import { on as busOn, type StatusReport } from '../bus';
 
 // ── Element refs ──────────────────────────────────────────────────────────────
@@ -85,9 +86,14 @@ export function mount(parent: HTMLElement): void {
   // ── Bus subscriptions ─────────────────────────────────────────────────────
   busOn<StatusReport>('status', ['mpos'], (r) => {
     if (!r.mpos) return;
-    _droX.textContent = fmtPos(String(r.mpos.x));
-    _droY.textContent = fmtPos(String(r.mpos.y));
-    _droZ.textContent = fmtPos(String(r.mpos.z));
+    // Compute work position = machine position - WCS offset
+    const wcs = state.wcsOffsets[state.activeWcs];
+    const wx = r.mpos.x - (wcs?.x ?? 0);
+    const wy = r.mpos.y - (wcs?.y ?? 0);
+    const wz = r.mpos.z - (wcs?.z ?? 0);
+    _droX.textContent = fmtPos(String(wx));
+    _droY.textContent = fmtPos(String(wy));
+    _droZ.textContent = fmtPos(String(wz));
     _droMX.textContent = 'M: ' + fmtPos(String(r.mpos.x));
     _droMY.textContent = 'M: ' + fmtPos(String(r.mpos.y));
     _droMZ.textContent = 'M: ' + fmtPos(String(r.mpos.z));

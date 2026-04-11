@@ -67,6 +67,8 @@ export const state = {
   wcsOffsets: {} as Record<string, { x: number; y: number; z: number }>,
   tloOffset: 0 as number,
   tloActive: false as boolean,
+  activeWcs: 'G54' as string,
+  rulerCoords: 'machine' as string,
   wcsPhase: 'idle' as string,
   currentToolNumber: 0,
   ttPhase: 'idle' as string,
@@ -104,6 +106,7 @@ export const state = {
   camMeasuring: false,
   camMeasureStartPos: null as { x: number; y: number } | null,
   _camTabInited: false,
+  _probingTabInited: false,
 
   // Keyboard jog
   kbJogActive: false,
@@ -189,6 +192,11 @@ export const MOD_DEFAULTS: Record<string, { x: number; y: number; enabled: boole
   limits:    { x: 302, y: 10,  enabled: false, size: 'normal' },
   signals:   { x: 594, y: 10,  enabled: false, size: 'normal' },
   bear:      { x: 594, y: 10,  enabled: false, size: 'normal' },
+  surfacing: { x: 10,  y: 10,  enabled: false, size: 'normal' },
+  toollength:   { x: 886, y: 10,  enabled: false, size: 'normal' },
+  edgefinder:   { x: 10,  y: 10,  enabled: false, size: 'normal' },
+  centerfinder: { x: 302, y: 10,  enabled: false, size: 'normal' },
+  rotation:     { x: 594, y: 10,  enabled: false, size: 'normal' },
 };
 
 export const MODULE_DEFS = [
@@ -202,6 +210,20 @@ export const MODULE_DEFS = [
   { id: 'limits',    icon: '📐', name: 'Program Limits' },
   { id: 'signals',   icon: '🔴', name: 'Signals' },
   { id: 'bear',      icon: '🐻', name: 'MR BEAR' },
+  { id: 'surfacing',    icon: '🪚', name: 'Surfacing' },
+  { id: 'toollength',   icon: '⊕', name: 'Tool Length' },
+  { id: 'edgefinder',   icon: '◈', name: 'Edge Finder' },
+  { id: 'centerfinder', icon: '⊙', name: 'Center Finder' },
+  { id: 'rotation',     icon: '⟳', name: 'Rotation' },
+];
+
+export const MODULE_GROUPS = [
+  { id: 'basic',     name: 'Basic Functions',               modules: ['position', 'jogging', 'overrides', 'spindle', 'limits', 'macros'] },
+  { id: 'debug',     name: 'Debug',                         modules: ['console', 'signals'] },
+  { id: 'toolcoord', name: 'Tool and Coordinate Control',   modules: ['tooltable', 'toollength'] },
+  { id: 'probing',   name: 'Probing',                       modules: ['toollength', 'edgefinder', 'centerfinder', 'rotation'] },
+  { id: 'exclusion', name: 'Exclusion Zones',               modules: ['bear'] },
+  { id: 'tools',     name: 'Tools',                         modules: ['surfacing'] },
 ];
 
 export const OPT_COLOR_DEFAULTS: Record<string, string> = {

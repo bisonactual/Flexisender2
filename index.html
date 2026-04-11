@@ -6,7 +6,6 @@
 <title>FlexiSender</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <link rel="stylesheet" href="/style.css">
-<!-- CSS extracted to style.css — build.ts inlines it for distribution -->
 </head>
 <body class="conn-websocket">
 
@@ -77,11 +76,17 @@
   <button class="tab-btn" id="tab-settings" data-tab="settings">SETTINGS: GRBL</button>
   <button class="tab-btn" id="tab-camera" data-tab="camera">CAMERA</button>
   <button class="tab-btn" id="tab-tooltable" data-tab="tooltable">TOOL TABLE</button>
+  <button class="tab-btn" id="tab-offsets" data-tab="offsets">OFFSETS</button>
+  <button class="tab-btn" id="tab-probing" data-tab="probing">PROBING</button>
   <button class="tab-btn" id="tab-modules" data-tab="modules">MODULES</button>
   <button class="tab-btn" id="tab-options" data-tab="options">⚙ OPTIONS</button>
   <button class="mod-lock-btn" id="modLockBtn" title="Lock / unlock module positions">
     <span id="modLockIcon">🔓</span>
     <span id="modLockLabel">UNLOCKED</span>
+  </button>
+  <button class="dock-toggle-btn" id="dockToggleBtn" title="Enable / disable docking">
+    <span id="dockToggleIcon">📌</span>
+    <span id="dockToggleLabel">DOCK ON</span>
   </button>
 </div>
 
@@ -180,6 +185,7 @@
       <button class="view-btn" data-view="side">SIDE</button>
       <button class="view-btn" id="btnFitView">FIT</button>
       <button class="view-btn" id="btnToolhead">TOOL ●</button>
+      <button class="view-btn" id="btnWcsVis">WCS ○</button>
     </div>
 
     <div class="progress-wrap">
@@ -189,18 +195,37 @@
 
     <div class="viewport-wrap">
       <canvas id="threeCanvas"></canvas>
+      <canvas id="rulerX" class="ruler ruler-x"></canvas>
+      <canvas id="rulerY" class="ruler ruler-y"></canvas>
       <div class="viewport-stats" id="vpStats">
         X: 0.000&nbsp;&nbsp;Y: 0.000&nbsp;&nbsp;Z: 0.000<br>
         MOVES: 0&nbsp;&nbsp;RAPIDS: 0
       </div>
       <button class="vp-copy-btn" id="vpCopyBtn" title="Copy debug stats to clipboard">📋</button>
+
+      <!-- Probe preview overlay -->
+      <div class="pp-overlay" id="probePreviewOverlay" style="display:none;">
+        <div class="pp-dro">
+          <div class="pp-dro-row"><span class="pp-axis">X</span><span class="pp-val" id="ppDroX">—</span></div>
+          <div class="pp-dro-row"><span class="pp-axis">Y</span><span class="pp-val" id="ppDroY">—</span></div>
+          <div class="pp-dro-row"><span class="pp-axis">Z</span><span class="pp-val" id="ppDroZ">—</span></div>
+          <div class="pp-label" id="ppDroLabel">—</div>
+        </div>
+        <div class="pp-controls">
+          <button class="pp-btn" id="ppStepBck" title="Previous step" disabled>◀</button>
+          <button class="pp-btn pp-btn-play" id="ppPlay" title="Play">▶</button>
+          <button class="pp-btn" id="ppStepFwd" title="Next step" disabled>▶|</button>
+          <span class="pp-counter" id="ppCounter">—</span>
+          <button class="pp-btn pp-btn-close" id="ppClose" title="Close preview">✕</button>
+        </div>
+      </div>
     </div>
 
     <div class="viewport-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#00d4ff"></div>Cut</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ff4444"></div>Rapid</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#00ff88"></div>Current</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ffd740"></div>Tool</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--vp-cut)"></div>Cut</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--vp-rapid)"></div>Rapid</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--vp-executed)"></div>Current</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--vp-tool)"></div>Tool</div>
       <div class="legend-item" style="margin-left:auto;color:var(--text3);font-family:var(--mono);font-size:10px">Drag:Orbit · Scroll:Zoom · RClick:Pan</div>
     </div>
 
@@ -374,185 +399,346 @@
   <div class="modules-page">
     <div class="modules-page-header">
       <div class="modules-page-title">Modules</div>
-      <div class="modules-page-hint">Toggle modules on or off, then pick a size. Enabled modules appear as floating panels on the RUN page — drag their title bar to reposition them.</div>
+      <div class="modules-page-hint">Enable groups or individual modules. Enabled modules appear as floating panels on the RUN page — drag their title bar to reposition them.</div>
     </div>
-    <div class="modules-config-grid">
 
-      <div class="mod-toggle-card" id="modcfg-position">
-        <div class="mod-toggle-icon">📍</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Machine Position</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">DRO axis readouts, WCS selector, machine state and feed/spindle status</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+    <!-- ── GROUP: Basic Functions ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="basic">▼</button>
+        <span class="mod-group-name" data-collapse-group="basic">Basic Functions</span>
+        <span class="mod-group-badge" id="modgrp-badge-basic">0 / 6</span>
+        <div class="mod-group-toggle enabled" data-group-id="basic"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-position" data-module-id="position">
+          <div class="mod-toggle-icon">📍</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Machine Position</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">DRO axis readouts, WCS selector, machine state and feed/spindle status</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-jogging">
-        <div class="mod-toggle-icon">🕹</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Jogging</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">XY/Z jog buttons, step size selectors, and jog feed rate control</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+        <div class="mod-toggle-card" id="modcfg-jogging" data-module-id="jogging">
+          <div class="mod-toggle-icon">🕹</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Jogging</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">XY/Z jog buttons, step size selectors, and jog feed rate control</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-overrides">
-        <div class="mod-toggle-icon">⚡</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Overrides</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Real-time feed rate, rapid, and spindle speed override sliders</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+        <div class="mod-toggle-card" id="modcfg-overrides" data-module-id="overrides">
+          <div class="mod-toggle-icon">⚡</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Overrides</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Real-time feed rate, rapid, and spindle speed override sliders</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-spindle">
-        <div class="mod-toggle-icon">🔄</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Spindle / Coolant</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Spindle direction (CW/CCW/OFF), RPM input, and flood/mist coolant toggles</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+        <div class="mod-toggle-card" id="modcfg-spindle" data-module-id="spindle">
+          <div class="mod-toggle-icon">🔄</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Spindle / Coolant</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Spindle direction (CW/CCW/OFF), RPM input, and flood/mist coolant toggles</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-macros">
-        <div class="mod-toggle-icon">🔧</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Macros</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Quick-access buttons for common G-code commands and machine routines</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
+        <div class="mod-toggle-card" id="modcfg-limits" data-module-id="limits">
+          <div class="mod-toggle-icon">📐</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Program Limits</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Min/max/span of X, Y and Z in the loaded program. Includes a Frame button to trace XY extents.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-console">
-        <div class="mod-toggle-icon">💻</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Console</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Live command log with manual G-code entry and touch keyboard support</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
-          </div>
-          <div class="mod-extra-row">
-            <span class="mod-extra-label">Output lines:</span>
-            <button class="mod-lines-btn active">50</button>
-            <button class="mod-lines-btn">100</button>
-            <button class="mod-lines-btn">200</button>
-            <button class="mod-lines-btn">500</button>
+        <div class="mod-toggle-card" id="modcfg-macros" data-module-id="macros">
+          <div class="mod-toggle-icon">🔧</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Macros</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Quick-access buttons for common G-code commands and machine routines</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mod-toggle-card" id="modcfg-tooltable">
-        <div class="mod-toggle-icon">🔩</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Tool Table</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Live tool library with offsets, pocket assignments and active tool indicator</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-            <button class="mod-size-btn">XXL</button>
-          </div>
-        </div>
       </div>
-
-      <div class="mod-toggle-card" id="modcfg-limits">
-        <div class="mod-toggle-icon">📐</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Program Limits</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Shows the minimum, maximum and span of X, Y and Z movements in the loaded program. Includes a Frame button to trace the XY extents on the machine.</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="mod-toggle-card" id="modcfg-signals">
-        <div class="mod-toggle-icon">🔴</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">Signals</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Live indicator lights for X, Y and Z limit switches, probe, toolsetter, door and E-Stop inputs. Reads the Pn: field from the GRBL status report.</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="mod-toggle-card" id="modcfg-bear" style="display:none">
-        <div class="mod-toggle-icon">🐻</div>
-        <div class="mod-toggle-info">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="mod-toggle-name" style="flex:1">MR BEAR DO NOT TOUCH</div>
-            <div class="mod-switch"></div>
-          </div>
-          <div class="mod-toggle-desc">Zone management for the MR BEAR plugin. Shows exclusion zones in a table and visualizes them as red boxes on the 3D viewport.</div>
-          <div class="mod-size-row">
-            <button class="mod-size-btn active">Normal</button>
-            <button class="mod-size-btn">Large</button>
-            <button class="mod-size-btn">XL</button>
-          </div>
-        </div>
-      </div>
-
     </div>
+
+    <!-- ── GROUP: Debug ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="debug">▼</button>
+        <span class="mod-group-name" data-collapse-group="debug">Debug</span>
+        <span class="mod-group-badge" id="modgrp-badge-debug">0 / 2</span>
+        <div class="mod-group-toggle enabled" data-group-id="debug"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-console" data-module-id="console">
+          <div class="mod-toggle-icon">💻</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Console</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Live command log with manual G-code entry and touch keyboard support</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
+            <div class="mod-extra-row">
+              <span class="mod-extra-label">Output lines:</span>
+              <button class="mod-lines-btn active">50</button>
+              <button class="mod-lines-btn">100</button>
+              <button class="mod-lines-btn">200</button>
+              <button class="mod-lines-btn">500</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" id="modcfg-signals" data-module-id="signals">
+          <div class="mod-toggle-icon">🔴</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Signals</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Live indicator lights for limit switches, probe, toolsetter, door and E-Stop inputs.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── GROUP: Tool and Coordinate Control ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="toolcoord">▼</button>
+        <span class="mod-group-name" data-collapse-group="toolcoord">Tool and Coordinate Control</span>
+        <span class="mod-group-badge" id="modgrp-badge-toolcoord">0 / 2</span>
+        <div class="mod-group-toggle enabled" data-group-id="toolcoord"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-tooltable" data-module-id="tooltable">
+          <div class="mod-toggle-icon">🔩</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Tool Table</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Live tool library with offsets, pocket assignments and active tool indicator</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+              <button class="mod-size-btn">XXL</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" data-module-id="toollength">
+          <div class="mod-toggle-icon">⊕</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Tool Length</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Probe tool length using a touch plate or fixed toolsetter (G59.3). Applies offset with G43.1.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── GROUP: Probing ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="probing">▼</button>
+        <span class="mod-group-name" data-collapse-group="probing">Probing</span>
+        <span class="mod-group-badge" id="modgrp-badge-probing">0 / 4</span>
+        <div class="mod-group-toggle enabled" data-group-id="probing"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-toollength" data-module-id="toollength">
+          <div class="mod-toggle-icon">⊕</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Tool Length</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Probe tool length using a touch plate or fixed toolsetter (G59.3). Applies offset with G43.1. Supports reference tool workflow for multi-tool setups.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" id="modcfg-edgefinder" data-module-id="edgefinder">
+          <div class="mod-toggle-icon">◈</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Edge Finder</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Find edges and corners of a workpiece. External and internal modes for all four corners and edges, plus Z surface.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" id="modcfg-centerfinder" data-module-id="centerfinder">
+          <div class="mod-toggle-icon">⊙</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Center Finder</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Find the center of a bore or boss in X, Y, or both. Supports multiple passes for accuracy.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-toggle-card" id="modcfg-rotation" data-module-id="rotation">
+          <div class="mod-toggle-icon">⟳</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Rotation</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Measure workpiece rotation angle by probing two points along an edge. Optionally applies the rotation to the loaded G-code.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── GROUP: Exclusion Zones ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="exclusion">▼</button>
+        <span class="mod-group-name" data-collapse-group="exclusion">Exclusion Zones</span>
+        <span class="mod-group-badge" id="modgrp-badge-exclusion">0 / 1</span>
+        <div class="mod-group-toggle enabled" data-group-id="exclusion"></div>
+      </div>
+      <div class="mod-group-body">
+
+        <div class="mod-toggle-card" id="modcfg-bear" data-module-id="bear" style="display:none">
+          <div class="mod-toggle-icon">🐻</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">MR BEAR DO NOT TOUCH</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Zone management for the MR BEAR plugin. Shows exclusion zones in a table and visualizes them as red boxes on the 3D viewport.</div>
+            <div class="mod-size-row">
+              <button class="mod-size-btn active">Normal</button>
+              <button class="mod-size-btn">Large</button>
+              <button class="mod-size-btn">XL</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── GROUP: Tools ── -->
+    <div class="mod-group">
+      <div class="mod-group-header">
+        <button class="mod-group-chevron" data-collapse-group="tools">▼</button>
+        <span class="mod-group-name" data-collapse-group="tools">Tools</span>
+        <span class="mod-group-badge" id="modgrp-badge-tools">0 / 1</span>
+        <div class="mod-group-toggle enabled" data-group-id="tools"></div>
+      </div>
+      <div class="mod-group-body">
+        <div class="mod-toggle-card" id="modcfg-surfacing" data-module-id="surfacing">
+          <div class="mod-toggle-icon">🪚</div>
+          <div class="mod-toggle-info">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="mod-toggle-name" style="flex:1">Surfacing</div>
+              <div class="mod-switch"></div>
+            </div>
+            <div class="mod-toggle-desc">Generate G-code for fly-cutting / surface planing. Configurable area, depth, stepover, zigzag or spiral patterns.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div><!-- /tab-panel-modules -->
+
 
 <!-- TAB: SETTINGS -->
 <div class="tab-panel" id="tabpanel-settings" style="flex-direction:column;overflow:hidden;">
@@ -871,6 +1057,69 @@
               <button class="opt-reset-btn">Reset</button>
             </div>
 
+            <div style="height:1px;background:var(--border);margin:4px 0;"></div>
+            <div style="font-family:var(--cond);font-size:10px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Tab Bar</div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Active Tab</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorTabActive" class="opt-color-picker" value="#ff8c42" />
+                <div class="opt-color-swatch" id="optSwatchTabActive" style="background:#ff8c42"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexTabActive" value="#ff8c42" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div style="height:1px;background:var(--border);margin:4px 0;"></div>
+            <div style="font-family:var(--cond);font-size:10px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">3D Viewport</div>
+            <div class="opt-color-row" style="margin-bottom:8px;">
+              <span class="opt-color-label" style="flex:1">Ruler Coordinates</span>
+              <select class="prob-select" id="optRulerCoords" style="width:140px;">
+                <option value="machine">Machine</option>
+                <option value="work">Work (WCS)</option>
+              </select>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Cut Moves</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorVpCut" class="opt-color-picker" value="#00d4ff" />
+                <div class="opt-color-swatch" id="optSwatchVpCut" style="background:#00d4ff"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexVpCut" value="#00d4ff" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Rapid Moves</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorVpRapid" class="opt-color-picker" value="#ff4444" />
+                <div class="opt-color-swatch" id="optSwatchVpRapid" style="background:#ff4444"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexVpRapid" value="#ff4444" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Executed Path</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorVpExecuted" class="opt-color-picker" value="#00ff88" />
+                <div class="opt-color-swatch" id="optSwatchVpExecuted" style="background:#00ff88"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexVpExecuted" value="#00ff88" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
+            <div class="opt-color-row">
+              <span class="opt-color-label">Tool Marker</span>
+              <div class="opt-color-swatch-wrap">
+                <input type="color" id="optColorVpTool" class="opt-color-picker" value="#ffd740" />
+                <div class="opt-color-swatch" id="optSwatchVpTool" style="background:#ffd740"></div>
+              </div>
+              <input type="text" class="opt-hex-input" id="optHexVpTool" value="#ffd740" spellcheck="false" maxlength="7" />
+              <button class="opt-reset-btn">Reset</button>
+            </div>
+
             <div style="display:flex;gap:8px;margin-top:4px;">
               <button class="opt-action-btn" id="btnResetAllColors">↺ Reset All Colours</button>
             </div>
@@ -969,7 +1218,7 @@
         <div class="options-card-icon">🕹</div>
         <div class="options-card-body">
           <div class="options-card-title">Jog Step Sizes</div>
-          <div class="options-card-desc">Configure the step size presets for XY and Z jog buttons. Comma-separated values in mm.</div>
+          <div class="options-card-desc">Configure the step size presets and maximum feed rates for XY and Z jogging. Comma-separated values in mm. Max speed caps the slider regardless of its position.</div>
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
             <div>
               <div class="opt-field-label">XY Steps (mm)</div>
@@ -979,7 +1228,20 @@
               <div class="opt-field-label">Z Steps (mm)</div>
               <input class="opt-input" type="text" id="optJogStepsZ" value="0.01, 0.1, 1, 5, 10" spellcheck="false" />
             </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <div class="opt-field-label">Max XY Speed (mm/min)</div>
+                <input class="opt-input" type="number" id="optJogMaxXY" value="3000" min="1" step="100" />
+              </div>
+              <div>
+                <div class="opt-field-label">Max Z Speed (mm/min)</div>
+                <input class="opt-input" type="number" id="optJogMaxZ" value="500" min="1" step="50" />
+              </div>
+            </div>
             <button class="opt-action-btn" id="btnApplyJogSteps">↺ Apply &amp; Rebuild Buttons</button>
+            <label class="tb-opt-toggle" style="margin-top:2px;">
+              <input type="checkbox" id="optJogShowUnits"> Show mm units on distance buttons
+            </label>
           </div>
         </div>
       </div>
@@ -1053,12 +1315,51 @@
   </div>
 </div><!-- /tab-panel-tooltable -->
 
+<!-- TAB: OFFSETS -->
+<div class="tab-panel" id="tabpanel-offsets" style="flex-direction:column;overflow:hidden;background:var(--bg);">
+  <div class="wcs-toolbar">
+    <span class="wcs-toolbar-title">Coordinate Offsets</span>
+    <span id="wcsStatus" style="font-family:var(--mono);font-size:11px;color:var(--text3);flex:1"></span>
+    <button class="tb-btn" id="btnWcsRefresh">↻ REFRESH</button>
+  </div>
+  <div class="wcs-table-wrap">
+    <table id="wcsTable" style="display:none;">
+      <thead>
+        <tr style="background:var(--surface2);">
+          <th class="wcs-th">SYSTEM</th>
+          <th class="wcs-th wcs-th-num">X</th>
+          <th class="wcs-th wcs-th-num">Y</th>
+          <th class="wcs-th wcs-th-num">Z</th>
+          <th class="wcs-th wcs-th-num">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody id="wcsTableBody"></tbody>
+    </table>
+    <div id="wcsEmpty" style="display:flex;">
+      <div class="wcs-empty-icon">⊕</div>
+      <div class="wcs-empty-text">Connect and the offsets will load automatically</div>
+    </div>
+  </div>
+</div><!-- /tab-panel-offsets -->
 
-<script src="/bundle.js" type="module"></script>
+<!-- TAB: PROBING -->
+<div class="tab-panel" id="tabpanel-probing" style="flex-direction:column;overflow:hidden;background:var(--bg);">
+  <div class="prob-subtab-bar">
+    <button class="prob-subtab-btn active" data-subtab="toollength">Tool Length</button>
+    <button class="prob-subtab-btn" data-subtab="edgefinder">Edge Finder</button>
+    <button class="prob-subtab-btn" data-subtab="centerfinder">Center Finder</button>
+    <button class="prob-subtab-btn" data-subtab="rotation">Rotation</button>
+  </div>
+  <div class="prob-panels" style="flex:1;overflow:hidden;position:relative;"></div>
+</div><!-- /tab-panel-probing -->
+
+
 <!-- DEV-RELOAD -->
 <script>
-(function(){const ws=new WebSocket('ws://'+location.host+'/ws');ws.onmessage=()=>location.reload();ws.onclose=()=>setTimeout(()=>location.reload(),1000);})();
+  const _ws = new WebSocket('ws://' + location.host + '/ws');
+  _ws.onmessage = () => location.reload();
 </script>
 <!-- /DEV-RELOAD -->
+<script src="/bundle.js" type="module"></script>
 </body>
 </html>

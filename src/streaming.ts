@@ -100,6 +100,7 @@ export function sendHome(): void { import('./connection').then(c => c.sendCmd('$
 export function goToXY0(): void { import('./modules/jog').then(j => j.clearWaypoints()); import('./connection').then(c => c.sendCmd('G0 X0 Y0')); }
 
 export function setWCS(code: string): void {
+  state.activeWcs = code;
   import('./connection').then(c => {
     c.sendCmd(code);
     log('info', 'WCS set to ' + code);

@@ -6,7 +6,7 @@ import { state } from './state';
 import { lsGet, lsSet, $ } from './ui';
 import { log, clearConsole, sendManual, handleConInput, conAutoUpdate } from './console';
 import { toggleConnect, sendCmd } from './connection';
-import { initViewport, setView, fitView, toggleToolhead, vpApply, setProjection, vpRefreshColors } from './viewport';
+import { initViewport, setView, fitView, toggleToolhead, vpApply, setProjection, vpRefreshColors, toggleWcsMarkers, refreshWcsMarkers } from './viewport';
 import { loadFile, uploadAndOpenFile, frameProgram } from './gcode';
 import { startJob, pauseJob, stopJob, updateRunButtons, sendReset, unlockAlarm, sendHome, goToXY0, setWCS } from './streaming';
 import { mount as mountJog, initKeyboardJog } from './modules/jog';
@@ -15,14 +15,21 @@ import { mount as mountOverrides } from './modules/overrides';
 import { mount as mountSpindle } from './modules/spindle';
 import { mount as mountMacros } from './modules/macros';
 import { mount as mountSignals } from './modules/signals';
+import { mount as mountSurfacing } from './modules/tools/surfacing';
+import { mount as mountToolLength } from './probing/tool-length';
+import { mount as mountEdgeFinder } from './probing/edge-finder-module';
+import { mount as mountCenterFinder } from './probing/center-finder-module';
+import { mount as mountRotation } from './probing/rotation-module';
+import { initProbingTab } from './probing/probing-tab';
+import { loadPreview3D, clearPreview3D, stepPreview3D, playPreview3D } from './probing/probe-preview-3d';
 import { loadSettings, filterSettings, writeAllDirty } from './settings';
 import { loadToolTable } from './tooltable';
 import { loadOffsets, renderOffsetsTable } from './offsets';
 import { toggleSdPanel, closeSdPanel, sdRefreshFiles, sdRunSelected, initSdClickOutside } from './sd';
 import { initCameraTab, selectCamera, startCamera, stopCamera, measureOffset, goToCamera, goToSpindle, zeroAtCrosshair, camMouseDown, camMouseMove, camMouseUp, setCrosshairStyle, setCrosshairColor, loadCamSettings, saveCamSettings, drawOverlay, initCameraListeners } from './camera';
 import { kbdPress, kbdBackspace, kbdClear, kbdSend, toggleTouchKeyboard } from './keyboard';
-import { toggleModule, setModSize, setConsoleLines, modInitPositions, toggleModLock, modDragStart, modTouchStart, initModDragListeners } from './modules';
-import { initDock, dockModule, undockModule } from './dock';
+import { toggleModule, setModSize, setConsoleLines, modInitPositions, toggleModLock, modDragStart, modTouchStart, initModDragListeners, toggleGroup, toggleGroupCollapse } from './modules';
+import { initDock, dockModule, undockModule, isDockingEnabled, setDockingEnabled } from './dock';
 import { optSetConnMode, optSaveConnSettings, optLoadConnSettings, optLoadColors, optLoadTabLocks, optBuildTabLockList, initToolbarOptions, saveTbOpt, optApplyColor, optHexChange, optResetColor, optResetAllColors, optSaveJogSteps, optLoadJogSteps, optApplyJogSteps, optApplyJogShowUnits, optLoadJogShowUnits, optSaveBearColors, optLoadBearColors } from './options';
 import { bearRefresh, bearCheckPlugin, bearIntercept, bearParseStatus, bearShowAddForm, bearEditZone, bearSaveZone, bearDeleteZone, bearCancelEdit } from './bear';
 
@@ -35,6 +42,7 @@ export function switchTab(tab: string): void {
   document.getElementById('tabpanel-' + tab)!.classList.add('active');
   if (tab === 'settings' && !state.settingsLoaded && state.connected) loadSettings();
   if (tab === 'camera' && !state._camTabInited) { state._camTabInited = true; initCameraTab(); }
+  if (tab === 'probing' && !state._probingTabInited) { state._probingTabInited = true; initProbingTab(); }
   if (tab === 'tooltable') loadToolTable();
   if (tab === 'offsets') loadOffsets();
 }
@@ -64,6 +72,8 @@ w.setProjection = setProjection;
 
 // Remaining window globals — only for dynamically generated HTML onclick handlers
 w.sendCmd = sendCmd;  // used by settings-widgets.ts generated HTML
+w.loadPreview3D = loadPreview3D;
+w.clearPreview3D = clearPreview3D;
 w.bearShowAddForm = bearShowAddForm;
 w.bearEditZone = bearEditZone;
 w.bearSaveZone = bearSaveZone;
@@ -174,12 +184,27 @@ function initChunk2Events(): void {
   // in the init section below, so that JSX-mounted modules are included.
 
   // Module config toggles + size buttons
-  document.querySelectorAll<HTMLElement>('.mod-toggle-card').forEach(cfgCard => {
-    const moduleId = cfgCard.id.replace('modcfg-', '');
+  document.querySelectorAll<HTMLElement>('[data-module-id]').forEach(cfgCard => {
+    const moduleId = cfgCard.dataset.moduleId;
+    if (!moduleId) return;
     const sw = cfgCard.querySelector('.mod-switch');
     if (sw) sw.addEventListener('click', () => toggleModule(moduleId));
     cfgCard.querySelectorAll<HTMLElement>('.mod-size-btn').forEach(btn => {
       btn.addEventListener('click', e => setModSize(moduleId, btn.textContent!.toLowerCase(), e));
+    });
+  });
+  // Group toggles
+  document.querySelectorAll('.mod-group-toggle').forEach(toggle => {
+    const groupId = (toggle as HTMLElement).dataset.groupId;
+    if (groupId) toggle.addEventListener('click', () => toggleGroup(groupId));
+  });
+  document.querySelectorAll('[data-collapse-group]').forEach(el => {
+    el.addEventListener('click', () => toggleGroupCollapse((el as HTMLElement).dataset.collapseGroup!));
+  });
+  document.querySelectorAll('.mod-toggle-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('.mod-switch, .mod-size-btn, .mod-lines-btn')) return;
+      card.classList.toggle('expanded');
     });
   });
   // Console lines buttons
@@ -269,6 +294,12 @@ function initChunk1Events(): void {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab!));
   });
   on('modLockBtn', 'click', () => toggleModLock());
+  on('dockToggleBtn', 'click', () => {
+    const enabled = !isDockingEnabled();
+    setDockingEnabled(enabled);
+    document.getElementById('dockToggleIcon')!.textContent = enabled ? '📌' : '📎';
+    document.getElementById('dockToggleLabel')!.textContent = enabled ? 'DOCK ON' : 'DOCK OFF';
+  });
 
   // Viewport header
   document.querySelectorAll<HTMLElement>('.view-btn[data-view]').forEach(btn => {
@@ -276,7 +307,14 @@ function initChunk1Events(): void {
   });
   on('btnFitView', 'click', () => fitView());
   on('btnToolhead', 'click', () => toggleToolhead());
+  on('btnWcsVis', 'click', () => toggleWcsMarkers());
   on('vpCopyBtn', 'click', () => copyDebugStats());
+
+  // Probe preview overlay controls
+  on('ppStepBck', 'click', () => stepPreview3D(-1));
+  on('ppStepFwd', 'click', () => stepPreview3D(1));
+  on('ppPlay', 'click', () => playPreview3D());
+  on('ppClose', 'click', () => clearPreview3D());
 }
 
 // ── Debug stats clipboard ─────────────────────────────────────────────────────
@@ -313,6 +351,11 @@ mountSpindle(mainEl);
 mountMacros(mainEl);
 mountJog(mainEl);
 mountSignals(mainEl);
+mountSurfacing(mainEl);
+mountToolLength(mainEl);
+mountEdgeFinder(mainEl);
+mountCenterFinder(mainEl);
+mountRotation(mainEl);
 initKeyboardJog();
 
 // Re-wire drag handles now that all JSX-mounted modules are in the DOM.
@@ -330,6 +373,44 @@ document.querySelectorAll<HTMLElement>('.module-drag-close').forEach(btn => {
   btn.addEventListener('click', () => toggleModule(card.id.replace('mod-', ''), false));
 });
 
+// Add diagonal resize handles to all module cards
+document.querySelectorAll<HTMLElement>('.module-card').forEach(card => {
+  const handle = document.createElement('div');
+  handle.className = 'module-resize-handle';
+  card.appendChild(handle);
+
+  const startResize = (startX: number, startY: number) => {
+    const startW = card.offsetWidth;
+    const baseScale = parseFloat(card.dataset.modScale || '1');
+
+    const onMove = (mx: number, my: number) => {
+      const dx = mx - startX;
+      const dy = my - startY;
+      const delta = (dx + dy) / 2;
+      const newScale = Math.max(0.5, Math.min(2.0, baseScale + delta / startW));
+      card.style.transform = `scale(${newScale})`;
+      card.style.transformOrigin = 'top left';
+      card.dataset.modScale = String(newScale);
+    };
+
+    const onMouseMove = (e: MouseEvent) => onMove(e.clientX, e.clientY);
+    const onTouchMove = (e: TouchEvent) => { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onUp);
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+  };
+
+  handle.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); startResize(e.clientX, e.clientY); });
+  handle.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); startResize(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+});
+
 initModDragListeners();
 initSdClickOutside();
 initCameraListeners();
@@ -344,6 +425,11 @@ window.addEventListener('load', () => {
   const mainEl = document.querySelector('.viewport-wrap') as HTMLElement;
   if (mainEl) initDock(mainEl);
   try { if (lsGet('fs-mod-locked', false)) toggleModLock(); } catch (_) {}
+  // Restore dock toggle state
+  if (!isDockingEnabled()) {
+    document.getElementById('dockToggleIcon')!.textContent = '📎';
+    document.getElementById('dockToggleLabel')!.textContent = 'DOCK OFF';
+  }
   const fields: Record<string, number> = { vpXMin: state.vpXMin, vpXMax: state.vpXMax, vpYMin: state.vpYMin, vpYMax: state.vpYMax };
   for (const [id, val] of Object.entries(fields)) {
     const el = document.getElementById(id) as HTMLInputElement | null;

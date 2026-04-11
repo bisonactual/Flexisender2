@@ -6,6 +6,7 @@ import { state } from './state';
 import { log } from './console';
 import { sendCmd, cmdSend } from './connection';
 import { lsGet, lsSet } from './ui';
+import { refreshWcsMarkers } from './viewport';
 
 // ── Coordinate systems in display order ──────────────────────────────────────
 
@@ -76,6 +77,7 @@ export function offsetsInterceptOk(): void {
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function renderOffsetsTable(): void {
+  refreshWcsMarkers();
   const tbody = document.getElementById('wcsTableBody');
   const empty = document.getElementById('wcsEmpty');
   const table = document.getElementById('wcsTable') as HTMLElement;

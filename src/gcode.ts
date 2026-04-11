@@ -15,6 +15,15 @@ export function parseGcodeToToolpath(lines: string[]): { segments: any[]; cutCou
   let modal = { motion: 0 };
   let cutCount = 0, rapidCount = 0;
 
+  // WCS tracking — map G-code work coords to machine coords
+  const WCS_CODES: Record<number, string> = { 54: 'G54', 55: 'G55', 56: 'G56', 57: 'G57', 58: 'G58', 59: 'G59' };
+  let activeWcs = state.activeWcs || 'G54';
+
+  function wcsOffset(): { x: number; y: number; z: number } {
+    const off = state.wcsOffsets[activeWcs];
+    return off || { x: 0, y: 0, z: 0 };
+  }
+
   for (const raw of lines) {
     let line = raw.replace(/;.*/, '').replace(/\(.*?\)/g, '').trim().toUpperCase();
     if (!line) continue;
@@ -24,28 +33,35 @@ export function parseGcodeToToolpath(lines: string[]): { segments: any[]; cutCou
     let m;
     while ((m = re.exec(line)) !== null) words[m[1]] = parseFloat(m[2]);
 
+    // Check for WCS change (G54-G59)
     if ('G' in words) {
       const g = words['G'];
       if (g === 0 || g === 1 || g === 2 || g === 3) modal.motion = g;
+      if (WCS_CODES[g]) activeWcs = WCS_CODES[g];
     }
 
     const hasMove = 'X' in words || 'Y' in words || 'Z' in words;
     if (!hasMove) continue;
 
-    const nx = 'X' in words ? words['X'] : x;
-    const ny = 'Z' in words ? words['Z'] : y;
-    const nz = 'Y' in words ? -words['Y'] : z;
+    // Work coordinates from G-code
+    const off = wcsOffset();
+    // Convert work coords to machine coords, then to THREE.js coords
+    // Machine = Work + WCS offset
+    // THREE: x = machineX, y = machineZ, z = -machineY
+    const mx = ('X' in words ? words['X'] + off.x : (x));
+    const my = ('Z' in words ? words['Z'] + off.z : (y));
+    const mz = ('Y' in words ? -(words['Y'] + off.y) : (z));
 
     const from = new THREE.Vector3(x, y, z);
-    const to = new THREE.Vector3(nx, ny, nz);
+    const to = new THREE.Vector3(mx, my, mz);
 
-    if (from.distanceTo(to) < 0.0001) { x = nx; y = ny; z = nz; continue; }
+    if (from.distanceTo(to) < 0.0001) { x = mx; y = my; z = mz; continue; }
 
     const isRapid = (modal.motion === 0);
     segments.push({ from: from.clone(), to: to.clone(), isRapid });
     if (isRapid) rapidCount++; else cutCount++;
 
-    x = nx; y = ny; z = nz;
+    x = mx; y = my; z = mz;
   }
   return { segments, cutCount, rapidCount };
 }
