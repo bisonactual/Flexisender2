@@ -205,7 +205,7 @@ function initChunk2Events(): void {
   });
   document.querySelectorAll('.mod-toggle-card').forEach(card => {
     card.addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('.mod-switch, .mod-size-btn, .mod-lines-btn')) return;
+      if ((e.target as HTMLElement).closest('.mod-switch, .mod-lines-btn')) return;
       card.classList.toggle('expanded');
     });
   });
@@ -460,5 +460,50 @@ window.addEventListener('load', () => {
   if (projPersp && projOrtho) {
     projPersp.classList.toggle('selected', !state.vpOrtho);
     projOrtho.classList.toggle('selected', state.vpOrtho);
+  }
+
+  // ── Column selectors ────────────────────────────────────────────────────────
+  const modColSel = document.getElementById('modColSelect') as HTMLSelectElement | null;
+  const optColSel = document.getElementById('optColSelect') as HTMLSelectElement | null;
+  const modBody = document.querySelector('.modules-page-body') as HTMLElement | null;
+  const optGrid = document.querySelector('.options-grid') as HTMLElement | null;
+  const savedModCols = lsGet('fs-mod-cols', '2');
+  const savedOptCols = lsGet('fs-opt-cols', '2');
+  if (modColSel) { modColSel.value = savedModCols; if (modBody) modBody.style.setProperty('--mod-cols', savedModCols); }
+  if (optColSel) { optColSel.value = savedOptCols; if (optGrid) optGrid.style.setProperty('--opt-cols', savedOptCols); }
+  if (modColSel) modColSel.addEventListener('change', () => { if (modBody) modBody.style.setProperty('--mod-cols', modColSel.value); lsSet('fs-mod-cols', modColSel.value); });
+  if (optColSel) optColSel.addEventListener('change', () => { if (optGrid) optGrid.style.setProperty('--opt-cols', optColSel.value); lsSet('fs-opt-cols', optColSel.value); });
+
+  // ── Module search ───────────────────────────────────────────────────────────
+  const modSearchInput = document.getElementById('modSearch') as HTMLInputElement | null;
+  if (modSearchInput) {
+    modSearchInput.addEventListener('input', () => {
+      const q = modSearchInput.value.toLowerCase().trim();
+      document.querySelectorAll<HTMLElement>('.mod-group').forEach(group => {
+        let anyVisible = false;
+        group.querySelectorAll<HTMLElement>('.mod-toggle-card').forEach(card => {
+          const name = card.querySelector('.mod-toggle-name')?.textContent?.toLowerCase() || '';
+          const desc = card.querySelector('.mod-toggle-desc')?.textContent?.toLowerCase() || '';
+          const match = !q || name.includes(q) || desc.includes(q);
+          card.style.display = match ? '' : 'none';
+          if (match) anyVisible = true;
+        });
+        group.style.display = anyVisible ? '' : 'none';
+      });
+    });
+  }
+
+  // ── Options search ──────────────────────────────────────────────────────────
+  const optSearchInput = document.getElementById('optSearch') as HTMLInputElement | null;
+  if (optSearchInput) {
+    optSearchInput.addEventListener('input', () => {
+      const q = optSearchInput.value.toLowerCase().trim();
+      document.querySelectorAll<HTMLElement>('.options-card').forEach(card => {
+        const title = card.querySelector('.options-card-title')?.textContent?.toLowerCase() || '';
+        const desc = card.querySelector('.options-card-desc')?.textContent?.toLowerCase() || '';
+        const match = !q || title.includes(q) || desc.includes(q);
+        card.style.display = match ? '' : 'none';
+      });
+    });
   }
 });

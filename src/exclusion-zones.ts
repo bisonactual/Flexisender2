@@ -86,11 +86,15 @@ export function ezCheckPlugin(line: string): void {
   if (line.includes('[PLUGIN:Exclusion Zones')) {
     _ezPluginDetected = true;
     log('info', '🔒 Exclusion Zones plugin detected');
+    const notice = document.getElementById('ezPluginNotice');
+    if (notice) notice.style.display = 'none';
     setTimeout(() => ezRefresh(), 300);
   }
   if (line.includes('[PLUGIN:ATCi') || line.includes('[PLUGIN:ATCI') || line.includes('[PLUGIN:Sienci ATCi')) {
     _atciDetected = true;
     log('info', '🔧 ATCi plugin detected');
+    const notice = document.getElementById('ezPluginNotice');
+    if (notice) notice.style.display = 'none';
     setTimeout(() => { sendCmd('$130'); sendCmd('$131'); sendCmd('$132'); }, 500);
   }
 }

@@ -398,9 +398,20 @@
 <div class="tab-panel" id="tabpanel-modules" style="flex-direction:column;overflow:hidden;background:var(--bg);">
   <div class="modules-page">
     <div class="modules-page-header">
-      <div class="modules-page-title">Modules</div>
-      <div class="modules-page-hint">Enable groups or individual modules. Enabled modules appear as floating panels on the RUN page — drag their title bar to reposition them.</div>
+      <div class="modules-page-header-text">
+        <div class="modules-page-title">Modules</div>
+        <div class="modules-page-hint">Enable groups or individual modules. Enabled modules appear as floating panels on the RUN page — drag their title bar to reposition them.</div>
+      </div>
+      <div class="page-toolbar">
+        <input class="page-search" id="modSearch" placeholder="Search modules…" />
+        <select class="col-select" id="modColSelect" title="Columns">
+          <option value="1">1 col</option>
+          <option value="2" selected>2 col</option>
+          <option value="3">3 col</option>
+        </select>
+      </div>
     </div>
+    <div class="modules-page-body">
 
     <!-- ── GROUP: Basic Functions ── -->
     <div class="mod-group">
@@ -420,12 +431,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">DRO axis readouts, WCS selector, machine state and feed/spindle status</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-              <button class="mod-size-btn">XL</button>
-              <button class="mod-size-btn">XXL</button>
-            </div>
           </div>
         </div>
 
@@ -437,12 +442,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">XY/Z jog buttons, step size selectors, and jog feed rate control</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-              <button class="mod-size-btn">XL</button>
-              <button class="mod-size-btn">XXL</button>
-            </div>
           </div>
         </div>
 
@@ -454,12 +453,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Real-time feed rate, rapid, and spindle speed override sliders</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-              <button class="mod-size-btn">XL</button>
-              <button class="mod-size-btn">XXL</button>
-            </div>
           </div>
         </div>
 
@@ -471,12 +464,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Spindle direction (CW/CCW/OFF), RPM input, and flood/mist coolant toggles</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-              <button class="mod-size-btn">XL</button>
-              <button class="mod-size-btn">XXL</button>
-            </div>
           </div>
         </div>
 
@@ -488,10 +475,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Min/max/span of X, Y and Z in the loaded program. Includes a Frame button to trace XY extents.</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-            </div>
           </div>
         </div>
 
@@ -503,12 +486,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Quick-access buttons for common G-code commands and machine routines</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-              <button class="mod-size-btn">XL</button>
-              <button class="mod-size-btn">XXL</button>
-            </div>
           </div>
         </div>
 
@@ -532,13 +509,7 @@
               <div class="mod-toggle-name" style="flex:1">Console</div>
               <div class="mod-switch"></div>
             </div>
-            <div class="mod-toggle-desc">Live command log with manual G-code entry and touch keyboard support</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-              <button class="mod-size-btn">XL</button>
-              <button class="mod-size-btn">XXL</button>
-            </div>
+            <div class="mod-toggle-desc">Live command log with manual G-code entry and touch keyboard support. Scroll with Ctrl+Up / Ctrl+Down.</div>
             <div class="mod-extra-row">
               <span class="mod-extra-label">Output lines:</span>
               <button class="mod-lines-btn active">50</button>
@@ -557,10 +528,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Live indicator lights for limit switches, probe, toolsetter, door and E-Stop inputs.</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-            </div>
           </div>
         </div>
 
@@ -585,12 +552,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Live tool library with offsets, pocket assignments and active tool indicator</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-              <button class="mod-size-btn">XL</button>
-              <button class="mod-size-btn">XXL</button>
-            </div>
           </div>
         </div>
 
@@ -602,10 +563,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Probe tool length using a touch plate or fixed toolsetter (G59.3). Applies offset with G43.1.</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-            </div>
           </div>
         </div>
 
@@ -630,10 +587,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Probe tool length using a touch plate or fixed toolsetter (G59.3). Applies offset with G43.1. Supports reference tool workflow for multi-tool setups.</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-            </div>
           </div>
         </div>
 
@@ -645,10 +598,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Find edges and corners of a workpiece. External and internal modes for all four corners and edges, plus Z surface.</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-            </div>
           </div>
         </div>
 
@@ -660,10 +609,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Find the center of a bore or boss in X, Y, or both. Supports multiple passes for accuracy.</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-            </div>
           </div>
         </div>
 
@@ -675,10 +620,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Measure workpiece rotation angle by probing two points along an edge. Optionally applies the rotation to the loaded G-code.</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-            </div>
           </div>
         </div>
 
@@ -703,11 +644,6 @@
               <div class="mod-switch"></div>
             </div>
             <div class="mod-toggle-desc">Zone management for the Exclusion Zones plugin. Shows zones in a compact table with status badge and quick edit/delete.</div>
-            <div class="mod-size-row">
-              <button class="mod-size-btn active">Normal</button>
-              <button class="mod-size-btn">Large</button>
-              <button class="mod-size-btn">XL</button>
-            </div>
           </div>
         </div>
 
@@ -736,6 +672,7 @@
       </div>
     </div>
 
+    </div>
   </div>
 </div><!-- /tab-panel-modules -->
 
@@ -882,8 +819,18 @@
 <div class="tab-panel" id="tabpanel-options" style="flex-direction:column;overflow:hidden;background:var(--bg);">
   <div class="options-page">
     <div class="options-page-header">
-      <div class="options-page-title">Options</div>
-      <div class="options-page-hint">Configure appearance and behaviour settings. Changes are saved to local storage and applied immediately.</div>
+      <div class="options-page-header-text">
+        <div class="options-page-title">Options</div>
+        <div class="options-page-hint">Configure appearance and behaviour settings. Changes are saved to local storage and applied immediately.</div>
+      </div>
+      <div class="page-toolbar">
+        <input class="page-search" id="optSearch" placeholder="Search options…" />
+        <select class="col-select" id="optColSelect" title="Columns">
+          <option value="1">1 col</option>
+          <option value="2" selected>2 col</option>
+          <option value="3">3 col</option>
+        </select>
+      </div>
     </div>
 
     <div class="options-grid">
@@ -1284,6 +1231,7 @@
     <button class="tb-btn" id="ezTabLabelToggle" title="Toggle 3D labels">LABELS ON</button>
     <button class="tb-btn primary" id="ezTabRefreshBtn">↻ REFRESH</button>
   </div>
+  <div id="ezPluginNotice" style="padding:8px 16px;font-family:var(--cond);font-size:11px;letter-spacing:0.5px;color:var(--text3);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;">Requires the EZ — Exclusion Zones Plugin to function. Also compatible with the Sienci ATCI Plugin.</div>
   <div style="flex:1;overflow:auto;padding:16px;">
     <div id="ezTabContent">
       <div style="text-align:center;padding:40px;color:var(--text3);font-family:var(--cond);font-size:12px;letter-spacing:1px;text-transform:uppercase">
@@ -1328,6 +1276,7 @@
   </div>
 
   <!-- Status / empty state -->
+  <div id="ttPluginNotice" style="padding:8px 16px;font-family:var(--cond);font-size:11px;letter-spacing:0.5px;color:var(--text3);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;">Requires the Expatria ATC Plugin to function.</div>
   <div id="ttStatus" style="padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--accent);flex-shrink:0;display:none;"></div>
 
   <!-- Table -->

@@ -86,6 +86,8 @@ function renderTTInto(tableId: string, emptyId: string, tbodyId: string, countId
   tbody.innerHTML = sortedEntries().map(e => renderRow(e, isMod)).join('');
   table.style.display = '';
   empty.style.display = 'none';
+  const notice = document.getElementById('ttPluginNotice');
+  if (notice) notice.style.display = 'none';
   const carouselCount = state.ttEntries.filter(e => e.pocket > 0).length;
   if (count) count.textContent = isMod
     ? `${state.ttEntries.length}T · ${carouselCount}P`
