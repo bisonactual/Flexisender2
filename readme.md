@@ -4,7 +4,7 @@ A browser-based GrblHAL sender with a live 3D toolpath visualizer, built as a si
 
 Based on the original flexisender from [Expatria](https://github.com/Expatria-Technologies)
 
-[FlexiSender](https://expatria-technologies.github.io/FlexiSender/flexisender.html)
+[FlexiSender](https://bisonactual.github.io/Flexisender2/flexisender.html)
 
 ![FlexiSender screenshot](screenshot.png)
 
