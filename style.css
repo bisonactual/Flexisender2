@@ -771,6 +771,8 @@
   .limits-safe-label { font-family: var(--cond); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); flex-shrink: 0; }
   .limits-safe-input { flex: 1; background: var(--surface3); border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 5px 8px; outline: none; border-radius: var(--radius-sm); transition: border-color 0.15s; }
   .limits-safe-input:focus { border-color: var(--accent); }
+  .limits-safe-select { background: var(--surface3); border: 1px solid var(--border2); color: var(--text); font-family: var(--cond); font-size: 10px; letter-spacing: 0.5px; padding: 5px 4px; outline: none; border-radius: var(--radius-sm); cursor: pointer; flex-shrink: 0; }
+  .limits-safe-select:focus { border-color: var(--accent); }
   .limits-frame-btn { width: 100%; background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.5); color: var(--blue); font-family: var(--cond); font-weight: 800; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; padding: 10px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.15s; margin-top: 2px; }
   .limits-frame-btn:hover { background: rgba(59,130,246,0.32); border-color: var(--blue); }
   .limits-frame-btn:disabled { opacity: 0.3; cursor: not-allowed; }

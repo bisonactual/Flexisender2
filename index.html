@@ -168,8 +168,10 @@
         <div class="limits-divider"></div>
         <div class="limits-safe-row">
           <span class="limits-safe-label">Safe Z</span>
-          <input type="number" class="limits-safe-input" id="limitsSafeZ" value="5" step="1" title="Z height to lift to before framing (absolute WCS)" />
-          <span style="font-family:var(--cond);font-size:9px;color:var(--text3);letter-spacing:1px">MM</span>
+          <input type="number" class="limits-safe-input" id="limitsSafeZ" value="5" step="1" title="Z height to lift to before framing" />
+          <select class="limits-safe-select" id="limitsSafeZRef" title="Safe Z reference frame">
+            <option value="absolute">ABS</option>
+          </select>
         </div>
         <button class="limits-frame-btn" id="limitsFrameBtn" disabled>⬛ FRAME PROGRAM</button>
       </div>

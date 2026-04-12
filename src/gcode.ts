@@ -6,6 +6,7 @@ import { state } from './state';
 import { log } from './console';
 import { sendCmd } from './connection';
 import { buildToolpathMesh, fitView } from './viewport';
+import { WCS_ENTRIES } from './offsets';
 
 declare const THREE: any;
 
@@ -165,6 +166,33 @@ export function renderProgLimits(): void {
   document.getElementById('limZMin')!.textContent = p.hasZ ? fmt(p.zMin) : dash;
   document.getElementById('limZMax')!.textContent = p.hasZ ? fmt(p.zMax) : dash;
   document.getElementById('limZSpan')!.textContent = p.hasZ ? span(p.zMin, p.zMax) : dash;
+
+  // ── Populate Safe Z reference dropdown ─────────────────────────────────────
+  const sel = document.getElementById('limitsSafeZRef') as HTMLSelectElement | null;
+  if (sel) {
+    const prev = sel.value;
+    sel.innerHTML = '<option value="absolute">ABS</option>';
+    for (const entry of WCS_ENTRIES) {
+      if (entry.code === 'G28' || entry.code === 'G30' || entry.code === 'TLO') continue;
+      const opt = document.createElement('option');
+      opt.value = entry.code;
+      opt.textContent = entry.code;
+      sel.appendChild(opt);
+    }
+    // Restore previous selection if still valid
+    if (prev && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
+  }
+}
+
+// Hard limit: no absolute machine coordinate may exceed -1.
+// Returns list of violating axis names, or empty if all clear.
+function checkAbsoluteBounds(coords: { axis: string; absVal: number }[]): string[] {
+  const BAD_LIMIT = -1;
+  const violations: string[] = [];
+  for (const c of coords) {
+    if (c.absVal > BAD_LIMIT) violations.push(`${c.axis} (${c.absVal.toFixed(3)})`);
+  }
+  return violations;
 }
 
 export function frameProgram(): void {
@@ -172,12 +200,54 @@ export function frameProgram(): void {
   const safeZ = parseFloat((document.getElementById('limitsSafeZ') as HTMLInputElement).value);
   if (isNaN(safeZ)) { log('err', 'Frame: invalid Safe Z value'); return; }
 
+  const ref = (document.getElementById('limitsSafeZRef') as HTMLSelectElement)?.value || 'absolute';
+  const off = state.wcsOffsets[state.activeWcs] || { x: 0, y: 0, z: 0 };
   const { xMin, xMax, yMin, yMax } = state.progLimits;
+
+  // Compute absolute machine coords for all frame corners
+  const absXMin = xMin + off.x;
+  const absXMax = xMax + off.x;
+  const absYMin = yMin + off.y;
+  const absYMax = yMax + off.y;
+
+  // Compute absolute Z for safe height
+  let absSafeZ: number;
+  if (ref === 'absolute') {
+    absSafeZ = safeZ;
+  } else {
+    const refOff = state.wcsOffsets[ref] || { x: 0, y: 0, z: 0 };
+    absSafeZ = safeZ + refOff.z;
+  }
+
+  // Check every coordinate that will be commanded against the -1 limit
+  const violations = checkAbsoluteBounds([
+    { axis: 'X', absVal: absXMax },
+    { axis: 'Y', absVal: absYMax },
+    { axis: 'Z', absVal: absSafeZ },
+  ]);
+
+  if (violations.length) {
+    log('err', `Frame BLOCKED — would exceed -1 in absolute machine space: ${violations.join(', ')}. Adjust WCS or program.`);
+    return;
+  }
+
+  // Build Z command
+  let zCmd: string;
+  if (ref === 'absolute') {
+    zCmd = `G53 G0 Z${safeZ.toFixed(4)}`;
+  } else {
+    const refOff = state.wcsOffsets[ref] || { x: 0, y: 0, z: 0 };
+    const curOff = off;
+    const absZ = safeZ + refOff.z;
+    const workZ = absZ - curOff.z;
+    zCmd = `G0 Z${workZ.toFixed(4)}`;
+  }
+
   const f = (v: number) => v.toFixed(4);
 
-  log('info', `Framing program — X[${xMin.toFixed(3)} → ${xMax.toFixed(3)}] Y[${yMin.toFixed(3)} → ${yMax.toFixed(3)}] SafeZ:${safeZ}`);
+  log('info', `Framing program — X[${xMin.toFixed(3)} → ${xMax.toFixed(3)}] Y[${yMin.toFixed(3)} → ${yMax.toFixed(3)}] SafeZ:${safeZ} (${ref})`);
 
-  sendCmd(`G0 Z${f(safeZ)}`);
+  sendCmd(zCmd);
   sendCmd(`G0 X${f(xMin)} Y${f(yMin)}`);
   sendCmd(`G0 X${f(xMax)} Y${f(yMin)}`);
   sendCmd(`G0 X${f(xMax)} Y${f(yMax)}`);

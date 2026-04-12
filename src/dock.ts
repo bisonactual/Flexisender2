@@ -402,6 +402,7 @@ function findLeafNode(node: DockNode, moduleId: string): DockLeafNode | null {
 
 function dockSave(): void {
   try {
+    lsSet('fs-dock-tree', { root: _root });
   } catch (_) {}
 }
 

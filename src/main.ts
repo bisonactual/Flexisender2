@@ -41,6 +41,7 @@ export function switchTab(tab: string): void {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab)!.classList.add('active');
   document.getElementById('tabpanel-' + tab)!.classList.add('active');
+  try { lsSet('fs-active-tab', tab); } catch (_) {}
   if (tab === 'settings' && !state.settingsLoaded && state.connected) loadSettings();
   if (tab === 'camera' && !state._camTabInited) { state._camTabInited = true; initCameraTab(); }
   if (tab === 'probing' && !state._probingTabInited) { state._probingTabInited = true; initProbingTab(); }
@@ -424,6 +425,9 @@ updateRunButtons();
 
 window.addEventListener('load', () => {
   modInitPositions();
+  // Restore last active tab
+  const savedTab = lsGet<string>('fs-active-tab', '');
+  if (savedTab) { try { switchTab(savedTab); } catch (_) {} }
   const mainEl = document.querySelector('.viewport-wrap') as HTMLElement;
   if (mainEl) initDock(mainEl);
   try { if (lsGet('fs-mod-locked', false)) toggleModLock(); } catch (_) {}
