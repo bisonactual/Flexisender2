@@ -2,6 +2,8 @@
 
 A browser-based GrblHAL sender with a live 3D toolpath visualizer, built as a single self-contained HTML file. No installation, no server, no dependencies — open it and connect.
 
+Based on the original flexisender from [Expatria](https://github.com/Expatria-Technologies)
+
 [FlexiSender](https://expatria-technologies.github.io/FlexiSender/flexisender.html)
 
 ![FlexiSender screenshot](screenshot.png)
