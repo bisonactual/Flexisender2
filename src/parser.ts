@@ -10,6 +10,7 @@ import { updateExecutedPath, toolGroup } from './viewport';
 import { settingsIntercept, tryInterceptValue, onSettingWriteOk, onSettingWriteErr, tryParseSettingLine } from './settings';
 import { toolTableIntercept, renderToolTable, renderModTT } from './tooltable';
 import { bearCheckPlugin, bearIntercept, bearParseStatus } from './bear';
+import { ezCheckPlugin, ezIntercept, ezParseStatus } from './exclusion-zones';
 import { emit, type StatusReport } from './bus';
 import { offsetsIntercept, offsetsInterceptOk } from './offsets';
 
@@ -31,6 +32,8 @@ export function parseResponse(raw: string): void {
   if (state.ttPhase === 'loading' && toolTableIntercept(raw)) return;
 
   if (bearIntercept(raw)) return;
+
+  if (ezIntercept(raw)) return;
 
   // Offset intercept — handles $# responses and live [G54:] etc. updates
   // Always active (not phase-gated) so live updates work mid-session
@@ -83,6 +86,7 @@ export function parseResponse(raw: string): void {
 
   if (raw.startsWith('[') || raw.startsWith('Grbl') || raw.startsWith('GrblHAL') || raw.startsWith('>')) {
     bearCheckPlugin(raw);
+    ezCheckPlugin(raw);
     log('info', raw); return;
   }
   log('rx', raw);
@@ -169,6 +173,12 @@ function parseStatus(s: string): void {
       report.bear = vals[0] || '';
       tags.add('bear');
       bearParseStatus(report.bear);
+    }
+    if (key === 'EZ') {
+      report.bear = vals[0] || '';
+      tags.add('bear');
+      bearParseStatus(report.bear);
+      ezParseStatus(report.bear);
     }
   }
   if (!hasPn) { report.pins = ''; tags.add('pins'); }

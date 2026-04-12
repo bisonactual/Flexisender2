@@ -30,8 +30,9 @@ import { initCameraTab, selectCamera, startCamera, stopCamera, measureOffset, go
 import { kbdPress, kbdBackspace, kbdClear, kbdSend, toggleTouchKeyboard } from './keyboard';
 import { toggleModule, setModSize, setConsoleLines, modInitPositions, toggleModLock, modDragStart, modTouchStart, initModDragListeners, toggleGroup, toggleGroupCollapse } from './modules';
 import { initDock, dockModule, undockModule, isDockingEnabled, setDockingEnabled } from './dock';
-import { optSetConnMode, optSaveConnSettings, optLoadConnSettings, optLoadColors, optLoadTabLocks, optBuildTabLockList, initToolbarOptions, saveTbOpt, optApplyColor, optHexChange, optResetColor, optResetAllColors, optSaveJogSteps, optLoadJogSteps, optApplyJogSteps, optApplyJogShowUnits, optLoadJogShowUnits, optSaveBearColors, optLoadBearColors } from './options';
+import { optSetConnMode, optSaveConnSettings, optLoadConnSettings, optLoadColors, optLoadTabLocks, optBuildTabLockList, initToolbarOptions, saveTbOpt, optApplyColor, optHexChange, optResetColor, optResetAllColors, optSaveJogSteps, optLoadJogSteps, optApplyJogSteps, optApplyJogShowUnits, optLoadJogShowUnits, optSaveBearColors, optLoadBearColors, optBuildTabVisList, optLoadTabVis } from './options';
 import { bearRefresh, bearCheckPlugin, bearIntercept, bearParseStatus, bearShowAddForm, bearEditZone, bearSaveZone, bearDeleteZone, bearCancelEdit } from './bear';
+import { initExclusionZonesTab, ezRefresh, renderEzTab, renderEzModule } from './exclusion-zones';
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
 export function switchTab(tab: string): void {
@@ -45,6 +46,7 @@ export function switchTab(tab: string): void {
   if (tab === 'probing' && !state._probingTabInited) { state._probingTabInited = true; initProbingTab(); }
   if (tab === 'tooltable') loadToolTable();
   if (tab === 'offsets') loadOffsets();
+  if (tab === 'exclusions') renderEzTab();
 }
 
 // ── Expose to window for HTML onclick handlers ────────────────────────────────
@@ -447,6 +449,9 @@ window.addEventListener('load', () => {
   optApplyJogSteps();
   optLoadJogShowUnits();
   optLoadBearColors();
+  optBuildTabVisList();
+  optLoadTabVis();
+  initExclusionZonesTab();
   // Restore auto-load settings toggle
   try { const al = document.getElementById('optAutoLoadSettings') as HTMLInputElement; if (al) al.checked = lsGet('fs-opt-autoload-settings', false); } catch (_) {}
   // Sync projection toggle

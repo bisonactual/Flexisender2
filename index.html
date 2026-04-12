@@ -78,6 +78,7 @@
   <button class="tab-btn" id="tab-tooltable" data-tab="tooltable">TOOL TABLE</button>
   <button class="tab-btn" id="tab-offsets" data-tab="offsets">OFFSETS</button>
   <button class="tab-btn" id="tab-probing" data-tab="probing">PROBING</button>
+  <button class="tab-btn" id="tab-exclusions" data-tab="exclusions">EXCLUSION ZONES</button>
   <button class="tab-btn" id="tab-modules" data-tab="modules">MODULES</button>
   <button class="tab-btn" id="tab-options" data-tab="options">⚙ OPTIONS</button>
   <button class="mod-lock-btn" id="modLockBtn" title="Lock / unlock module positions">
@@ -374,20 +375,19 @@
     </div>
   </div>
 
-  <!-- ═══ MODULE: MR BEAR DO NOT TOUCH ═══ -->
-  <div class="module-card mod-hidden" id="mod-bear" data-mod-size="normal" style="top:10px;left:594px">
-    <div class="module-drag-handle"
-        
-        >
+  <!-- ═══ MODULE: EXCLUSION ZONES ═══ -->
+  <div class="module-card mod-hidden" id="mod-exclusionzones" data-mod-size="normal" style="top:10px;left:594px">
+    <div class="module-drag-handle">
       <span class="module-drag-dots">⠿⠿</span>
-      <span class="module-drag-title">🐻 MR BEAR</span>
+      <span class="module-drag-title">🔒 Exclusion Zones</span>
       <div style="display:flex;gap:5px;align-items:center">
-        <span class="bear-status-badge" id="bearStatusBadge">🐻 OFF</span>
-        <button class="tb-btn" style="font-size:10px;padding:2px 8px">↻</button>
+        <span class="bear-status-badge" id="ezModStatusBadge">🔒 OFF</span>
+        <button class="tb-btn" style="font-size:9px;padding:1px 5px" id="ezModLabelToggle">LABELS ON</button>
+        <button class="tb-btn" style="font-size:10px;padding:2px 8px" id="ezModRefreshBtn">↻</button>
       </div>
       <button class="module-drag-close">✕</button>
     </div>
-    <div class="module-body" id="bearModBody" style="padding:0">
+    <div class="module-body" id="ezModBody" style="padding:0">
     </div>
   </div>
 
@@ -695,14 +695,14 @@
       </div>
       <div class="mod-group-body">
 
-        <div class="mod-toggle-card" id="modcfg-bear" data-module-id="bear" style="display:none">
-          <div class="mod-toggle-icon">🐻</div>
+        <div class="mod-toggle-card" id="modcfg-exclusionzones" data-module-id="exclusionzones">
+          <div class="mod-toggle-icon">🔒</div>
           <div class="mod-toggle-info">
             <div style="display:flex;align-items:center;gap:10px">
-              <div class="mod-toggle-name" style="flex:1">MR BEAR DO NOT TOUCH</div>
+              <div class="mod-toggle-name" style="flex:1">Exclusion Zones</div>
               <div class="mod-switch"></div>
             </div>
-            <div class="mod-toggle-desc">Zone management for the MR BEAR plugin. Shows exclusion zones in a table and visualizes them as red boxes on the 3D viewport.</div>
+            <div class="mod-toggle-desc">Zone management for the Exclusion Zones plugin. Shows zones in a compact table with status badge and quick edit/delete.</div>
             <div class="mod-size-row">
               <button class="mod-size-btn active">Normal</button>
               <button class="mod-size-btn">Large</button>
@@ -1246,6 +1246,18 @@
         </div>
       </div>
 
+      <!-- ── TAB VISIBILITY ── -->
+      <div class="options-card">
+        <div class="options-card-icon">👁</div>
+        <div class="options-card-body">
+          <div class="options-card-title">Tab Visibility</div>
+          <div class="options-card-desc">Choose which tabs appear in the tab bar. RUN and OPTIONS are always shown.</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;" id="optTabVisList">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </div>
+
       <!-- ── TAB ACCESS CONTROL ── -->
       <div class="options-card">
         <div class="options-card-icon">🔒</div>
@@ -1261,6 +1273,50 @@
     </div>
   </div>
 </div><!-- /tab-panel-options -->
+
+<!-- TAB: EXCLUSION ZONES -->
+<div class="tab-panel" id="tabpanel-exclusions" style="flex-direction:column;overflow:hidden;background:var(--bg);">
+  <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;">
+    <span style="font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);">EXCLUSION ZONES</span>
+    <span class="bear-status-badge" id="ezTabStatusBadge" style="font-size:10px">—</span>
+    <div style="flex:1"></div>
+    <button class="tb-btn" id="ezTabToggleBtn" title="Toggle exclusion zones on/off">ENABLE</button>
+    <button class="tb-btn" id="ezTabLabelToggle" title="Toggle 3D labels">LABELS ON</button>
+    <button class="tb-btn primary" id="ezTabRefreshBtn">↻ REFRESH</button>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px;">
+    <div id="ezTabContent">
+      <div style="text-align:center;padding:40px;color:var(--text3);font-family:var(--cond);font-size:12px;letter-spacing:1px;text-transform:uppercase">
+        Connect and click ↻ REFRESH to load zones
+      </div>
+    </div>
+    <!-- Edit form for tab view -->
+    <div id="ezTabEditForm" style="display:none;margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);">
+      <div style="font-family:var(--cond);font-size:11px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:10px" id="ezTabFormTitle">NEW ZONE</div>
+      <div id="ezTabSlotRow" style="display:none">
+        <input id="ezTabSlot" type="hidden" value="0">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;font-family:var(--mono);font-size:12px;">
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--text3);width:16px;font-weight:700">X</span><input id="ezTabXMin" type="number" step="0.01" value="0" class="limits-safe-input" style="flex:1" placeholder="min"><span style="color:var(--text3)">—</span><input id="ezTabXMax" type="number" step="0.01" value="0" class="limits-safe-input" style="flex:1" placeholder="max"></div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--text3);width:16px;font-weight:700">Y</span><input id="ezTabYMin" type="number" step="0.01" value="0" class="limits-safe-input" style="flex:1" placeholder="min"><span style="color:var(--text3)">—</span><input id="ezTabYMax" type="number" step="0.01" value="0" class="limits-safe-input" style="flex:1" placeholder="max"></div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--text3);width:16px;font-weight:700">Z</span><input id="ezTabZMin" type="number" step="0.01" value="0" class="limits-safe-input" style="flex:1" placeholder="min"><span style="color:var(--text3)">—</span><input id="ezTabZMax" type="number" step="0.01" value="0" class="limits-safe-input" style="flex:1" placeholder="max"></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;">
+        <label style="display:flex;align-items:center;gap:4px;font-family:var(--cond);font-size:11px;color:var(--text2);cursor:pointer"><input type="checkbox" id="ezTabFlagEn" checked> Enabled</label>
+        <label style="display:flex;align-items:center;gap:4px;font-family:var(--cond);font-size:11px;color:var(--text2);cursor:pointer"><input type="checkbox" id="ezTabFlagGcode"> Allow G-code</label>
+        <label style="display:flex;align-items:center;gap:4px;font-family:var(--cond);font-size:11px;color:var(--text2);cursor:pointer"><input type="checkbox" id="ezTabFlagJog"> Allow Jog</label>
+        <label style="display:flex;align-items:center;gap:4px;font-family:var(--cond);font-size:11px;color:var(--text2);cursor:pointer"><input type="checkbox" id="ezTabFlagTool"> Allow Tool Chg</label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="tb-btn primary" id="ezTabSaveBtn">SAVE</button>
+        <button class="tb-btn" id="ezTabCancelBtn">CANCEL</button>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="tb-btn success" id="ezTabAddBtn" style="font-size:11px;padding:8px 16px">+ ADD ZONE</button>
+    </div>
+  </div>
+</div>
 
 <!-- TAB: TOOL TABLE -->
 <div class="tab-panel" id="tabpanel-tooltable" style="flex-direction:column;overflow:hidden;background:var(--bg);">

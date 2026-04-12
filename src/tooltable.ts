@@ -124,6 +124,24 @@ export function loadToolTable(): void {
     renderModTT();
     return;
   }
+
+  // Already loading — don't re-fire
+  if (state.ttPhase === 'loading') return;
+
+  // If other commands are still in flight (e.g. $I+, settings, offsets),
+  // defer until the queue drains so responses don't get interleaved.
+  if (state.sentQueue.length > 0 || state.esPhase !== 'idle') {
+    ttSetStatus('Waiting for pending commands…');
+    if (tabBtn) tabBtn.disabled = true;
+    if (modBtn) modBtn.disabled = true;
+    setTimeout(() => {
+      if (tabBtn) tabBtn.disabled = false;
+      if (modBtn) modBtn.disabled = false;
+      loadToolTable();
+    }, 400);
+    return;
+  }
+
   ttSetStatus('Loading tool table…');
   state.ttEntries = [];
   state._ttLines = [];

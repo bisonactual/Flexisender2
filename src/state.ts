@@ -192,6 +192,7 @@ export const MOD_DEFAULTS: Record<string, { x: number; y: number; enabled: boole
   limits:    { x: 302, y: 10,  enabled: false, size: 'normal' },
   signals:   { x: 594, y: 10,  enabled: false, size: 'normal' },
   bear:      { x: 594, y: 10,  enabled: false, size: 'normal' },
+  exclusionzones: { x: 594, y: 10, enabled: false, size: 'normal' },
   surfacing: { x: 10,  y: 10,  enabled: false, size: 'normal' },
   toollength:   { x: 886, y: 10,  enabled: false, size: 'normal' },
   edgefinder:   { x: 10,  y: 10,  enabled: false, size: 'normal' },
@@ -209,7 +210,7 @@ export const MODULE_DEFS = [
   { id: 'tooltable', icon: '🔩', name: 'Tool Table' },
   { id: 'limits',    icon: '📐', name: 'Program Limits' },
   { id: 'signals',   icon: '🔴', name: 'Signals' },
-  { id: 'bear',      icon: '🐻', name: 'MR BEAR' },
+  { id: 'exclusionzones', icon: '🔒', name: 'Exclusion Zones' },
   { id: 'surfacing',    icon: '🪚', name: 'Surfacing' },
   { id: 'toollength',   icon: '⊕', name: 'Tool Length' },
   { id: 'edgefinder',   icon: '◈', name: 'Edge Finder' },
@@ -222,7 +223,7 @@ export const MODULE_GROUPS = [
   { id: 'debug',     name: 'Debug',                         modules: ['console', 'signals'] },
   { id: 'toolcoord', name: 'Tool and Coordinate Control',   modules: ['tooltable', 'toollength'] },
   { id: 'probing',   name: 'Probing',                       modules: ['toollength', 'edgefinder', 'centerfinder', 'rotation'] },
-  { id: 'exclusion', name: 'Exclusion Zones',               modules: ['bear'] },
+  { id: 'exclusion', name: 'Exclusion Zones',               modules: ['exclusionzones'] },
   { id: 'tools',     name: 'Tools',                         modules: ['surfacing'] },
 ];
 
@@ -258,6 +259,17 @@ export const OPT_COLOR_CSS_VARS: Record<string, string> = {
 export const OPT_LOCKABLE_TABS = [
   { id: 'settings', label: 'SETTINGS: GRBL' },
   { id: 'tooltable', label: 'TOOL TABLE' },
+];
+
+// Tabs that can be shown/hidden. 'run' and 'options' are always visible.
+export const OPT_HIDEABLE_TABS = [
+  { id: 'settings',   label: 'SETTINGS: GRBL' },
+  { id: 'camera',     label: 'CAMERA' },
+  { id: 'tooltable',  label: 'TOOL TABLE' },
+  { id: 'offsets',    label: 'OFFSETS' },
+  { id: 'probing',    label: 'PROBING' },
+  { id: 'exclusions', label: 'EXCLUSION ZONES' },
+  { id: 'modules',    label: 'MODULES' },
 ];
 
 export const TB_BTN_DEFAULTS: Record<string, boolean> = {

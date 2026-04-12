@@ -2,7 +2,7 @@
 // Options — connection, colours, tab locks, toolbar
 // ═══════════════════════════════════════════════
 
-import { state, OPT_COLOR_DEFAULTS, OPT_COLOR_CSS_VARS, OPT_LOCKABLE_TABS, TB_BTN_DEFAULTS } from './state';
+import { state, OPT_COLOR_DEFAULTS, OPT_COLOR_CSS_VARS, OPT_LOCKABLE_TABS, OPT_HIDEABLE_TABS, TB_BTN_DEFAULTS } from './state';
 import { lsGet, lsSet } from './ui';
 import { log } from './console';
 import { rebuildSteps, updateFeedSliderMax } from './modules/jog';
@@ -294,4 +294,46 @@ export function optGetBearColor(flags: number): string {
   if (blocksJog) return (document.getElementById('optBearColorJog') as HTMLInputElement)?.value || '#ffcc00';
   if (blocksTool) return (document.getElementById('optBearColorTool') as HTMLInputElement)?.value || '#cc44ff';
   return (document.getElementById('optBearColorAll') as HTMLInputElement)?.value || '#ff2222';
+}
+
+// ── Tab visibility ────────────────────────────────────────────────────────────
+
+export function optBuildTabVisList(): void {
+  const container = document.getElementById('optTabVisList');
+  if (!container) return;
+  container.innerHTML = '';
+  const stored = lsGet<Record<string, boolean>>('fs-opt-tabvis', {});
+  OPT_HIDEABLE_TABS.forEach(t => {
+    const visible = stored[t.id] !== false; // default visible
+    const label = document.createElement('label');
+    label.className = 'tb-opt-toggle';
+    label.style.padding = '8px 14px';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = visible;
+    cb.addEventListener('change', () => optToggleTabVis(t.id, cb.checked));
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' ' + t.label));
+    container.appendChild(label);
+  });
+}
+
+function optToggleTabVis(tabId: string, visible: boolean): void {
+  const stored = lsGet<Record<string, boolean>>('fs-opt-tabvis', {});
+  stored[tabId] = visible;
+  lsSet('fs-opt-tabvis', stored);
+  optApplyTabVis();
+}
+
+export function optApplyTabVis(): void {
+  const stored = lsGet<Record<string, boolean>>('fs-opt-tabvis', {});
+  OPT_HIDEABLE_TABS.forEach(t => {
+    const visible = stored[t.id] !== false;
+    const btn = document.getElementById('tab-' + t.id);
+    if (btn) btn.style.display = visible ? '' : 'none';
+  });
+}
+
+export function optLoadTabVis(): void {
+  optApplyTabVis();
 }
