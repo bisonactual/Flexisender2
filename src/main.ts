@@ -32,7 +32,7 @@ import { toggleModule, setModSize, setConsoleLines, modInitPositions, toggleModL
 import { initDock, dockModule, undockModule, isDockingEnabled, setDockingEnabled } from './dock';
 import { optSetConnMode, optSaveConnSettings, optLoadConnSettings, optLoadColors, optLoadTabLocks, optBuildTabLockList, initToolbarOptions, saveTbOpt, optApplyColor, optHexChange, optResetColor, optResetAllColors, optSaveJogSteps, optLoadJogSteps, optApplyJogSteps, optApplyJogShowUnits, optLoadJogShowUnits, optSaveBearColors, optLoadBearColors, optBuildTabVisList, optLoadTabVis } from './options';
 import { bearRefresh, bearCheckPlugin, bearIntercept, bearParseStatus, bearShowAddForm, bearEditZone, bearSaveZone, bearDeleteZone, bearCancelEdit } from './bear';
-import { initExclusionZonesTab, ezRefresh, renderEzTab, renderEzModule } from './exclusion-zones';
+import { initExclusionZonesTab, ezRefresh, renderEzTab, renderEzModule, rebuildZoneMeshes } from './exclusion-zones';
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
 export function switchTab(tab: string): void {
@@ -158,15 +158,15 @@ function initChunk3Events(): void {
     if (cb) cb.addEventListener('change', () => saveTbOpt(cb));
   });
 
-  // Options — bear colours
+  // Options — exclusion zone colours
   ['optBearColorAll', 'optBearColorGcode', 'optBearColorJog', 'optBearColorTool', 'optBearColorSafe'].forEach(id => {
-    on(id, 'input', () => optSaveBearColors());
+    on(id, 'input', () => { optSaveBearColors(); rebuildZoneMeshes(); });
     // Swatch click
     const picker = document.getElementById(id);
     const swatch = picker?.nextElementSibling as HTMLElement | null;
     if (swatch) swatch.addEventListener('click', () => (document.getElementById(id) as HTMLInputElement).click());
   });
-  on('optBearScale', 'input', () => { optSaveBearColors(); document.getElementById('optBearScaleVal')!.textContent = parseFloat((document.getElementById('optBearScale') as HTMLInputElement).value).toFixed(3); });
+  on('optBearScale', 'input', () => { optSaveBearColors(); rebuildZoneMeshes(); document.getElementById('optBearScaleVal')!.textContent = parseFloat((document.getElementById('optBearScale') as HTMLInputElement).value).toFixed(3); });
 
   // Options — jog steps
   on('optJogStepsXY', 'input', () => optSaveJogSteps());

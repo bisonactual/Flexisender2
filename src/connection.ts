@@ -8,6 +8,7 @@ import { log } from './console';
 import { parseResponse } from './parser';
 import { updateRunButtons } from './streaming';
 import { renderProgLimits } from './gcode';
+import { ezResetPluginState, renderEzTab, renderEzModule } from './exclusion-zones';
 
 // ── Poll rate ─────────────────────────────────────────────────────────────────
 export function setPollRate(ms: number): void {
@@ -166,6 +167,9 @@ function onClose(): void {
   state.tloActive = false;
   state.wcsPhase = 'idle';
   try { import('./offsets').then(o => o.renderOffsetsTable()); } catch (_) {}
+  ezResetPluginState();
+  renderEzTab();
+  renderEzModule();
 }
 
 // ── Send helpers ──────────────────────────────────────────────────────────────

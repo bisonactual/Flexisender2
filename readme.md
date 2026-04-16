@@ -159,7 +159,7 @@ Application-wide settings, all persisted to localStorage:
 - **Colour Theme** — customise UI colours (text, background, surface, accent, tab bar) and viewport toolpath colours (cut, rapid, executed, tool marker). Ruler coordinate mode (machine vs work)
 - **Toolbar Button Visibility** — show/hide individual toolbar buttons per row
 - **Jog Step Sizes** — configure XY and Z step presets (comma-separated mm values) and max feed rates
-- **Bear Zone Colours** — colour-code exclusion zone boxes by what they block, plus icon scale slider
+- **🐻 Exclusion Zone Colours** — colour-code exclusion zone boxes by what they block, plus icon scale slider
 - **Tab Visibility** — show/hide tabs in the tab bar (RUN and OPTIONS are always visible)
 - **Tab Access Control** — lock tabs to prevent accidental access (useful for shared machines)
 

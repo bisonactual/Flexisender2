@@ -35,6 +35,20 @@ let _showLabels = true;
 export function ezPluginDetected(): boolean { return _ezPluginDetected; }
 export function ezZones(): EzZone[] { return _ezZones; }
 export function ezGlobalEnabled(): boolean { return _ezGlobalEnabled; }
+export function atciDetected(): boolean { return _atciDetected; }
+
+/** Reset plugin-detection flags on disconnect so stale state doesn't persist. */
+export function ezResetPluginState(): void {
+  _atciDetected = false;
+  _ezPluginDetected = false;
+  _ezGlobalEnabled = false;
+  _ezZones = [];
+  _insideZone = false;
+  // Clear stale ATCI travel limits so they don't persist across connections
+  delete state.settingsValues[130];
+  delete state.settingsValues[131];
+  delete state.settingsValues[132];
+}
 
 // ── Flags ─────────────────────────────────────────────────────────────────────
 
@@ -95,7 +109,11 @@ export function ezCheckPlugin(line: string): void {
     log('info', '🔧 ATCi plugin detected');
     const notice = document.getElementById('ezPluginNotice');
     if (notice) notice.style.display = 'none';
-    setTimeout(() => { sendCmd('$130'); sendCmd('$131'); sendCmd('$132'); }, 500);
+    setTimeout(() => {
+      sendCmd('$130'); sendCmd('$131'); sendCmd('$132');
+      // Re-render after responses arrive so the ATCI row appears with fresh values
+      setTimeout(() => { renderEzTab(); renderEzModule(); }, 600);
+    }, 500);
   }
 }
 
@@ -137,15 +155,15 @@ export function ezParseStatus(field: string): void {
   _insideZone = field.includes('Z');
   let text: string, cls: string;
   if (!_ezGlobalEnabled) {
-    text = '🔒 OFF'; cls = 'bear-status-badge';
+    text = '🔒 OFF'; cls = 'ez-status-badge';
   } else if (_insideZone) {
     if (isInsideBlockingZone()) {
-      text = '🔒 IN ZONE'; cls = 'bear-status-badge in-zone';
+      text = '🔒 IN ZONE'; cls = 'ez-status-badge in-zone';
     } else {
-      text = '🔒 APPROACHING'; cls = 'bear-status-badge in-zone';
+      text = '🔒 APPROACHING'; cls = 'ez-status-badge in-zone';
     }
   } else {
-    text = '🔒 ACTIVE'; cls = 'bear-status-badge active';
+    text = '🔒 ACTIVE'; cls = 'ez-status-badge active';
   }
   for (const id of ['ezTabStatusBadge', 'ezModStatusBadge']) {
     const el = document.getElementById(id);
@@ -160,7 +178,11 @@ export function ezParseStatus(field: string): void {
 export function ezRefresh(): void {
   if (!state.connected) { log('err', 'Not connected'); return; }
   if (_ezPluginDetected) { _ezLoading = true; _ezLoadLines = []; sendCmd('$ZONE'); }
-  if (_atciDetected) { sendCmd('$130'); sendCmd('$131'); sendCmd('$132'); }
+  if (_atciDetected) {
+    sendCmd('$130'); sendCmd('$131'); sendCmd('$132');
+    // Re-render after ATCI setting responses arrive so coordinates update
+    setTimeout(() => { renderEzTab(); renderEzModule(); rebuildZoneMeshes(); }, 600);
+  }
   renderEzTab(); renderEzModule();
 }
 
@@ -261,7 +283,7 @@ export function renderEzModule(): void {
   const body = document.getElementById('ezModBody');
   if (!body) return;
   const mb = document.getElementById('ezModStatusBadge');
-  if (mb) { mb.textContent = _ezPluginDetected ? (_ezGlobalEnabled ? '🔒 ACTIVE' : '🔒 OFF') : '🔒 —'; mb.className = 'bear-status-badge' + (_ezGlobalEnabled ? ' active' : ''); }
+  if (mb) { mb.textContent = _ezPluginDetected ? (_ezGlobalEnabled ? '🔒 ACTIVE' : '🔒 OFF') : '🔒 —'; mb.className = 'ez-status-badge' + (_ezGlobalEnabled ? ' active' : ''); }
   ensureModFormExists(body);
   const tw = document.getElementById('ezModTableWrap');
   if (!tw) return;
@@ -379,7 +401,7 @@ export function ezCancelEdit(): void { const f = document.getElementById('ezTabE
 
 // ── 3D zone visualization ─────────────────────────────────────────────────────
 
-function rebuildZoneMeshes(): void {
+export function rebuildZoneMeshes(): void {
   for (const m of _zoneMeshes) { scene.remove(m); if (m.geometry) m.geometry.dispose(); if (m.material) m.material.dispose(); }
   _zoneMeshes = []; _zoneSprites = [];
 

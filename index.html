@@ -383,7 +383,7 @@
       <span class="module-drag-dots">⠿⠿</span>
       <span class="module-drag-title">🔒 Exclusion Zones</span>
       <div style="display:flex;gap:5px;align-items:center">
-        <span class="bear-status-badge" id="ezModStatusBadge">🔒 OFF</span>
+        <span class="ez-status-badge" id="ezModStatusBadge">🔒 OFF</span>
         <button class="tb-btn" style="font-size:9px;padding:1px 5px" id="ezModLabelToggle">LABELS ON</button>
         <button class="tb-btn" style="font-size:10px;padding:2px 8px" id="ezModRefreshBtn">↻</button>
       </div>
@@ -1109,12 +1109,12 @@
 
       <!-- ── JOG STEP SIZES ── -->
 
-      <!-- ── BEAR ZONE COLOURS ── -->
+      <!-- ── EXCLUSION ZONE COLOURS ── -->
       <div class="options-card">
         <div class="options-card-icon">🐻</div>
         <div class="options-card-body">
-          <div class="options-card-title">Bear Zone Colours</div>
-          <div class="options-card-desc">Colours for zone boxes in the 3D viewport based on what the zone blocks. Applied on next zone refresh.</div>
+          <div class="options-card-title">Exclusion Zone Colours</div>
+          <div class="options-card-desc">Colours for exclusion zone boxes in the 3D viewport based on what the zone blocks.</div>
           <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
             <div class="opt-color-row">
               <span class="opt-color-label">Blocks All</span>
@@ -1227,7 +1227,7 @@
 <div class="tab-panel" id="tabpanel-exclusions" style="flex-direction:column;overflow:hidden;background:var(--bg);">
   <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;">
     <span style="font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);">EXCLUSION ZONES</span>
-    <span class="bear-status-badge" id="ezTabStatusBadge" style="font-size:10px">—</span>
+    <span class="ez-status-badge" id="ezTabStatusBadge" style="font-size:10px">—</span>
     <div style="flex:1"></div>
     <button class="tb-btn" id="ezTabToggleBtn" title="Toggle exclusion zones on/off">ENABLE</button>
     <button class="tb-btn" id="ezTabLabelToggle" title="Toggle 3D labels">LABELS ON</button>

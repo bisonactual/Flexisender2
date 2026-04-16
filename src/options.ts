@@ -253,7 +253,7 @@ export function optLoadJogShowUnits(): void {
   document.body.classList.toggle('jog-show-units', show);
 }
 
-// ── Bear zone colours ─────────────────────────────────────────────────────────
+// ── Exclusion zone colours ─────────────────────────────────────────────────────
 const BEAR_COLOR_IDS = ['optBearColorAll', 'optBearColorGcode', 'optBearColorJog', 'optBearColorTool', 'optBearColorSafe'];
 
 export function optSaveBearColors(): void {

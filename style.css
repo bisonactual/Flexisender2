@@ -906,14 +906,14 @@
   }
   .con-param-hint.visible { display: block; }
 
-  /* ── MR BEAR ──────────────────────────────────────────────────────────── */
-  .bear-status-badge {
+  /* ── EXCLUSION ZONES ─────────────────────────────────────────────────── */
+  .ez-status-badge {
     font-family: var(--cond); font-weight: 700; font-size: 10px; letter-spacing: 0.5px;
     padding: 2px 8px; border-radius: 10px; white-space: nowrap;
     background: var(--surface3); color: var(--text3); border: 1px solid var(--border2);
   }
-  .bear-status-badge.active { background: rgba(34,197,94,0.15); color: var(--green); border-color: var(--green2); }
-  .bear-status-badge.in-zone { background: rgba(239,68,68,0.2); color: var(--red); border-color: var(--red2); animation: pulse 0.8s infinite; }
+  .ez-status-badge.active { background: rgba(34,197,94,0.15); color: var(--green); border-color: var(--green2); }
+  .ez-status-badge.in-zone { background: rgba(239,68,68,0.2); color: var(--red); border-color: var(--red2); animation: pulse 0.8s infinite; }
 
   /* ── DOCK SYSTEM ──────────────────────────────────────────────────────── */
   .dock-node { position: relative; }

@@ -123,6 +123,8 @@ export function loadToolTable(): void {
     empty.style.display = 'flex';
     empty.querySelector('div:last-child')!.textContent = 'Connect to a controller and click Refresh.';
     document.getElementById('ttToolCount')!.textContent = '';
+    const notice = document.getElementById('ttPluginNotice');
+    if (notice) notice.style.display = '';
     renderModTT();
     return;
   }
