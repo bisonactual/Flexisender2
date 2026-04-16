@@ -160,7 +160,7 @@ function initChunk3Events(): void {
 
   // Options — exclusion zone colours
   ['optBearColorAll', 'optBearColorGcode', 'optBearColorJog', 'optBearColorTool', 'optBearColorSafe'].forEach(id => {
-    on(id, 'input', () => { optSaveBearColors(); rebuildZoneMeshes(); });
+    on(id, 'input', () => { optSaveBearColors(); rebuildZoneMeshes(); const p = document.getElementById(id) as HTMLInputElement; const s = p?.nextElementSibling as HTMLElement; if (s) s.style.background = p.value; });
     // Swatch click
     const picker = document.getElementById(id);
     const swatch = picker?.nextElementSibling as HTMLElement | null;
