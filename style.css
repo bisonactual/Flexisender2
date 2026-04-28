@@ -757,6 +757,10 @@
   .tab-btn.tab-locked::after { content: ' 🔒'; font-size: 9px; }
 
   /* PROGRAM LIMITS MODULE */
+  .limits-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 8px; }
+  .limits-tab { background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); font-family: var(--cond); font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; cursor: pointer; transition: all 0.15s; }
+  .limits-tab:hover { border-color: var(--accent); color: var(--text); }
+  .limits-tab.active { background: rgba(255,140,66,0.16); border-color: var(--accent); color: var(--accent); }
   .limits-table { width: 100%; border-collapse: collapse; }
   .limits-axis-label { font-family: var(--cond); font-weight: 900; font-size: 15px; color: var(--text3); width: 22px; padding: 5px 6px 5px 2px; }
   .limits-col-hdr { font-family: var(--cond); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); text-align: right; padding: 0 6px 4px; }

@@ -10,6 +10,11 @@ import { WCS_ENTRIES } from './offsets';
 
 declare const THREE: any;
 
+const WCS_CODES: Record<string, string> = {
+  '54': 'G54', '55': 'G55', '56': 'G56', '57': 'G57', '58': 'G58', '59': 'G59',
+  '59.1': 'G59.1', '59.2': 'G59.2', '59.3': 'G59.3',
+};
+
 export function parseGcodeToToolpath(lines: string[]): { segments: any[]; cutCount: number; rapidCount: number } {
   const segments: any[] = [];
   let x = 0, y = 0, z = 0;
@@ -17,7 +22,6 @@ export function parseGcodeToToolpath(lines: string[]): { segments: any[]; cutCou
   let cutCount = 0, rapidCount = 0;
 
   // WCS tracking — map G-code work coords to machine coords
-  const WCS_CODES: Record<number, string> = { 54: 'G54', 55: 'G55', 56: 'G56', 57: 'G57', 58: 'G58', 59: 'G59' };
   let activeWcs = state.activeWcs || 'G54';
 
   function wcsOffset(): { x: number; y: number; z: number } {
@@ -30,15 +34,20 @@ export function parseGcodeToToolpath(lines: string[]): { segments: any[]; cutCou
     if (!line) continue;
 
     const words: Record<string, number> = {};
+    const gWords: number[] = [];
     const re = /([A-Z])([+-]?[\d.]+)/g;
     let m;
-    while ((m = re.exec(line)) !== null) words[m[1]] = parseFloat(m[2]);
+    while ((m = re.exec(line)) !== null) {
+      const code = m[1].toUpperCase();
+      const val = parseFloat(m[2]);
+      if (code === 'G') gWords.push(val);
+      else words[code] = val;
+    }
 
-    // Check for WCS change (G54-G59)
-    if ('G' in words) {
-      const g = words['G'];
+    for (const g of gWords) {
       if (g === 0 || g === 1 || g === 2 || g === 3) modal.motion = g;
-      if (WCS_CODES[g]) activeWcs = WCS_CODES[g];
+      const wcs = WCS_CODES[String(g)];
+      if (wcs) activeWcs = wcs;
     }
 
     const hasMove = 'X' in words || 'Y' in words || 'Z' in words;
@@ -73,6 +82,20 @@ export function processGcode(text: string, name: string): void {
   document.getElementById('fileName')!.textContent = name;
   updateProgress(0, state.gcodeLines.length);
 
+  refreshLoadedProgramPreview();
+  log('info', 'Loaded: ' + name + ' (' + state.gcodeLines.length + ' lines, ' + state.totalMoves + ' cuts, ' + state.totalRapids + ' rapids)');
+}
+
+export function refreshLoadedProgramPreview(): void {
+  if (!state.gcodeLines.length) {
+    state.toolpathSegments = [];
+    state.totalMoves = 0;
+    state.totalRapids = 0;
+    state.progLimits = null;
+    renderProgLimits();
+    return;
+  }
+
   const result = parseGcodeToToolpath(state.gcodeLines);
   state.toolpathSegments = result.segments;
   state.totalMoves = result.cutCount;
@@ -84,9 +107,8 @@ export function processGcode(text: string, name: string): void {
   (document.getElementById('btnStart') as HTMLButtonElement).disabled = false;
   document.getElementById('vpStats')!.innerHTML =
     `X: 0.000&nbsp;&nbsp;Y: 0.000&nbsp;&nbsp;Z: 0.000<br>CUTS: ${state.totalMoves}&nbsp;&nbsp;RAPIDS: ${state.totalRapids}`;
-  log('info', 'Loaded: ' + name + ' (' + state.gcodeLines.length + ' lines, ' + state.totalMoves + ' cuts, ' + state.totalRapids + ' rapids)');
 
-  computeProgLimits(text);
+  computeProgLimits(state.gcodeLines.join('\n'));
 }
 
 export function updateProgress(cur: number, total: number): void {
@@ -99,37 +121,134 @@ export function updateProgress(cur: number, total: number): void {
 // PROGRAM LIMITS
 // ═══════════════════════════════════════════════
 
-export function computeProgLimits(rawText: string): void {
-  const stripped = rawText.replace(/\(.*?\)/g, ' ').replace(/;[^\n]*/g, ' ');
-  const xVals: number[] = [], yVals: number[] = [], zVals: number[] = [];
+function makeAxisAcc() {
+  return { xMin: 0, xMax: 0, yMin: 0, yMax: 0, zMin: 0, zMax: 0, hasX: false, hasY: false, hasZ: false };
+}
 
-  const re = /([XYZ])([+-]?\.?\d+\.?\d*)/gi;
-  let m;
-  while ((m = re.exec(stripped)) !== null) {
-    const axis = m[1].toUpperCase();
-    const val = parseFloat(m[2]);
-    if (isNaN(val)) continue;
-    if (axis === 'X') xVals.push(val);
-    else if (axis === 'Y') yVals.push(val);
-    else if (axis === 'Z') zVals.push(val);
+function updateAxisAcc(acc: any, axis: string, val: number): void {
+  if (axis === 'X') {
+    if (!acc.hasX) { acc.xMin = acc.xMax = val; acc.hasX = true; }
+    else { if (val < acc.xMin) acc.xMin = val; if (val > acc.xMax) acc.xMax = val; }
+  } else if (axis === 'Y') {
+    if (!acc.hasY) { acc.yMin = acc.yMax = val; acc.hasY = true; }
+    else { if (val < acc.yMin) acc.yMin = val; if (val > acc.yMax) acc.yMax = val; }
+  } else if (axis === 'Z') {
+    if (!acc.hasZ) { acc.zMin = acc.zMax = val; acc.hasZ = true; }
+    else { if (val < acc.zMin) acc.zMin = val; if (val > acc.zMax) acc.zMax = val; }
+  }
+}
+
+function finalizeAxisAcc(acc: any): any {
+  return {
+    xMin: acc.hasX ? acc.xMin : 0,
+    xMax: acc.hasX ? acc.xMax : 0,
+    yMin: acc.hasY ? acc.yMin : 0,
+    yMax: acc.hasY ? acc.yMax : 0,
+    zMin: acc.hasZ ? acc.zMin : 0,
+    zMax: acc.hasZ ? acc.zMax : 0,
+    hasX: acc.hasX,
+    hasY: acc.hasY,
+    hasZ: acc.hasZ,
+  };
+}
+
+function collectOverallLimitsFromToolpath(): any | null {
+  if (!state.toolpathSegments.length) return null;
+  const acc = makeAxisAcc();
+  for (const seg of state.toolpathSegments) {
+    for (const pt of [seg.from, seg.to]) {
+      updateAxisAcc(acc, 'X', pt.x);
+      updateAxisAcc(acc, 'Y', -pt.z);
+      updateAxisAcc(acc, 'Z', pt.y);
+    }
+  }
+  return finalizeAxisAcc(acc);
+}
+
+function collectPerWcsLimits(rawText: string): { order: string[]; perWcs: Record<string, any> } {
+  const perWcsAcc: Record<string, any> = {};
+  const order: string[] = [];
+  let activeWcs = state.activeWcs || 'G54';
+
+  const ensureWcs = (code: string) => {
+    if (!perWcsAcc[code]) {
+      perWcsAcc[code] = makeAxisAcc();
+      order.push(code);
+    }
+    return perWcsAcc[code];
+  };
+
+  for (const raw of rawText.split('\n')) {
+    const line = raw.replace(/;.*/, '').replace(/\(.*?\)/g, '').trim().toUpperCase();
+    if (!line) continue;
+
+    const gWords: number[] = [];
+    const re = /([A-Z])([+-]?[\d.]+)/g;
+    let m;
+    while ((m = re.exec(line)) !== null) {
+      const code = m[1].toUpperCase();
+      const val = parseFloat(m[2]);
+      if (code === 'G') gWords.push(val);
+    }
+
+    for (const g of gWords) {
+      const wcs = WCS_CODES[String(g)];
+      if (wcs) activeWcs = wcs;
+    }
+
+    const axisRe = /([XYZ])([+-]?\.?\d+\.?\d*)/gi;
+    let sawAxis = false;
+    while ((m = axisRe.exec(line)) !== null) {
+      const axis = m[1].toUpperCase();
+      const val = parseFloat(m[2]);
+      if (isNaN(val)) continue;
+      updateAxisAcc(ensureWcs(activeWcs), axis, val);
+      sawAxis = true;
+    }
+
+    if (gWords.some(g => !!WCS_CODES[String(g)]) && !sawAxis) ensureWcs(activeWcs);
   }
 
-  if (!xVals.length && !yVals.length && !zVals.length) {
+  const perWcs: Record<string, any> = {};
+  for (const code of order) perWcs[code] = finalizeAxisAcc(perWcsAcc[code]);
+  return { order, perWcs };
+}
+
+function getLimitsTabs(): { id: string; label: string; stats: any; frameable: boolean }[] {
+  if (!state.progLimits) return [];
+  const tabs = [{ id: 'overall', label: 'Overall', stats: state.progLimits.overall, frameable: false }];
+  for (const code of state.progLimits.order || []) {
+    const stats = state.progLimits.perWcs?.[code];
+    if (stats) tabs.push({ id: code, label: code, stats, frameable: true });
+  }
+  return tabs;
+}
+
+function getSelectedLimitsTab(): { id: string; label: string; stats: any; frameable: boolean } | null {
+  const tabs = getLimitsTabs();
+  if (!tabs.length) return null;
+  const ids = tabs.map(t => t.id);
+  if (!ids.includes(state.progLimitsTab)) {
+    if ((state.progLimits.order || []).includes(state.activeWcs)) state.progLimitsTab = state.activeWcs;
+    else state.progLimitsTab = tabs[0].id;
+  }
+  return tabs.find(t => t.id === state.progLimitsTab) || tabs[0];
+}
+
+export function computeProgLimits(rawText: string): void {
+  const { order, perWcs } = collectPerWcsLimits(rawText);
+  const overall = collectOverallLimitsFromToolpath();
+
+  if (!overall && !order.length) {
     state.progLimits = null;
     renderProgLimits();
     return;
   }
 
   state.progLimits = {
-    xMin: xVals.length ? Math.min(...xVals) : 0,
-    xMax: xVals.length ? Math.max(...xVals) : 0,
-    yMin: yVals.length ? Math.min(...yVals) : 0,
-    yMax: yVals.length ? Math.max(...yVals) : 0,
-    zMin: zVals.length ? Math.min(...zVals) : 0,
-    zMax: zVals.length ? Math.max(...zVals) : 0,
-    hasX: xVals.length > 0,
-    hasY: yVals.length > 0,
-    hasZ: zVals.length > 0,
+    overall: overall || (order[0] ? perWcs[order[0]] : null),
+    perWcs,
+    order,
   };
 
   renderProgLimits();
@@ -138,24 +257,55 @@ export function computeProgLimits(rawText: string): void {
 export function renderProgLimits(): void {
   const emptyEl = document.getElementById('limitsEmpty');
   const contentEl = document.getElementById('limitsContent');
+  const tabsEl = document.getElementById('limitsTabs');
   const frameBtn = document.getElementById('limitsFrameBtn') as HTMLButtonElement | null;
   if (!emptyEl || !contentEl) return;
 
-  if (!state.progLimits) {
+  if (!state.progLimits || !state.progLimits.overall) {
     emptyEl.style.display = '';
     contentEl.style.display = 'none';
-    if (frameBtn) frameBtn.disabled = true;
+    if (tabsEl) tabsEl.innerHTML = '';
+    if (frameBtn) {
+      frameBtn.disabled = true;
+      frameBtn.textContent = '⬛ FRAME PROGRAM';
+      frameBtn.title = '';
+    }
     return;
   }
 
   emptyEl.style.display = 'none';
   contentEl.style.display = '';
-  if (frameBtn) frameBtn.disabled = !state.connected;
+
+  const tabs = getLimitsTabs();
+  const selected = getSelectedLimitsTab();
+  if (!selected) return;
+
+  if (tabsEl) {
+    tabsEl.style.display = tabs.length > 1 ? '' : 'none';
+    tabsEl.innerHTML = '';
+    for (const tab of tabs) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'limits-tab' + (tab.id === selected.id ? ' active' : '');
+      btn.textContent = tab.label;
+      btn.addEventListener('click', () => {
+        state.progLimitsTab = tab.id;
+        renderProgLimits();
+      });
+      tabsEl.appendChild(btn);
+    }
+  }
+
+  if (frameBtn) {
+    frameBtn.disabled = !state.connected || !selected.frameable;
+    frameBtn.textContent = selected.frameable ? `⬛ FRAME ${selected.id}` : '⬛ FRAME PROGRAM';
+    frameBtn.title = selected.frameable ? `Frame limits for ${selected.id}` : 'Select a WCS tab to frame that program section';
+  }
 
   const fmt = (v: number) => v.toFixed(3);
   const span = (mn: number, mx: number) => (mx - mn).toFixed(3);
   const dash = '—';
-  const p = state.progLimits;
+  const p = selected.stats;
 
   document.getElementById('limXMin')!.textContent = p.hasX ? fmt(p.xMin) : dash;
   document.getElementById('limXMax')!.textContent = p.hasX ? fmt(p.xMax) : dash;
@@ -167,7 +317,6 @@ export function renderProgLimits(): void {
   document.getElementById('limZMax')!.textContent = p.hasZ ? fmt(p.zMax) : dash;
   document.getElementById('limZSpan')!.textContent = p.hasZ ? span(p.zMin, p.zMax) : dash;
 
-  // ── Populate Safe Z reference dropdown ─────────────────────────────────────
   const sel = document.getElementById('limitsSafeZRef') as HTMLSelectElement | null;
   if (sel) {
     const prev = sel.value;
@@ -179,7 +328,6 @@ export function renderProgLimits(): void {
       opt.textContent = entry.code;
       sel.appendChild(opt);
     }
-    // Restore previous selection if still valid
     if (prev && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
   }
 }
@@ -196,13 +344,14 @@ function checkAbsoluteBounds(coords: { axis: string; absVal: number }[]): string
 }
 
 export function frameProgram(): void {
-  if (!state.connected || !state.progLimits) return;
+  const selected = getSelectedLimitsTab();
+  if (!state.connected || !selected || !selected.frameable) return;
   const safeZ = parseFloat((document.getElementById('limitsSafeZ') as HTMLInputElement).value);
   if (isNaN(safeZ)) { log('err', 'Frame: invalid Safe Z value'); return; }
 
   const ref = (document.getElementById('limitsSafeZRef') as HTMLSelectElement)?.value || 'absolute';
-  const off = state.wcsOffsets[state.activeWcs] || { x: 0, y: 0, z: 0 };
-  const { xMin, xMax, yMin, yMax } = state.progLimits;
+  const off = state.wcsOffsets[selected.id] || { x: 0, y: 0, z: 0 };
+  const { xMin, xMax, yMin, yMax } = selected.stats;
 
   // Compute absolute machine coords for all frame corners
   const absXMin = xMin + off.x;
@@ -245,7 +394,7 @@ export function frameProgram(): void {
 
   const f = (v: number) => v.toFixed(4);
 
-  log('info', `Framing program — X[${xMin.toFixed(3)} → ${xMax.toFixed(3)}] Y[${yMin.toFixed(3)} → ${yMax.toFixed(3)}] SafeZ:${safeZ} (${ref})`);
+  log('info', `Framing ${selected.id} — X[${xMin.toFixed(3)} → ${xMax.toFixed(3)}] Y[${yMin.toFixed(3)} → ${yMax.toFixed(3)}] SafeZ:${safeZ} (${ref})`);
 
   sendCmd(zCmd);
   sendCmd(`G0 X${f(xMin)} Y${f(yMin)}`);

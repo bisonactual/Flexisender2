@@ -76,6 +76,7 @@ export const state = {
 
   // Program limits
   progLimits: null as any,
+  progLimitsTab: 'overall' as string,
 
   // Console
   conLines: 0,

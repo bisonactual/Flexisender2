@@ -67,10 +67,16 @@ export function offsetsIntercept(raw: string): boolean {
   return true;
 }
 
+function refreshLoadedProgramPreviewIfNeeded(): void {
+  if (!state.gcodeLines.length) return;
+  import('./gcode').then(g => g.refreshLoadedProgramPreview());
+}
+
 export function offsetsInterceptOk(): void {
   if (state.wcsPhase === 'loading') {
     state.wcsPhase = 'idle';
     renderOffsetsTable();
+    refreshLoadedProgramPreviewIfNeeded();
   }
 }
 
@@ -236,6 +242,7 @@ function writeOffset(code: string): void {
 
   // Update local state and re-render
   state.wcsOffsets[code] = { x: vals.x, y: vals.y, z: vals.z };
+  refreshLoadedProgramPreviewIfNeeded();
   const row = document.querySelector<HTMLElement>(`tr[data-code="${code}"]`);
   if (row) row.classList.remove('wcs-dirty');
   log('info', `Offset written: ${code} X${vals.x.toFixed(3)} Y${vals.y.toFixed(3)} Z${vals.z.toFixed(3)}`);
@@ -257,6 +264,7 @@ function zeroOffset(code: string): void {
   }
   state.wcsOffsets[code] = { x: 0, y: 0, z: 0 };
   renderOffsetsTable();
+  refreshLoadedProgramPreviewIfNeeded();
   log('info', `Offset zeroed: ${code}`);
   setTimeout(() => loadOffsets(), 300);
 }
@@ -276,6 +284,7 @@ function setToCurrentPos(code: string): void {
 
   state.wcsOffsets[code] = { x, y, z };
   renderOffsetsTable();
+  refreshLoadedProgramPreviewIfNeeded();
   log('info', `Offset set to machine pos: ${code} X${x.toFixed(3)} Y${y.toFixed(3)} Z${z.toFixed(3)}`);
   setTimeout(() => loadOffsets(), 300);
 }
